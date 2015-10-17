@@ -9,7 +9,9 @@
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
-    </activity>-->
+    </activity>
+    -->
+
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -27,8 +29,11 @@
             android:label="@string/title_activity_login" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".activities.MainActivity" >
         </activity>
     </application>
 

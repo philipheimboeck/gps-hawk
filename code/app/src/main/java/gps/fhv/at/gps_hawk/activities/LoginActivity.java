@@ -3,6 +3,7 @@ package gps.fhv.at.gps_hawk.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
@@ -209,7 +210,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void loginFinished() {
+    /**
+     * Call when login is finished.
+     * Will close this activity and call the next one.
+     */
+    private void loginFinished() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
         finish();
     }
 
