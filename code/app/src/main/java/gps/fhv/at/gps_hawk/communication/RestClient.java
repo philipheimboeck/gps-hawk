@@ -4,11 +4,18 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 
@@ -69,6 +76,78 @@ public class RestClient {
         return answer;
     }
 
+    public HTTPAnswer post(URL url, HashMap<String, String> params) throws IOException, NoConnectionException {
+        if (checkConnection()) {
+            throw new NoConnectionException();
+        }
+
+        InputStream inputStream = null;
+        HttpURLConnection connection = null;
+        HTTPAnswer answer = null;
+
+        try {
+            connection = createConnection(url, "POST");
+
+            // Start the query
+            connection.connect();
+
+            // Send the data
+            OutputStream os = connection.getOutputStream();
+            BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(os, "UTF-8"));
+            writer.write(getPostDataString(params));
+
+            writer.flush();
+            writer.close();
+            os.close();
+
+            // Get the response code
+            answer = new HTTPAnswer();
+            answer.responseCode = connection.getResponseCode();
+
+            // Get the content
+            inputStream = connection.getInputStream();
+            answer.content = getContent(inputStream);
+
+        } finally {
+
+            // Close stream and connection
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+
+        return answer;
+    }
+
+    /**
+     * Returns an encoded data string
+     * @param params The params to encode
+     * @return The data string
+     * @throws UnsupportedEncodingException
+     */
+    private String getPostDataString(Map<String, String> params) throws UnsupportedEncodingException {
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                result.append("&");
+            }
+
+            result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+            result.append("=");
+            result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        }
+
+        return result.toString();
+    }
+
     /**
      * Returns the content of the input stream
      *
@@ -119,6 +198,7 @@ public class RestClient {
         connection.setConnectTimeout(10000);
         connection.setRequestMethod(method);
         connection.setDoInput(true);
+        connection.setDoOutput(true);
 
         return connection;
     }

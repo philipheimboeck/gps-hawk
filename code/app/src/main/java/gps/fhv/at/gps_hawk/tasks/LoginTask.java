@@ -10,11 +10,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import javax.security.auth.login.LoginException;
-
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
 import gps.fhv.at.gps_hawk.communication.LoginTestClient;
+import gps.fhv.at.gps_hawk.exceptions.LoginException;
 
 /**
  * Represents an asynchronous login/registration task used to authenticate
@@ -45,6 +44,7 @@ public class LoginTask extends AsyncTask<Void, Void, String> {
             return loginClient.login(mUser, mPassword, mAndroidId);
 
         } catch (LoginException e) {
+            
             e.printStackTrace();
 
             return null;

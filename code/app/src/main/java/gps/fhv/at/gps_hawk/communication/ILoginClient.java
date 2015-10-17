@@ -1,7 +1,6 @@
 package gps.fhv.at.gps_hawk.communication;
 
-import javax.security.auth.login.LoginException;
-
+import gps.fhv.at.gps_hawk.exceptions.LoginException;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
 
 /**
