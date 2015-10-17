@@ -19,8 +19,19 @@ public class LoginTestClient implements ILoginClient {
     }
 
     @Override
-    public void register(String username, String password) throws RegistrationException {
-        throw new RegistrationException("Not implemented!");
+    public String register(String username, String password, String deviceID) throws RegistrationException {
+        if(username.equals(USER) ) {
+            throw new RegistrationException("Already existing user!");
+        }
+
+        // Simulate network access.
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return TOKEN;
     }
 
     @Override

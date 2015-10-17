@@ -22,10 +22,11 @@ public interface ILoginClient {
      *
      * @param username
      * @param password
+     * @param deviceID
      * @return Authentication Token
      * @throws RegistrationException
      */
-    void register(String username, String password) throws RegistrationException;
+    String register(String username, String password, String deviceID) throws RegistrationException;
 
     /**
      * Login as the user

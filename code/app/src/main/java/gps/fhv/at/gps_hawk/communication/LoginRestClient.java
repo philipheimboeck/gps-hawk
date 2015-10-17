@@ -47,7 +47,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     }
 
     @Override
-    public void register(String username, String password) throws RegistrationException {
+    public String register(String username, String password, String deviceID) throws RegistrationException {
         try {
             String urlString = REST_USER_REGISTER;
             URL url = new URL(urlString);
@@ -55,11 +55,14 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
             params.put("password", password);
+            params.put("deviceID", deviceID);
 
             HTTPAnswer answer = post(url, params);
             if (answer.responseCode != 200) {
                 throw new RegistrationException("Registration was not successful!");
             }
+
+            return answer.content;
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");

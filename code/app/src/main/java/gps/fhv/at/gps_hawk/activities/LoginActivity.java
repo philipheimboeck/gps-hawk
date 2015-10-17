@@ -4,12 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
-
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -17,16 +16,16 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.helper.TokenHelper;
 import gps.fhv.at.gps_hawk.tasks.CheckUserTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.LoginTask;
+import gps.fhv.at.gps_hawk.tasks.RegisterTask;
 
 /**
  * A login screen that offers login via email/password.
@@ -43,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private LoginTask mAuthTask = null;
+    private AsyncTask<Void, Void, String> mAuthTask = null;
     private CheckUserTask mCheckUserTask = null;
 
     // Define the login Action
@@ -59,15 +58,16 @@ public class LoginActivity extends AppCompatActivity {
     private View mLoginPasswordsFormView;
     private Button mCheckUserButton;
 
+    private TokenHelper mTokenHelper = new TokenHelper(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         // Check for valid token to skip login process
-        SharedPreferences preferences = getSharedPreferences(Constants.PREFERENCES, MODE_PRIVATE);
-        String token = preferences.getString(Constants.PREF_DEVICE_TOKEN, null);
-        if(token != null) {
+        String token = mTokenHelper.getToken();
+        if (token != null) {
             loginFinished();
         }
 
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void checkUser() {
-        if(mCheckUserTask != null) {
+        if (mCheckUserTask != null) {
             return;
         }
 
@@ -265,21 +265,25 @@ public class LoginActivity extends AppCompatActivity {
             // perform the user login attempt.
             showProgress(true);
 
-            if(mLoginAction == LoginAction.LOGIN) {
-                // Start the login action
-                startLoginAction(user, password);
+            // Get the Android ID
+            String androidId = Settings.Secure.getString(getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+
+            // Start the action
+            if (mLoginAction == LoginAction.LOGIN) {
+                // Start the login task
+                startLoginAction(user, password, androidId);
             } else {
-                startRegistrationAction(user, password);
+                // Start the registration task
+                startRegistrationAction(user, password, androidId);
             }
 
         }
     }
 
-    private void startLoginAction(String user, String password) {
-        String android_id = Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ANDROID_ID);
+    private void startLoginAction(String user, String password, String androidId) {
 
-        mAuthTask = new LoginTask(user, password, android_id, new IAsyncTaskCaller<Void, Boolean>() {
+        mAuthTask = new LoginTask(user, password, androidId, new IAsyncTaskCaller<Void, Boolean>() {
             @Override
             public void onPostExecute(Boolean success) {
                 mAuthTask = null;
@@ -308,13 +312,41 @@ public class LoginActivity extends AppCompatActivity {
             public void onPreExecute() {
 
             }
-        }, this);
+        }, mTokenHelper);
 
         mAuthTask.execute();
     }
 
-    private void startRegistrationAction(String user, String password) {
+    private void startRegistrationAction(String user, String password, String androidId) {
+        mAuthTask = new RegisterTask(user, password, androidId, new IAsyncTaskCaller<Void, Boolean>() {
+            @Override
+            public void onPostExecute(Boolean success) {
+                mAuthTask = null;
+                showProgress(false);
 
+                if (success) {
+                    loginFinished();
+                }
+            }
+
+            @Override
+            public void onCancelled() {
+                mAuthTask = null;
+                showProgress(false);
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
+            }
+        }, mTokenHelper);
+
+        mAuthTask.execute();
     }
 
     /**
