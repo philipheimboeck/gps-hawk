@@ -27,7 +27,12 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     }
 
     @Override
-    public void login(String username, String password, String deviceID) throws LoginException {
+    public String login(String username, String password, String deviceID) throws LoginException {
+        return null;
+    }
 
+    @Override
+    public boolean tokenValid(String token) {
+        return false;
     }
 }

@@ -12,6 +12,7 @@ public class LoginTestClient implements ILoginClient {
 
     private static final String USER = "user";
     private static final String PASS = "pass";
+    private static final String TOKEN = "token";
 
     @Override
     public boolean userExists(String username) {
@@ -24,8 +25,8 @@ public class LoginTestClient implements ILoginClient {
     }
 
     @Override
-    public void login(String username, String password, String deviceID) throws LoginException {
-        if(!username.equals(USER) || password.equals(PASS) ) {
+    public String login(String username, String password, String deviceID) throws LoginException {
+        if(!username.equals(USER) || !password.equals(PASS) ) {
             throw new LoginException("Wrong Credentials!");
         }
 
@@ -35,5 +36,12 @@ public class LoginTestClient implements ILoginClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        return TOKEN;
+    }
+
+    @Override
+    public boolean tokenValid(String token) {
+        return token.equals(TOKEN);
     }
 }
