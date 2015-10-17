@@ -50,6 +50,7 @@ public class RestClient {
 
         try {
             connection = createConnection(url, "GET");
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
             // Start the query
             connection.connect();
@@ -87,6 +88,7 @@ public class RestClient {
 
         try {
             connection = createConnection(url, "POST");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
 
             // Start the query
             connection.connect();
@@ -193,7 +195,6 @@ public class RestClient {
     private HttpURLConnection createConnection(URL url, String method) throws IOException {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
         connection.setReadTimeout(5000);
         connection.setConnectTimeout(10000);
         connection.setRequestMethod(method);
