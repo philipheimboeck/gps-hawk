@@ -18,7 +18,13 @@ import android.widget.Toast;
 
 import java.security.Provider;
 
+import com.google.android.gms.maps.GoogleMap;
 import gps.fhv.at.gps_hawk.Constants;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
 import gps.fhv.at.gps_hawk.services.GpsSvc;
@@ -28,6 +34,7 @@ public class CaptureFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private GpsSvc mGpsService;
+    private MapFragment mMapFragment;
     private LocationManager locationManager;
 
     public CaptureFragment() {
@@ -80,8 +87,20 @@ public class CaptureFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_capture, container, false);
+        View view = inflater.inflate(R.layout.fragment_capture, container, false);
+
+        mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mMapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            }
+        });
+
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
