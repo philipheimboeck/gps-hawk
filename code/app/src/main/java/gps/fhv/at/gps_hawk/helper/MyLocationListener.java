@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +34,7 @@ public class MyLocationListener implements LocationListener {
         Log.v("Debug", longitude);
         String latitude = "Latitude: " + loc.getLatitude();
         Log.v("Debug", latitude);
+        Toast.makeText(mContext,"lngChanged",Toast.LENGTH_LONG).show();
 
     /*----------to get City-Name from coordinates ------------- */
         String cityName = null;

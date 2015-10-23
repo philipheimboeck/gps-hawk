@@ -98,13 +98,16 @@ public class CaptureFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_capture, container, false);
 
         mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(new OnMapReadyCallback() {
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-                googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-            }
-        });
-
+        if ( mMapFragment != null ) {
+            mMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+                }
+            });
+        } else {
+            // Todo: maybe a permission issue?
+        }
 
         return view;
     }
