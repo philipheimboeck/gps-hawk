@@ -17,4 +17,8 @@
     <string name="action_check">Check</string>
     <string name="user_status_existing">User is existing. Please enter your password to login.</string>
     <string name="user_status_available">Username is available. Please enter a password to register.</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_capture">Capture GPS</string>
 </resources>
