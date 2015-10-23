@@ -7,6 +7,7 @@ package gps.fhv.at.gps_hawk;
 public class Constants {
     public static final String PREFERENCES = "gps.fhv.at.gps_hawk";
     public static final String PREF_DEVICE_TOKEN = "dev_token";
+    public static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 111;
 
     /**
      * GPS-Constants
