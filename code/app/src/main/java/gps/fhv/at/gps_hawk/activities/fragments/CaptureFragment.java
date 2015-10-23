@@ -8,12 +8,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import gps.fhv.at.gps_hawk.R;
 
 
 public class CaptureFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+    private MapFragment mMapFragment;
 
     public CaptureFragment() {
         // Required empty public constructor
@@ -27,8 +34,20 @@ public class CaptureFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_capture, container, false);
+        View view = inflater.inflate(R.layout.fragment_capture, container, false);
+
+        mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mMapFragment.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            }
+        });
+
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
