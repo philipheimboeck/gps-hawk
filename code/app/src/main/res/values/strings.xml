@@ -21,4 +21,6 @@
     <string name="navigation_capture">Capture GPS</string>
     <string name="start_tracking">Start Tracking</string>
     <string name="stop_tracking">Stop Tracking</string>
+
+    <string name="enable_gps_button">GPS is currently deactivated. Hit \'Enable\' to go to android-settings to enable it.</string>
 </resources>

@@ -1,8 +1,11 @@
 package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -63,26 +66,46 @@ public class CaptureFragment extends Fragment {
             // for Activity#requestPermissions for more details.
         }
 
-        LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-//        mGpsService = new GpsSvc(locationManager,getActivity().getApplicationContext());
-//        boolean gpsRS = mGpsService.initialize();
-//        if ( !gpsRS ) {
-//            Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//            startActivity(i);
-//        }
-
-        myLocationListener = new MyLocationListener(getActivity().getApplicationContext());
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+        mGpsService = new GpsSvc(locationManager,getActivity().getApplicationContext());
+        boolean gpsRS = mGpsService.initialize();
+        if ( !gpsRS ) {
+            showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
         }
+//        } else {
+//
+//            myLocationListener = new MyLocationListener(getActivity().getApplicationContext());
+//
+//            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
+//            } else {
+//                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
+//            }
+//        }
 
 //        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,myLocationListener,null);
 
     }
+
+    protected void showMessageBox(Context context, String message, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(R.string.app_name);
+        dlgAlert.setPositiveButton("Enable", null);
+        dlgAlert.setCancelable(true);
+
+        if (listener != null) dlgAlert.setPositiveButton(R.string.enable_gps_button, listener);
+
+        dlgAlert.create().show();
+    }
+
 
 
     @Override

@@ -12,109 +12,93 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.domain.Position;
+import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.helper.MyLocationListener;
 
 /**
  * Created by Tobias on 23.10.2015.
  */
-public class GpsSvc {
+public class GpsSvc implements IGpsSvc {
 
     private LocationManager mLocationManager;
     private Context mContext;
     private LocationListener mLocationListener;
+    private List<Waypoint> mListWaypoints;
 
     public GpsSvc(LocationManager locationManager, Context context) {
         mLocationManager = locationManager;
         mContext = context;
+        mListWaypoints = new ArrayList<>();
     }
 
     public boolean initialize() {
 
-        mLocationListener = new MyLocationListener();
+        mLocationListener = new MyLocationListener(mContext, this);
 
         if (!isGpsAvailable()) {
-//            Toast.makeText(mContext, "Bitte GPS einschalten", Toast.LENGTH_LONG);
             return false;
         } else {
             startGpsTracking();
             return true;
         }
 
-
     }
 
-    private void startGpsTracking() {
+    public void startGpsTracking() {
 
-        //noinspection ResourceType
-//        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MIN_TIME, Constants.MIN_DIST_CHANGE, mLocationListener);
-//noinspection ResourceType
-        mLocationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLocationListener, null);
+        try {
 
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        String provider = mLocationManager.getBestProvider(criteria, false);
+            //noinspection ResourceType
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MIN_TIME, Constants.MIN_DIST_CHANGE, mLocationListener);
 
-        @SuppressWarnings("ResourceType") Location location = mLocationManager.getLastKnownLocation(provider);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            String provider = mLocationManager.getBestProvider(criteria, false);
 
-        Toast.makeText(mContext,"ein Test",Toast.LENGTH_LONG);
-        if ( location != null ) {
-            Log.i("Debug: ", location.toString());
-        }
-    }
+            @SuppressWarnings("ResourceType")
+            Location location = mLocationManager.getLastKnownLocation(provider);
 
-    /*----------Listener class to get coordinates ------------- */
-    class MyLocationListener implements LocationListener {
-        @Override
-        public void onLocationChanged(Location loc) {
-
-/*
-            editLocation.setText("");
-            pb.setVisibility(View.INVISIBLE);
-*/
-
-            Toast.makeText(mContext, "Location changed : Lat: " + loc.getLatitude() + " Lng: " + loc.getLongitude(),
-                    Toast.LENGTH_SHORT).show();
-            String longitude = "Longitude: " + loc.getLongitude();
-            Log.v("Debug", longitude);
-            String latitude = "Latitude: " + loc.getLatitude();
-            Log.v("Debug", latitude);
-
-    /*----------to get City-Name from coordinates ------------- */
-            String cityName = null;
-            Geocoder gcd = new Geocoder(mContext, Locale.getDefault());
-            List<Address> addresses;
-            try {
-                addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-                if (addresses.size() > 0)
-                    System.out.println(addresses.get(0).getLocality());
-                cityName = addresses.get(0).getLocality();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (location != null) {
+                Log.i("Debug: ", location.toString());
             }
-
-            String s = longitude + "\n" + latitude + "\n\nMy Currrent City is: " + cityName;
-
-//            editLocation.setText(s);
+        } catch (Exception ex) {
+            Log.e("Debug", "Error at starting GpsTracking", ex);
         }
 
-        @Override
-        public void onProviderDisabled(String provider) {
-            Log.i("Location Listener", "Provider disabled");
-        }
+    }
 
-        @Override
-        public void onProviderEnabled(String provider) {
-            Log.i("Location Listener", "Provider enabled");
-        }
+    public void addNewLocation(Location location) {
+        Waypoint wp = new Waypoint();
+        Position p = new Position();
+        p.setLat(location.getLatitude());
+        p.setLng(location.getLongitude());
 
-        @Override
-        public void onStatusChanged(String provider,
-                                    int status, Bundle extras) {
-            Log.i("Location Listener", "onStatusChanged");
+        wp.setPosition(p);
+
+        mListWaypoints.add(wp);
+    }
+
+    /**
+     * Gets possible adresses from a location
+     *
+     * @param loc
+     * @return the address
+     */
+    protected List<Address> getAddress(Location loc) {
+        Geocoder gcd = new Geocoder(mContext, Locale.getDefault());
+        List<Address> addresses = new ArrayList<>();
+        try {
+            addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return addresses;
     }
 
 

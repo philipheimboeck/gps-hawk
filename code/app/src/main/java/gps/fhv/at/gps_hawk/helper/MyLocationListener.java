@@ -13,45 +13,28 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import gps.fhv.at.gps_hawk.services.IGpsSvc;
+
 /**
  * Created by Tobias on 23.10.2015.
  */
 public class MyLocationListener implements LocationListener {
     private Context mContext;
-    public MyLocationListener(Context context) {
+    private IGpsSvc mGpsSvc;
+
+    public MyLocationListener(Context context, IGpsSvc gpsSvc) {
         mContext = context;
+        mGpsSvc = gpsSvc;
     }
 
     @Override
     public void onLocationChanged(Location loc) {
 
-/*
-            editLocation.setText("");
-            pb.setVisibility(View.INVISIBLE);
-*/
-
-        String longitude = "Longitude: " + loc.getLongitude();
-        Log.v("Debug", longitude);
-        String latitude = "Latitude: " + loc.getLatitude();
-        Log.v("Debug", latitude);
-        Toast.makeText(mContext,"lngChanged",Toast.LENGTH_LONG).show();
-
-    /*----------to get City-Name from coordinates ------------- */
-        String cityName = null;
-        Geocoder gcd = new Geocoder(mContext, Locale.getDefault());
-        List<Address> addresses;
-        try {
-            addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
-            if (addresses.size() > 0)
-                System.out.println(addresses.get(0).getLocality());
-            cityName = addresses.get(0).getLocality();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if ( isSufficientLocation(loc)){
+            mGpsSvc.addNewLocation(loc);
         }
+        // else: throw away
 
-        String s = longitude + "\n" + latitude + "\n\nMy Currrent City is: " + cityName;
-
-//            editLocation.setText(s);
     }
 
     @Override
@@ -62,12 +45,22 @@ public class MyLocationListener implements LocationListener {
     @Override
     public void onProviderEnabled(String provider) {
         Log.i("Location Listener", "Provider enabled");
+        mGpsSvc.startGpsTracking();
     }
 
     @Override
-    public void onStatusChanged(String provider,
-                                int status, Bundle extras) {
+    public void onStatusChanged(String provider, int status, Bundle extras) {
         Log.i("Location Listener", "onStatusChanged");
     }
+
+    /**
+     * determines whether location can be used or not
+     * @param location
+     * @return
+     */
+    protected boolean isSufficientLocation(Location location) {
+        return true;
+    }
+
 }
 
