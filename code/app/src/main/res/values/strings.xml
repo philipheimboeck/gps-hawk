@@ -23,4 +23,5 @@
     <string name="stop_tracking">Stop Tracking</string>
 
     <string name="enable_gps_button">GPS is currently deactivated. Hit \'Enable\' to go to android-settings to enable it.</string>
+    <string name="enable_gps_button_positive">Enable</string>
 </resources>

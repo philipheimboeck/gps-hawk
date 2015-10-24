@@ -15,6 +15,7 @@ import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -36,6 +37,7 @@ public class CaptureFragment extends Fragment {
     private MapFragment mMapFragment;
     private LocationManager locationManager;
     private MyLocationListener myLocationListener;
+    private Button mButStartTracking;
 
     public CaptureFragment() {
         // Required empty public constructor
@@ -45,6 +47,7 @@ public class CaptureFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         /**
          * Todo
          * Test-Only
@@ -52,7 +55,7 @@ public class CaptureFragment extends Fragment {
         if (PermissionChecker.checkCallingOrSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS", Toast.LENGTH_LONG).show();
 
-            if(Build.VERSION.SDK_INT >= 23) {
+            if (Build.VERSION.SDK_INT >= 23) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
             }
 
@@ -66,11 +69,14 @@ public class CaptureFragment extends Fragment {
             // for Activity#requestPermissions for more details.
         }
 
+    }
+
+    private void handleButStart() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        mGpsService = new GpsSvc(locationManager,getActivity().getApplicationContext());
+        mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
         boolean gpsRS = mGpsService.initialize();
-        if ( !gpsRS ) {
-            showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), new DialogInterface.OnClickListener() {
+        if (!gpsRS) {
+            showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -78,34 +84,21 @@ public class CaptureFragment extends Fragment {
                 }
             });
         }
-//        } else {
-//
-//            myLocationListener = new MyLocationListener(getActivity().getApplicationContext());
-//
-//            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-//            } else {
-//                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-//            }
-//        }
-
-//        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,myLocationListener,null);
 
     }
 
-    protected void showMessageBox(Context context, String message, DialogInterface.OnClickListener listener) {
+    protected void showMessageBox(Context context, String message, String positiveText, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
         dlgAlert.setMessage(message);
         dlgAlert.setTitle(R.string.app_name);
-        dlgAlert.setPositiveButton("Enable", null);
+        dlgAlert.setPositiveButton(positiveText, null);
         dlgAlert.setCancelable(true);
 
-        if (listener != null) dlgAlert.setPositiveButton(R.string.enable_gps_button, listener);
+        if (listener != null) dlgAlert.setPositiveButton(positiveText, listener);
 
         dlgAlert.create().show();
     }
-
 
 
     @Override
@@ -114,14 +107,13 @@ public class CaptureFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_capture, container, false);
 
         mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if ( mMapFragment != null ) {
+        if (mMapFragment != null) {
             mMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
@@ -131,6 +123,14 @@ public class CaptureFragment extends Fragment {
         } else {
             // Todo: maybe a permission issue?
         }
+
+        mButStartTracking = (Button) view.findViewById(R.id.button_tracking);
+        mButStartTracking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleButStart();
+            }
+        });
 
         return view;
     }
