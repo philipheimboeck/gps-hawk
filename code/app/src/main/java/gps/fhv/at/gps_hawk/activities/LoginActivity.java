@@ -3,7 +3,10 @@ package gps.fhv.at.gps_hawk.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,8 +24,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
+import gps.fhv.at.gps_hawk.persistence.WaypointContract;
+import gps.fhv.at.gps_hawk.services.DbSetup;
 import gps.fhv.at.gps_hawk.tasks.CheckUserTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.LoginTask;
@@ -64,6 +73,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Create Database
+        dbSetup();
 
         // Check for valid token to skip login process
         String token = mTokenHelper.getToken();
@@ -135,6 +147,65 @@ public class LoginActivity extends AppCompatActivity {
         mLoginPasswordsFormView = findViewById(R.id.user_login_passwords_form);
         mProgressView = findViewById(R.id.login_progress);
         mUserStatusView = (TextView) findViewById(R.id.user_status_text);
+    }
+
+    private void dbSetup() {
+
+        try {
+            DbSetup mDbHelper = new DbSetup(this);
+            // Gets the data repository in write mode
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_NR_OF_SATTELITES, 2);
+            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME, DateHelper.toSql(Calendar.getInstance()));
+            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_POSITION_ID, 1);
+
+            // Insert the new row, returning the primary key value of the new row
+            long newRowId;
+            newRowId = db.insert(WaypointContract.WaypointEntry.TABLE_NAME, null, values);
+
+            dbReadWaypoints(mDbHelper);
+
+        } catch (Exception e) {
+            Log.e("FATAL", "dbSetup-Error: ", e);
+        }
+    }
+
+    private void dbReadWaypoints(DbSetup mDbHelper) {
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+// Define a projection that specifies which columns from the database
+// you will actually use after this query.
+        String[] projection = {
+                WaypointContract.WaypointEntry._ID,
+                WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME,
+                WaypointContract.WaypointEntry.COLUMN_NAME_POSITION_ID,
+                WaypointContract.WaypointEntry.COLUMN_NAME_NR_OF_SATTELITES
+        };
+
+// How you want the results sorted in the resulting Cursor
+        String sortOrder = WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME + " DESC";
+
+        Cursor c = db.query(
+                WaypointContract.WaypointEntry.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        c.moveToFirst();
+
+        int i = 0;
+        while (i < c.getCount()) {
+            String date = c.getString(c.getColumnIndexOrThrow(WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME));
+            Log.d("DEBUG: ", date);
+            c.moveToNext();
+            ++i;
+        }
     }
 
     private void checkUser() {

@@ -7,9 +7,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,6 +80,11 @@ public class GpsSvc implements IGpsSvc {
         wp.setPosition(p);
 
         mListWaypoints.add(wp);
+    }
+
+    @Override
+    public LocationManager getLocationManager() {
+        return mLocationManager;
     }
 
     /**

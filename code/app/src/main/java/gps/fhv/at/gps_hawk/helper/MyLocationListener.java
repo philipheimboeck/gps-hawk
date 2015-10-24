@@ -3,8 +3,11 @@ package gps.fhv.at.gps_hawk.helper;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.GpsSatellite;
+import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,7 +21,7 @@ import gps.fhv.at.gps_hawk.services.IGpsSvc;
 /**
  * Created by Tobias on 23.10.2015.
  */
-public class MyLocationListener implements LocationListener {
+public class MyLocationListener implements LocationListener, GpsStatus.Listener {
     private Context mContext;
     private IGpsSvc mGpsSvc;
 
@@ -62,5 +65,23 @@ public class MyLocationListener implements LocationListener {
         return true;
     }
 
+    /**
+     * Method is called to determine number os sattelites
+     * @param event
+     */
+    @Override
+    public void onGpsStatusChanged(int event) {
+        int satellites = 0;
+        int satellitesInFix = 0;
+        int timetofix = mGpsSvc.getLocationManager().getGpsStatus(null).getTimeToFirstFix();
+        Log.i("Debug", "Time to first fix = " + timetofix);
+        for (GpsSatellite sat : mGpsSvc.getLocationManager().getGpsStatus(null).getSatellites()) {
+            if(sat.usedInFix()) {
+                satellitesInFix++;
+            }
+            satellites++;
+        }
+        Log.i("Debug", satellites + " Used In Last Fix ("+satellitesInFix+")");
+    }
 }
 
