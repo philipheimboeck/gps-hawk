@@ -29,7 +29,7 @@ import java.util.Calendar;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
-import gps.fhv.at.gps_hawk.persistence.WaypointContract;
+import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.DbSetup;
 import gps.fhv.at.gps_hawk.tasks.CheckUserTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
@@ -157,13 +157,13 @@ public class LoginActivity extends AppCompatActivity {
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_NR_OF_SATTELITES, 2);
-            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME, DateHelper.toSql(Calendar.getInstance()));
-            values.put(WaypointContract.WaypointEntry.COLUMN_NAME_POSITION_ID, 1);
+            values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, 2);
+            values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(Calendar.getInstance()));
+            values.put(WaypointDef.COLUMN_NAME_POSITION_ID, 1);
 
             // Insert the new row, returning the primary key value of the new row
             long newRowId;
-            newRowId = db.insert(WaypointContract.WaypointEntry.TABLE_NAME, null, values);
+            newRowId = db.insert(WaypointDef.TABLE_NAME, null, values);
 
             dbReadWaypoints(mDbHelper);
 
@@ -175,20 +175,20 @@ public class LoginActivity extends AppCompatActivity {
     private void dbReadWaypoints(DbSetup mDbHelper) {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
-// Define a projection that specifies which columns from the database
-// you will actually use after this query.
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
         String[] projection = {
-                WaypointContract.WaypointEntry._ID,
-                WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME,
-                WaypointContract.WaypointEntry.COLUMN_NAME_POSITION_ID,
-                WaypointContract.WaypointEntry.COLUMN_NAME_NR_OF_SATTELITES
+                WaypointDef._ID,
+                WaypointDef.COLUMN_NAME_DATETIME,
+                WaypointDef.COLUMN_NAME_POSITION_ID,
+                WaypointDef.COLUMN_NAME_NR_OF_SATTELITES
         };
 
-// How you want the results sorted in the resulting Cursor
-        String sortOrder = WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME + " DESC";
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder = WaypointDef.COLUMN_NAME_DATETIME + " DESC";
 
         Cursor c = db.query(
-                WaypointContract.WaypointEntry.TABLE_NAME,  // The table to query
+                WaypointDef.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
                 null,                                // The columns for the WHERE clause
                 null,                            // The values for the WHERE clause
@@ -201,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
 
         int i = 0;
         while (i < c.getCount()) {
-            String date = c.getString(c.getColumnIndexOrThrow(WaypointContract.WaypointEntry.COLUMN_NAME_DATETIME));
+            String date = c.getString(c.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIME));
             Log.d("DEBUG: ", date);
             c.moveToNext();
             ++i;
