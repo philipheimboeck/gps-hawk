@@ -3,7 +3,10 @@ package gps.fhv.at.gps_hawk.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,8 +24,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
+import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
+import gps.fhv.at.gps_hawk.services.DbSetup;
 import gps.fhv.at.gps_hawk.tasks.CheckUserTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.LoginTask;
@@ -62,6 +71,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Create Database
+        dbSetup();
 
         // Check for valid token to skip login process
         String token = TokenHelper.getToken(this);
@@ -133,6 +145,15 @@ public class LoginActivity extends AppCompatActivity {
         mLoginPasswordsFormView = findViewById(R.id.user_login_passwords_form);
         mProgressView = findViewById(R.id.login_progress);
         mUserStatusView = (TextView) findViewById(R.id.user_status_text);
+    }
+
+    private void dbSetup() {
+        try {
+            DbSetup db = new DbSetup(this);
+            db.getWritableDatabase();
+        } catch (Exception e) {
+            Log.e("FATAL", "Could not create Database", e);
+        }
     }
 
     private void checkUser() {

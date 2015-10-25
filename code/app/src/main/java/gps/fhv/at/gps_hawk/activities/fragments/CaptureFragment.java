@@ -1,8 +1,11 @@
 package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -12,6 +15,7 @@ import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -33,6 +37,7 @@ public class CaptureFragment extends Fragment {
     private MapFragment mMapFragment;
     private LocationManager locationManager;
     private MyLocationListener myLocationListener;
+    private Button mButStartTracking;
 
     public CaptureFragment() {
         // Required empty public constructor
@@ -42,15 +47,19 @@ public class CaptureFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (PermissionChecker.checkCallingOrSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity(), "Please enable GPS", Toast.LENGTH_LONG).show();
+
+        /**
+         * Todo
+         * Test-Only
+         */
+        if (PermissionChecker.checkCallingOrSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS", Toast.LENGTH_LONG).show();
 
             if (Build.VERSION.SDK_INT >= 23) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
             }
 
             return;
-
             // TODO: Consider calling
             //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
             // here to request the missing permissions, and then overriding
@@ -58,73 +67,70 @@ public class CaptureFragment extends Fragment {
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for Activity#requestPermissions for more details.
-
-
-        } else {
-            addLocationListener();
         }
+
     }
 
-    /**
-     * Add an new location listener
-     */
-    private void addLocationListener() {
-
-        if (PermissionChecker.checkCallingOrSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
-//        mGpsService = new GpsSvc(locationManager,getActivity());
-//        boolean gpsRS = mGpsService.initialize();
-//        if ( !gpsRS ) {
-//            Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-//            startActivity(i);
-//        }
-
-            myLocationListener = new MyLocationListener(getActivity());
-
-
-            if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, myLocationListener);
-            } else {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocationListener);
-            }
+    private void handleButStart() {
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
+        boolean gpsRS = mGpsService.initialize();
+        if (!gpsRS) {
+            showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
         }
-//        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,myLocationListener,null);
+
+    }
+
+    protected void showMessageBox(Context context, String message, String positiveText, DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
+
+        dlgAlert.setMessage(message);
+        dlgAlert.setTitle(R.string.app_name);
+        dlgAlert.setPositiveButton(positiveText, null);
+        dlgAlert.setCancelable(true);
+
+        if (listener != null) dlgAlert.setPositiveButton(positiveText, listener);
+
+        dlgAlert.create().show();
     }
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        switch (requestCode) {
-            case Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addLocationListener();
-                } else {
-                    Toast.makeText(getActivity(), R.string.error_permission_location_required, Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                break;
-        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_capture, container, false);
 
         mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapFragment.getMapAsync(new OnMapReadyCallback() {
+        if (mMapFragment != null) {
+            mMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+                }
+            });
+        } else {
+            // Todo: maybe a permission issue?
+        }
+
+        mButStartTracking = (Button) view.findViewById(R.id.button_tracking);
+        mButStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onMapReady(GoogleMap googleMap) {
-                googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            public void onClick(View v) {
+                handleButStart();
             }
         });
-
 
         return view;
     }

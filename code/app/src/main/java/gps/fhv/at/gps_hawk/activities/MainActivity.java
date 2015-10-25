@@ -7,6 +7,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.fragments.CaptureFragment;
+import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
+import gps.fhv.at.gps_hawk.activities.fragments.SettingsFragment;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationItem;
 import gps.fhv.at.gps_hawk.activities.navigation.adapter.NavigationListAdapter;
 
@@ -27,9 +30,13 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
 
     // Fragments
     private CaptureFragment mCaptureFragment;
+    private ExportFragment mExportFragment;
+    private SettingsFragment mSettingsFragment;
 
     public MainActivity() {
         mCaptureFragment = new CaptureFragment();
+        mExportFragment = new ExportFragment();
+        mSettingsFragment = new SettingsFragment();
     }
 
     @Override
@@ -54,17 +61,23 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
     }
 
     private void populateNavigation() {
-        ArrayList<NavigationItem> navigationItems = new ArrayList<>();
-        navigationItems.add(new NavigationItem(mCaptureFragment, getString(R.string.navigation_capture), 0));
+        try {
+            ArrayList<NavigationItem> navigationItems = new ArrayList<>();
+            navigationItems.add(new NavigationItem(mCaptureFragment, getString(R.string.navigation_capture), 0));
+            navigationItems.add(new NavigationItem(mExportFragment, getString(R.string.navigation_export), 0));
+            navigationItems.add(new NavigationItem(mSettingsFragment, getString(R.string.navigation_settings), 0));
 
-        NavigationListAdapter adapter = new NavigationListAdapter(this, navigationItems);
-        mDrawerList = (ListView) mDrawerLayout.findViewById(R.id.navigation_list);
-        mDrawerList.setAdapter(adapter);
+            NavigationListAdapter adapter = new NavigationListAdapter(this, navigationItems);
+            mDrawerList = (ListView) mDrawerLayout.findViewById(R.id.navigation_list);
+            mDrawerList.setAdapter(adapter);
+        } catch (Exception e) {
+            Log.e("FATAL", "Error creating Navigation", e);
+        }
     }
 
     private void enableDrawerIcon() {
         // Enabling action bar app icon and let it behave as toggle button
-        if(getActionBar() != null) {
+        if (getActionBar() != null) {
             getActionBar().setDisplayHomeAsUpEnabled(true);
             getActionBar().setHomeButtonEnabled(true);
 
@@ -89,10 +102,11 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
 
     /**
      * Select Navigation Item
+     *
      * @param position The position of the item in the navigation list
      */
     private void selectItem(int position) {
-        NavigationItem item = (NavigationItem)mDrawerList.getItemAtPosition(position);
+        NavigationItem item = (NavigationItem) mDrawerList.getItemAtPosition(position);
         Fragment fragment = item.getFragment();
 
         // Replace the fragment
