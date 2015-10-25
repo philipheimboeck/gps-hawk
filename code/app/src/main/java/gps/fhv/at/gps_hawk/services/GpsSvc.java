@@ -72,12 +72,19 @@ public class GpsSvc implements IGpsSvc {
     }
 
     public void addNewLocation(Location location) {
+
         Waypoint wp = new Waypoint();
         Position p = new Position();
         p.setLat(location.getLatitude());
         p.setLng(location.getLongitude());
 
-        wp.setPosition(p);
+        DbFacade db = DbFacade.getInstance(mContext);
+
+        long id = db.saveEntity(p);
+
+        wp.setPositionId(id);
+
+        db.saveEntity(wp);
 
         mListWaypoints.add(wp);
     }
