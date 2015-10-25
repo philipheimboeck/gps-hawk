@@ -1,20 +1,12 @@
 package gps.fhv.at.gps_hawk.helper;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.services.IGpsSvc;
 

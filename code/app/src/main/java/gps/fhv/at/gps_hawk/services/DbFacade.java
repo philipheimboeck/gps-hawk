@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
+import gps.fhv.at.gps_hawk.domain.Position;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.broker.BrokerBase;
+import gps.fhv.at.gps_hawk.persistence.broker.PositionBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
@@ -28,17 +30,18 @@ public class DbFacade {
 
     static {
         mBrokerMap.put(Waypoint.class, new WaypointBroker());
+        mBrokerMap.put(Position.class, new PositionBroker());
     }
 
     public static DbFacade getInstance(Context context) {
-        if ( mInstance == null ) {
+        if (mInstance == null) {
             mInstance = new DbFacade(context);
         }
         return mInstance;
     }
 
     public static DbFacade getInstance() {
-        if ( mInstance == null ) {
+        if (mInstance == null) {
             throw new RuntimeException("DbFacade hasn't been initialized - First call needs context");
         }
         return mInstance;
@@ -102,6 +105,30 @@ public class DbFacade {
 
         }
         return listRet;
+    }
+
+    public int getCount(String tbl) {
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                "COUNT(*)"
+        };
+
+        Cursor c = getDb().query(
+                tbl,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                              // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        c.moveToFirst();
+
+        int ret = c.getInt(0);
+
+        return ret;
     }
 
 }

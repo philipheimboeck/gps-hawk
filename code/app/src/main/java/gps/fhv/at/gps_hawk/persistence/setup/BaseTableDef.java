@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 public abstract class BaseTableDef implements BaseColumns {
 
     protected static final String TYPE_TEXT = " TEXT";
-    protected static final String TYPE_INT = " TEXT";
+    protected static final String TYPE_INT = " INTEGER";
     protected static final String TYPE_DATETIME = " DATETIME";
     protected static final String COMMA_SEP = ",";
 
@@ -17,12 +17,6 @@ public abstract class BaseTableDef implements BaseColumns {
      * @return
      */
     protected abstract String getTableName();
-
-    /**
-     * Name of the PK-Column
-     * @return
-     */
-    protected abstract String getColumnId();
 
     /**
      * Gets the sql-statements for creating the columns
@@ -38,7 +32,7 @@ public abstract class BaseTableDef implements BaseColumns {
 
     public String getSqlCreateTable() {
         return "CREATE TABLE " + getTableName() + " (" +
-                _ID + " INTEGER PRIMARY KEY," +
+//                _ID + " INTEGER PRIMARY KEY NOT NULL," +
                 getSqlCreateColumns() +
                 " )";
     }

@@ -19,9 +19,12 @@
     <string name="user_status_available">Username is available. Please enter a password to register.</string>
 
     <string name="navigation_capture">Capture GPS</string>
+    <string name="navigation_export">Export Data</string>
     <string name="start_tracking">Start Tracking</string>
     <string name="stop_tracking">Stop Tracking</string>
 
     <string name="enable_gps_button">GPS is currently deactivated. Hit \'Enable\' to go to android-settings to enable it.</string>
     <string name="enable_gps_button_positive">Enable</string>
+    <string name="start_export">Export now</string>
+    <string name="amount_of_captured_waypoints">Amount of captured waypoints</string>
 </resources>

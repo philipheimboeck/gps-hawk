@@ -36,6 +36,7 @@ public class WaypointBroker extends BrokerBase {
 
         wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
         wp.setPositionId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_POSITION_ID)));
+        wp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

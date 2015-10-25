@@ -9,7 +9,6 @@ public class WaypointDef extends BaseTableDef {
     }
 
     public static final String TABLE_NAME = "waypoint";
-    public static final String PK_COL = "waypoint_id";
     public static final String COLUMN_NAME_NR_OF_SATTELITES = "nrOfSattelites";
     public static final String COLUMN_NAME_POSITION_ID = "position_id";
     public static final String COLUMN_NAME_DATETIME = "date_gps";
@@ -26,8 +25,4 @@ public class WaypointDef extends BaseTableDef {
         return TABLE_NAME;
     }
 
-    @Override
-    protected String getColumnId() {
-        return PK_COL;
-    }
 }

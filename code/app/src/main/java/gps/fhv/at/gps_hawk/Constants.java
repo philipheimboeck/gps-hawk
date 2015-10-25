@@ -13,5 +13,5 @@ public class Constants {
      * GPS-Constants
      */
     public static float MIN_DIST_CHANGE = 0.1F; // Minimum change in meters that needs to happen to get new coordinate
-    public static int MIN_TIME = 5; // Minimum time to report new coordinate
+    public static int MIN_TIME = 5000; // Minimum time to report new coordinate
 }

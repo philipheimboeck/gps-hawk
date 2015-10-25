@@ -6,7 +6,7 @@ package gps.fhv.at.gps_hawk.domain;
 public class Position extends DomainBase {
     private double _lng;
     private double _lat;
-    private int _id;
+    private long _id;
 
     public double getLng() {
         return _lng;
@@ -24,11 +24,11 @@ public class Position extends DomainBase {
         _lat = lat;
     }
 
-    public int getId() {
+    public long getId() {
         return _id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         _id = id;
     }
 }
