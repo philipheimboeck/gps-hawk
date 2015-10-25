@@ -1,11 +1,11 @@
 package gps.fhv.at.gps_hawk.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
 import gps.fhv.at.gps_hawk.communication.LoginTestClient;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
-import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Author: Philip Heimböck
@@ -16,15 +16,13 @@ public class RegisterTask extends AsyncTask<Void, Void, String> {
     private final String mUser;
     private final String mPassword;
     private final String mAndroidId;
-    private final TokenHelper mTokenHelper;
-    private final IAsyncTaskCaller<Void, Boolean> mCaller;
+    private final IAsyncTaskCaller<Void, String> mCaller;
 
-    public RegisterTask(final String user, final String password, final String androidId, IAsyncTaskCaller<Void, Boolean> mCaller, TokenHelper tokenHelper) {
+    public RegisterTask(final String user, final String password, final String androidId, IAsyncTaskCaller<Void, String> mCaller) {
         this.mUser = user;
         this.mPassword = password;
         this.mAndroidId = androidId;
         this.mCaller = mCaller;
-        this.mTokenHelper = tokenHelper;
     }
 
     @Override
@@ -42,13 +40,7 @@ public class RegisterTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(final String token) {
-
-        if (token != null) {
-            // Save token to settings
-            mTokenHelper.setToken(token);
-        }
-
-        mCaller.onPostExecute(token != null);
+        mCaller.onPostExecute(token);
     }
 
     @Override

@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:text="@string/start_tracking"
             android:id="@+id/button_tracking"
+            android:enabled="false"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"/>
 

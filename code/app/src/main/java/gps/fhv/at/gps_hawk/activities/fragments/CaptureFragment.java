@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.PermissionChecker;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,8 @@ import gps.fhv.at.gps_hawk.services.GpsSvc;
 
 public class CaptureFragment extends Fragment {
 
+    private boolean mPermissionsGranted = false;
+
     private OnFragmentInteractionListener mListener;
     private GpsSvc mGpsService;
     private MapFragment mMapFragment;
@@ -47,13 +50,12 @@ public class CaptureFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Check for permissions
+        mPermissionsGranted =
+                PermissionChecker.checkCallingOrSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
-        /**
-         * Todo
-         * Test-Only
-         */
-        if (PermissionChecker.checkCallingOrSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getActivity().getApplicationContext(), "Please enable GPS", Toast.LENGTH_LONG).show();
+        if (!mPermissionsGranted) {
+            Toast.makeText(getActivity(), "Please enable GPS", Toast.LENGTH_LONG).show();
 
             if (Build.VERSION.SDK_INT >= 23) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
@@ -73,7 +75,7 @@ public class CaptureFragment extends Fragment {
 
     private void handleButStart() {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
+        mGpsService = new GpsSvc(locationManager, getActivity());
         boolean gpsRS = mGpsService.initialize();
         if (!gpsRS) {
             showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
@@ -100,10 +102,23 @@ public class CaptureFragment extends Fragment {
         dlgAlert.create().show();
     }
 
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        switch (requestCode) {
+            case Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mPermissionsGranted = true;
+                    mButStartTracking.setEnabled(true);
+                } else {
+                    Toast.makeText(getActivity(), R.string.error_permission_location_required, Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+                break;
+        }
     }
 
     @Override
@@ -125,6 +140,7 @@ public class CaptureFragment extends Fragment {
         }
 
         mButStartTracking = (Button) view.findViewById(R.id.button_tracking);
+        mButStartTracking.setEnabled(mPermissionsGranted);
         mButStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
