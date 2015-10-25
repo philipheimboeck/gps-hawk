@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
 import gps.fhv.at.gps_hawk.communication.LoginTestClient;
 import gps.fhv.at.gps_hawk.exceptions.LoginException;
-import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Represents an asynchronous login/registration task used to authenticate
@@ -21,15 +20,13 @@ public class LoginTask extends AsyncTask<Void, Void, String> {
     private final String mUser;
     private final String mPassword;
     private final String mAndroidId;
-    private final IAsyncTaskCaller<Void, Boolean> mCaller;
-    private final TokenHelper mTokenHelper;
+    private final IAsyncTaskCaller<Void, String> mCaller;
 
-    public LoginTask(final String user, final String password, String androidId, final IAsyncTaskCaller<Void, Boolean> caller, TokenHelper tokenHelper) {
+    public LoginTask(final String user, final String password, String androidId, final IAsyncTaskCaller<Void, String> caller) {
         mUser = user;
         mPassword = password;
         mAndroidId = androidId;
         mCaller = caller;
-        mTokenHelper = tokenHelper;
     }
 
     @Override
@@ -48,13 +45,7 @@ public class LoginTask extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(final String token) {
-
-        if (token != null) {
-            // Save token to settings
-            mTokenHelper.setToken(token);
-        }
-
-        mCaller.onPostExecute(token != null);
+        mCaller.onPostExecute(token);
     }
 
     @Override

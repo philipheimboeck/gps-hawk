@@ -58,15 +58,13 @@ public class LoginActivity extends AppCompatActivity {
     private View mLoginPasswordsFormView;
     private Button mCheckUserButton;
 
-    private TokenHelper mTokenHelper = new TokenHelper(this);
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         // Check for valid token to skip login process
-        String token = mTokenHelper.getToken();
+        String token = TokenHelper.getToken(this);
         if (token != null) {
             loginFinished();
         }
@@ -283,13 +281,14 @@ public class LoginActivity extends AppCompatActivity {
 
     private void startLoginAction(String user, String password, String androidId) {
 
-        mAuthTask = new LoginTask(user, password, androidId, new IAsyncTaskCaller<Void, Boolean>() {
+        mAuthTask = new LoginTask(user, password, androidId, new IAsyncTaskCaller<Void, String>() {
             @Override
-            public void onPostExecute(Boolean success) {
+            public void onPostExecute(String token) {
                 mAuthTask = null;
                 showProgress(false);
 
-                if (success) {
+                if (token != null) {
+                    TokenHelper.setToken(getApplicationContext(), token);
                     loginFinished();
                 } else {
                     mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -312,19 +311,20 @@ public class LoginActivity extends AppCompatActivity {
             public void onPreExecute() {
 
             }
-        }, mTokenHelper);
+        });
 
         mAuthTask.execute();
     }
 
     private void startRegistrationAction(String user, String password, String androidId) {
-        mAuthTask = new RegisterTask(user, password, androidId, new IAsyncTaskCaller<Void, Boolean>() {
+        mAuthTask = new RegisterTask(user, password, androidId, new IAsyncTaskCaller<Void, String>() {
             @Override
-            public void onPostExecute(Boolean success) {
+            public void onPostExecute(String token) {
                 mAuthTask = null;
                 showProgress(false);
 
-                if (success) {
+                if (token != null) {
+                    TokenHelper.setToken(getApplicationContext(), token);
                     loginFinished();
                 }
             }
@@ -344,7 +344,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onPreExecute() {
 
             }
-        }, mTokenHelper);
+        });
 
         mAuthTask.execute();
     }
