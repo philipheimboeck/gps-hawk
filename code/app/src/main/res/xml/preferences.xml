@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference android:key="export_url"
+                        android:title="@string/txt_export_url"
+                        android:defaultValue="@string/txt_export_url_default" />
+</PreferenceScreen>

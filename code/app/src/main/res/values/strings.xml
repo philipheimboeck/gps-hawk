@@ -27,4 +27,7 @@
     <string name="enable_gps_button_positive">Enable</string>
     <string name="start_export">Export now</string>
     <string name="amount_of_captured_waypoints">Amount of captured waypoints</string>
+    <string name="txt_export_url">Export-URL:</string>
+    <string name="txt_export_url_default">http://intern.ts-maeder.at/application/debug/gps</string>
+    <string name="navigation_settings">Settings</string>
 </resources>

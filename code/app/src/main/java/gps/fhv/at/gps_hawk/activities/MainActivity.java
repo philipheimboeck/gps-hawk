@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.fragments.CaptureFragment;
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
+import gps.fhv.at.gps_hawk.activities.fragments.SettingsFragment;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationItem;
 import gps.fhv.at.gps_hawk.activities.navigation.adapter.NavigationListAdapter;
 
@@ -30,10 +31,12 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
     // Fragments
     private CaptureFragment mCaptureFragment;
     private ExportFragment mExportFragment;
+    private SettingsFragment mSettingsFragment;
 
     public MainActivity() {
         mCaptureFragment = new CaptureFragment();
         mExportFragment = new ExportFragment();
+        mSettingsFragment = new SettingsFragment();
     }
 
     @Override
@@ -62,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
             ArrayList<NavigationItem> navigationItems = new ArrayList<>();
             navigationItems.add(new NavigationItem(mCaptureFragment, getString(R.string.navigation_capture), 0));
             navigationItems.add(new NavigationItem(mExportFragment, getString(R.string.navigation_export), 0));
+            navigationItems.add(new NavigationItem(mSettingsFragment, getString(R.string.navigation_settings), 0));
 
             NavigationListAdapter adapter = new NavigationListAdapter(this, navigationItems);
             mDrawerList = (ListView) mDrawerLayout.findViewById(R.id.navigation_list);
