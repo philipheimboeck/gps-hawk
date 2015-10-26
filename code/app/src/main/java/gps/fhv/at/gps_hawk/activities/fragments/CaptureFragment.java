@@ -2,7 +2,6 @@ package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,7 +11,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.PermissionChecker;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,8 +21,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -37,7 +38,7 @@ public class CaptureFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private GpsSvc mGpsService;
-    private MapFragment mMapFragment;
+    private SupportMapFragment mMapFragment;
     private LocationManager locationManager;
     private MyLocationListener myLocationListener;
     private Button mButStartTracking;
@@ -121,22 +122,24 @@ public class CaptureFragment extends Fragment {
         }
     }
 
+
+    // Todo: Dirty Hack! Get rid of this static variable
+    private static View view;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_capture, container, false);
-
-        mMapFragment = (MapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        if (mMapFragment != null) {
-            mMapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    googleMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-                }
-            });
-        } else {
-            // Todo: maybe a permission issue?
+        // Todo: Dirty Hack! Shouldn't use nested fragments. CaptureFragment should therefore be an activity
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            // Inflate the layout for this fragment
+            view = inflater.inflate(R.layout.fragment_capture, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
         }
 
         mButStartTracking = (Button) view.findViewById(R.id.button_tracking);

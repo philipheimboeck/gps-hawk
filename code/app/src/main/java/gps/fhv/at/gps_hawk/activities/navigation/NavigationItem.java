@@ -1,6 +1,7 @@
 package gps.fhv.at.gps_hawk.activities.navigation;
 
-import android.app.Fragment;
+
+import android.support.v4.app.Fragment;
 
 /**
  * Author: Philip Heimböck

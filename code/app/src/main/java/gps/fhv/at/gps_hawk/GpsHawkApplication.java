@@ -17,6 +17,7 @@ public class GpsHawkApplication extends Application {
 
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
+                ex.printStackTrace();
                 Log.e("GpsHawkApplication", ex.getMessage());
             }
         });

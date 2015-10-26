@@ -1,8 +1,8 @@
 package gps.fhv.at.gps_hawk.activities;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.net.Uri;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -44,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Show first fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, mCaptureFragment).commit();
+
         // Find Views
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -60,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
         });
     }
 
+    /**
+     * Populate the navigation drawer with items
+     */
     private void populateNavigation() {
         try {
             ArrayList<NavigationItem> navigationItems = new ArrayList<>();
@@ -110,12 +117,25 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
         Fragment fragment = item.getFragment();
 
         // Replace the fragment
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, fragment).commit();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.fragment_placeholder, fragment)
+                .addToBackStack(fragment.getClass().getName())
+                .commit();
 
         // Highlight the selected item
         mDrawerList.setItemChecked(position, true);
         mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     /*
