@@ -13,8 +13,11 @@ import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.DbFacade;
+import gps.fhv.at.gps_hawk.tasks.ExportTask;
+import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -60,6 +63,34 @@ public class ExportFragment extends Fragment {
         if ( prefs.contains(key)) {
             String url = prefs.getString(key,"");
             Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+
+            ExportContext exportContext = new ExportContext();
+            exportContext.setUrl(url);
+            exportContext.setContext(getActivity());
+
+            ExportTask exportTask = new ExportTask(exportContext, new IAsyncTaskCaller<Void, Boolean>() {
+
+                @Override
+                public void onPostExecute(Boolean success) {
+
+                }
+
+                @Override
+                public void onCancelled() {
+
+                }
+
+                @Override
+                public void onProgressUpdate(Void... progress) {
+
+                }
+
+                @Override
+                public void onPreExecute() {
+
+                }
+            });
+            exportTask.execute();
         }
     }
 
