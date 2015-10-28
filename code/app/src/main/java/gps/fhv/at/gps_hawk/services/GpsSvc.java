@@ -18,6 +18,7 @@ import java.util.Locale;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.Position;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
 
 /**
@@ -27,7 +28,7 @@ public class GpsSvc implements IGpsSvc {
 
     private LocationManager mLocationManager;
     private Context mContext;
-    private LocationListener mLocationListener;
+    private MyLocationListener mLocationListener;
     private List<Waypoint> mListWaypoints;
 
     public GpsSvc(LocationManager locationManager, Context context) {
@@ -55,6 +56,7 @@ public class GpsSvc implements IGpsSvc {
 
             //noinspection ResourceType
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MIN_TIME, Constants.MIN_DIST_CHANGE, mLocationListener);
+            mLocationManager.addGpsStatusListener(mLocationListener);
 
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -72,7 +74,7 @@ public class GpsSvc implements IGpsSvc {
 
     }
 
-    public void addNewLocation(Location location) {
+    public void addNewLocation(Location location,NewLocationEventData data) {
 
         Waypoint wp = new Waypoint();
         Position p = new Position();
@@ -89,6 +91,7 @@ public class GpsSvc implements IGpsSvc {
         wp.setSpeed(location.getSpeed());
         wp.setBearing(location.getBearing());
         wp.setProvider(location.getProvider());
+        wp.setNrOfSattelites(data.getNrOfSattelites());
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(location.getTime());

@@ -6,8 +6,11 @@ import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
+import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.services.IGpsSvc;
 
 /**
@@ -16,6 +19,9 @@ import gps.fhv.at.gps_hawk.services.IGpsSvc;
 public class MyLocationListener implements LocationListener, GpsStatus.Listener {
     private Context mContext;
     private IGpsSvc mGpsSvc;
+    private Location mLastLocation;
+    private long mLastLocationMillis;
+    private int mNrOfSattelites = -1;
 
     public MyLocationListener(Context context, IGpsSvc gpsSvc) {
         mContext = context;
@@ -25,8 +31,15 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
     @Override
     public void onLocationChanged(Location loc) {
 
-        if ( isSufficientLocation(loc)){
-            mGpsSvc.addNewLocation(loc);
+        if (loc == null) return;
+
+        mLastLocation = loc;
+        mLastLocationMillis = SystemClock.elapsedRealtime();
+
+        if (isSufficientLocation(loc)) {
+            NewLocationEventData data = new NewLocationEventData();
+            data.setNrOfSattelites(mNrOfSattelites);
+            mGpsSvc.addNewLocation(loc,data);
         }
         // else: throw away
 
@@ -50,6 +63,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
     /**
      * determines whether location can be used or not
+     *
      * @param location
      * @return
      */
@@ -59,21 +73,46 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
     /**
      * Method is called to determine number os sattelites
+     *
      * @param event
      */
     @Override
     public void onGpsStatusChanged(int event) {
-        int satellites = 0;
-        int satellitesInFix = 0;
-        int timetofix = mGpsSvc.getLocationManager().getGpsStatus(null).getTimeToFirstFix();
-        Log.i("Debug", "Time to first fix = " + timetofix);
-        for (GpsSatellite sat : mGpsSvc.getLocationManager().getGpsStatus(null).getSatellites()) {
-            if(sat.usedInFix()) {
-                satellitesInFix++;
-            }
-            satellites++;
+        boolean isGPSFix = false;
+
+        switch (event) {
+            case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
+                if (mLastLocation != null)
+                    isGPSFix = (SystemClock.elapsedRealtime() - mLastLocationMillis) < 3000;
+
+
+                if (isGPSFix) { // A fix has been acquired.
+                    // Do something.
+
+                    // Old Code
+                    int satellites = 0;
+                    int satellitesInFix = 0;
+
+                    for (GpsSatellite sat : mGpsSvc.getLocationManager().getGpsStatus(null).getSatellites()) {
+                        if (sat.usedInFix()) {
+                            satellitesInFix++;
+                        }
+                        satellites++;
+                    }
+
+                    mNrOfSattelites = satellitesInFix;
+
+                } else { // The fix has been lost.
+                    // Do something.
+                }
+
+                break;
+            case GpsStatus.GPS_EVENT_FIRST_FIX:
+                // Do something.
+                isGPSFix = true;
+
+                break;
         }
-        Log.i("Debug", satellites + " Used In Last Fix ("+satellitesInFix+")");
     }
 }
 
