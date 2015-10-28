@@ -7,6 +7,7 @@ public class Position extends DomainBase {
     private double _lng;
     private double _lat;
     private long _id;
+    private double _altitude;
 
     public double getLng() {
         return _lng;
@@ -30,5 +31,13 @@ public class Position extends DomainBase {
 
     public void setId(long id) {
         _id = id;
+    }
+
+    public double getAltitude() {
+        return _altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        _altitude = altitude;
     }
 }

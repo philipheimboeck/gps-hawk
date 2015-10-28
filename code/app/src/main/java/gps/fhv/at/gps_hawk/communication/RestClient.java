@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import org.json.JSONArray;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,8 +17,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import gps.fhv.at.gps_hawk.domain.IJSONable;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 
 /**
@@ -78,7 +83,7 @@ public class RestClient {
     }
 
     public HTTPAnswer post(URL url, HashMap<String, String> params) throws IOException, NoConnectionException {
-        if (checkConnection()) {
+        if (!checkConnection()) {
             throw new NoConnectionException();
         }
 
@@ -95,8 +100,7 @@ public class RestClient {
 
             // Send the data
             OutputStream os = connection.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(
-                    new OutputStreamWriter(os, "UTF-8"));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
             writer.write(getPostDataString(params));
 
             writer.flush();
@@ -125,8 +129,17 @@ public class RestClient {
         return answer;
     }
 
+    protected <T extends IJSONable> String getJsonArray(List<T> list) {
+        JSONArray jsonArray = new JSONArray();
+        for (IJSONable o : list) {
+            jsonArray.put(o.toJSON());
+        }
+        return jsonArray.toString();
+    }
+
     /**
      * Returns an encoded data string
+     *
      * @param params The params to encode
      * @return The data string
      * @throws UnsupportedEncodingException

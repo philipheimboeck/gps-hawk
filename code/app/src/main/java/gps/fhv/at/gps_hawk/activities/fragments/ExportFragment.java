@@ -35,6 +35,8 @@ public class ExportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        PreferenceManager.setDefaultValues(getContext(), R.xml.preferences, true);
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
 
@@ -51,7 +53,7 @@ public class ExportFragment extends Fragment {
         DbFacade db = DbFacade.getInstance(getActivity());
         int amount = db.getCount(WaypointDef.TABLE_NAME);
 
-        mTextViewAmount.setText(""+ amount);
+        mTextViewAmount.setText("" + amount);
 
         return view;
     }
@@ -60,9 +62,10 @@ public class ExportFragment extends Fragment {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String key = Constants.PREF_EXPORT_URL;
 
-        if ( prefs.contains(key)) {
-            String url = prefs.getString(key,"");
-            Toast.makeText(getActivity(),url,Toast.LENGTH_LONG).show();
+
+        if (prefs.contains(key)) {
+            String url = prefs.getString(key, "");
+            Toast.makeText(getActivity(), url, Toast.LENGTH_LONG).show();
 
             ExportContext exportContext = new ExportContext();
             exportContext.setUrl(url);

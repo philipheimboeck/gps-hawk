@@ -59,7 +59,8 @@ public class DbSetup extends SQLiteOpenHelper {
             try {
                 // This database is only a cache for online data, so its upgrade policy is
                 // to simply to discard the data and start over
-                db.execSQL(tdbDef.getSqlDeleteEntries());
+                // Temporary don't delete all entries
+//                db.execSQL(tdbDef.getSqlDeleteEntries());
                 onCreate(db);
 
             } catch (Exception e) {

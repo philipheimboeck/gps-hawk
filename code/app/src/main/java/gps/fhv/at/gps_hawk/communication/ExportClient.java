@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,10 @@ public class ExportClient extends RestClient {
 
         JSONObject object = new JSONObject();
         try {
-            object.put("waypoints",expCtx.getWaypointList());
+
+//            JSONArray jsonArray = new JSONArray(expCtx.getWaypointList());
+            object.put("waypoints", getJsonArray(expCtx.getWaypointList()));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -38,7 +42,7 @@ public class ExportClient extends RestClient {
             URL url = new URL(expCtx.getUrl());
 
             HashMap<String, String> params = new HashMap<>();
-            params.put("data", object.toString());
+            params.put("waypoints", object.toString());
 
             HTTPAnswer answer = post(url, params);
             if (answer.responseCode != 200) {

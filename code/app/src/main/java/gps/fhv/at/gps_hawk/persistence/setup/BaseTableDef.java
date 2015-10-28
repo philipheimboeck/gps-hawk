@@ -10,6 +10,8 @@ public abstract class BaseTableDef implements BaseColumns {
     protected static final String TYPE_TEXT = " TEXT";
     protected static final String TYPE_INT = " INTEGER";
     protected static final String TYPE_DATETIME = " DATETIME";
+    protected static final String TYPE_FLOAT = " FLOAT";
+    protected static final String TYPE_DOUBLE = " DOUBLE";
     protected static final String COMMA_SEP = ",";
 
     /**
@@ -32,7 +34,7 @@ public abstract class BaseTableDef implements BaseColumns {
 
     public String getSqlCreateTable() {
         return "CREATE TABLE " + getTableName() + " (" +
-//                _ID + " INTEGER PRIMARY KEY NOT NULL," +
+                _ID + " INTEGER PRIMARY KEY NOT NULL," +
                 getSqlCreateColumns() +
                 " )";
     }

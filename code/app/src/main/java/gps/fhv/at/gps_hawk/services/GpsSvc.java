@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -77,12 +78,21 @@ public class GpsSvc implements IGpsSvc {
         Position p = new Position();
         p.setLat(location.getLatitude());
         p.setLng(location.getLongitude());
+        p.setAltitude(location.getAltitude());
 
         DbFacade db = DbFacade.getInstance(mContext);
 
         long id = db.saveEntity(p);
 
         wp.setPositionId(id);
+        wp.setAccuracy(location.getAccuracy());
+        wp.setSpeed(location.getSpeed());
+        wp.setBearing(location.getBearing());
+        wp.setProvider(location.getProvider());
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(location.getTime());
+        wp.setTimestampCaptured(cal);
 
         db.saveEntity(wp);
 
