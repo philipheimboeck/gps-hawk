@@ -1,14 +1,17 @@
 package gps.fhv.at.gps_hawk.activities;
 
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -70,9 +73,9 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
     private void populateNavigation() {
         try {
             ArrayList<NavigationItem> navigationItems = new ArrayList<>();
-            navigationItems.add(new NavigationItem(mCaptureFragment, getString(R.string.navigation_capture), 0));
+            navigationItems.add(new NavigationItem(mCaptureFragment, getString(R.string.navigation_capture), R.drawable.ic_hawk_white));
             navigationItems.add(new NavigationItem(mExportFragment, getString(R.string.navigation_export), 0));
-            navigationItems.add(new NavigationItem(mSettingsFragment, getString(R.string.navigation_settings), 0));
+            navigationItems.add(new NavigationItem(mSettingsFragment, getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
 
             NavigationListAdapter adapter = new NavigationListAdapter(this, navigationItems);
             mDrawerList = (ListView) mDrawerLayout.findViewById(R.id.navigation_list);
@@ -84,27 +87,49 @@ public class MainActivity extends AppCompatActivity implements CaptureFragment.O
 
     private void enableDrawerIcon() {
         // Enabling action bar app icon and let it behave as toggle button
-        if (getActionBar() != null) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            getActionBar().setHomeButtonEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
             mActionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.app_name, R.string.app_name) {
                 @Override
                 public void onDrawerClosed(View drawerView) {
                     super.onDrawerClosed(drawerView);
-
-                    invalidateOptionsMenu();
                 }
 
                 @Override
                 public void onDrawerOpened(View drawerView) {
                     super.onDrawerOpened(drawerView);
-
-                    invalidateOptionsMenu();
                 }
             };
             mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
+
+
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mActionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mActionBarDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mActionBarDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
     }
 
     /**
