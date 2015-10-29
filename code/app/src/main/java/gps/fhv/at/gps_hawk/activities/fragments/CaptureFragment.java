@@ -20,11 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
@@ -34,12 +30,15 @@ import gps.fhv.at.gps_hawk.services.GpsSvc;
 
 public class CaptureFragment extends Fragment {
 
+    // TOdo: Remove static flag and check for running background service!
+    private static boolean mTracking;
+    private static GpsSvc mGpsService;
+
+    private LocationManager locationManager;
     private boolean mPermissionsGranted = false;
 
     private OnFragmentInteractionListener mListener;
-    private GpsSvc mGpsService;
     private SupportMapFragment mMapFragment;
-    private LocationManager locationManager;
     private MyLocationListener myLocationListener;
     private Button mButStartTracking;
 
@@ -74,20 +73,27 @@ public class CaptureFragment extends Fragment {
 
     }
 
-    private void handleButStart() {
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        mGpsService = new GpsSvc(locationManager, getActivity());
-        boolean gpsRS = mGpsService.initialize();
-        if (!gpsRS) {
-            showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(i);
-                }
-            });
-        }
+    private void handleStartButton() {
+        // TODO: Check for running service instead of using a the static flag!
+        if(!mTracking) {
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
+            boolean gpsRS = mGpsService.initialize();
+            if (!gpsRS) {
+                showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(i);
+                    }
+                });
+            }
+            mTracking = true;
 
+        } else {
+            mGpsService.stopGpsTracking();
+            mTracking = false;
+        }
     }
 
     protected void showMessageBox(Context context, String message, String positiveText, DialogInterface.OnClickListener listener) {
@@ -147,7 +153,7 @@ public class CaptureFragment extends Fragment {
         mButStartTracking.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                handleButStart();
+                handleStartButton();
             }
         });
 

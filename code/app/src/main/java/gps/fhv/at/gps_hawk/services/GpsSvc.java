@@ -1,5 +1,7 @@
 package gps.fhv.at.gps_hawk.services;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.location.Address;
 import android.location.Criteria;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
@@ -66,10 +69,36 @@ public class GpsSvc implements IGpsSvc {
             if (location != null) {
                 Log.i("Debug: ", location.toString());
             }
+
+            // Show Notification
+            showNotification();
         } catch (Exception ex) {
             Log.e("Debug", "Error at starting GpsTracking", ex);
         }
+    }
 
+    private void showNotification() {
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification = new Notification.Builder(mContext)
+                .setSmallIcon(R.drawable.cast_ic_notification_0) // Todo: Use other icon
+                .setContentTitle(mContext.getString(R.string.notification_tracking_title))
+                .setContentText(mContext.getString(R.string.notification_tracking_text))
+                .setOngoing(true)
+                .build();
+        // TODO: Add Action to disable tracking from the notification
+        // TODO: Show Overview when clicking on notification
+        notificationManager.notify(Constants.NOTIFICATION_TRACKING_ID, notification);
+    }
+
+    private void cancelNotification() {
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(Constants.NOTIFICATION_TRACKING_ID);
+    }
+
+    public void stopGpsTracking() {
+        // TODO: Stop the tracking
+
+        cancelNotification();
     }
 
     public void addNewLocation(Location location,NewLocationEventData data) {
