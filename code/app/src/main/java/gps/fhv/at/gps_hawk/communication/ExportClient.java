@@ -27,26 +27,13 @@ public class ExportClient extends RestClient {
 
     public boolean exportCollectedWaypoints(ExportContext expCtx) {
 
-        JSONObject object = new JSONObject();
-        try {
-
-//            JSONArray jsonArray = new JSONArray(expCtx.getWaypointList());
-            object.put("waypoints", getJsonArray(expCtx.getWaypointList()));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
         try {
 
             URL url = new URL(expCtx.getUrl());
 
-            HashMap<String, String> params = new HashMap<>();
-            params.put("waypoints", object.toString());
-
-            HTTPAnswer answer = post(url, params);
+            HTTPAnswer answer = post(url, expCtx.getWaypointList(),"waypoints");
             if (answer.responseCode != 200) {
-                throw new RegistrationException("Registration was not successful!");
+                throw new RegistrationException("Could not export data!");
             }
             return true;
 
