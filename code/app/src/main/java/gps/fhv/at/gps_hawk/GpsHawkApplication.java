@@ -10,15 +10,29 @@ import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
  */
 public class GpsHawkApplication extends Application {
 
+    private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+
+    public GpsHawkApplication() {
+        mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Add some custom exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
+                // Do some custom exception handling
                 ex.printStackTrace();
-                Log.e("GpsHawkApplication", ex.getMessage());
+                Log.e("UNCAUGHT", ex.getMessage());
+
+                // Rethrow the exception to the OS!
+                if(mDefaultExceptionHandler != null) {
+                    mDefaultExceptionHandler.uncaughtException(thread, ex);
+                }
             }
         });
     }
