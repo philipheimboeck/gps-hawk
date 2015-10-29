@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -82,7 +84,18 @@ public class RestClient {
         return answer;
     }
 
-    public HTTPAnswer post(URL url, HashMap<String, String> params) throws IOException, NoConnectionException {
+    public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key) throws IOException, NoConnectionException {
+        StringBuilder result = new StringBuilder();
+
+        String content = getJsonArray(list);
+        result.append(URLEncoder.encode(key, "UTF-8"));
+        result.append("=");
+        result.append(URLEncoder.encode(content, "UTF-8"));
+
+        return post(url, result.toString());
+    }
+
+    private HTTPAnswer post(URL url, String content) throws IOException, NoConnectionException {
         if (!checkConnection()) {
             throw new NoConnectionException();
         }
@@ -101,7 +114,7 @@ public class RestClient {
             // Send the data
             OutputStream os = connection.getOutputStream();
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(getPostDataString(params));
+            writer.write(content);
 
             writer.flush();
             writer.close();
@@ -127,6 +140,12 @@ public class RestClient {
         }
 
         return answer;
+
+    }
+
+    public HTTPAnswer post(URL url, HashMap<String, String> params) throws IOException, NoConnectionException {
+        String content = getPostDataString(params);
+        return post(url, content);
     }
 
     protected <T extends IJSONable> String getJsonArray(List<T> list) {
