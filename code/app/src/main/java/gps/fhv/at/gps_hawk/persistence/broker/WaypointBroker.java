@@ -22,9 +22,22 @@ public class WaypointBroker extends BrokerBase {
         Waypoint wp = (Waypoint) domain;
 
         ContentValues values = new ContentValues();
+
+        // Int
         values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSattelites());
+
+        // Datetime
         values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
-        values.put(WaypointDef.COLUMN_NAME_POSITION_ID, wp.getPositionId());
+
+        // Float
+        values.put(WaypointDef.COLUMN_ACCURACY,wp.getAccuracy());
+        values.put(WaypointDef.COLUMN_BEARING,wp.getBearing());
+        values.put(WaypointDef.COLUMN_SPEED,wp.getSpeed());
+
+        // Double
+        values.put(WaypointDef.COLUMN_NAME_LAT,wp.getLat());
+        values.put(WaypointDef.COLUMN_NAME_LNG,wp.getLng());
+        values.put(WaypointDef.COLUMN_NAME_ALTITUDE,wp.getAltitude());
 
         return values;
     }
@@ -34,14 +47,28 @@ public class WaypointBroker extends BrokerBase {
 
         Waypoint wp = new Waypoint();
 
+
+        // Int
+        wp.setId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
         wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
-        wp.setPositionId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_POSITION_ID)));
-        wp.setId(cursor.getLong(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
+
+        // Double
+        wp.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_LAT)));
+        wp.setLng(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_LNG)));
+        wp.setAltitude(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_ALTITUDE)));
+
+        // Text
+        wp.setProvider(cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_PROVIDER)));
+
+        // Float
+        wp.setSpeed(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_SPEED)));
+        wp.setAccuracy(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_ACCURACY)));
+        wp.setBearing(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_BEARING)));
 
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try {
-            cal.setTime(sdf.parse(cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_POSITION_ID))));
+            cal.setTime(sdf.parse(cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIME))));
             wp.setTimestampCaptured(cal);
         } catch (ParseException e) {
             e.printStackTrace();

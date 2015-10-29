@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -12,10 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
-import gps.fhv.at.gps_hawk.domain.Position;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.broker.BrokerBase;
-import gps.fhv.at.gps_hawk.persistence.broker.PositionBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
@@ -30,7 +27,6 @@ public class DbFacade {
 
     static {
         mBrokerMap.put(Waypoint.class, new WaypointBroker());
-        mBrokerMap.put(Position.class, new PositionBroker());
     }
 
     public static DbFacade getInstance(Context context) {
@@ -73,10 +69,19 @@ public class DbFacade {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
+                // Int
                 WaypointDef._ID,
+                WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
+                // Datetime
                 WaypointDef.COLUMN_NAME_DATETIME,
-                WaypointDef.COLUMN_NAME_POSITION_ID,
-                WaypointDef.COLUMN_NAME_NR_OF_SATTELITES
+                // Double
+                WaypointDef.COLUMN_NAME_LAT,
+                WaypointDef.COLUMN_NAME_LNG,
+                WaypointDef.COLUMN_NAME_ALTITUDE,
+                // Float
+                WaypointDef.COLUMN_SPEED,
+                WaypointDef.COLUMN_ACCURACY,
+                WaypointDef.COLUMN_BEARING
         };
 
         // How you want the results sorted in the resulting Cursor

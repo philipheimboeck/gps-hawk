@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
-import gps.fhv.at.gps_hawk.persistence.setup.PositionDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
@@ -32,7 +31,6 @@ public class DbSetup extends SQLiteOpenHelper {
 
         // Add Table-Def for each table
         tableDefs.add(new WaypointDef());
-        tableDefs.add(new PositionDef());
 
         return  tableDefs;
     }

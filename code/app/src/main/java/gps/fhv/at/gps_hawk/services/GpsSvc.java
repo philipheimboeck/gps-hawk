@@ -5,7 +5,6 @@ import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.util.Log;
 
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.domain.Position;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
@@ -76,21 +74,20 @@ public class GpsSvc implements IGpsSvc {
 
     public void addNewLocation(Location location,NewLocationEventData data) {
 
-        Waypoint wp = new Waypoint();
-        Position p = new Position();
-        p.setLat(location.getLatitude());
-        p.setLng(location.getLongitude());
-        p.setAltitude(location.getAltitude());
-
         DbFacade db = DbFacade.getInstance(mContext);
 
-        long id = db.saveEntity(p);
-
-        wp.setPositionId(id);
+        Waypoint wp = new Waypoint();
+        // Double
+        wp.setLat(location.getLatitude());
+        wp.setLng(location.getLongitude());
+        wp.setAltitude(location.getAltitude());
+        // Float
         wp.setAccuracy(location.getAccuracy());
         wp.setSpeed(location.getSpeed());
         wp.setBearing(location.getBearing());
+        // Text
         wp.setProvider(location.getProvider());
+        // Int
         wp.setNrOfSattelites(data.getNrOfSattelites());
 
         Calendar cal = Calendar.getInstance();
