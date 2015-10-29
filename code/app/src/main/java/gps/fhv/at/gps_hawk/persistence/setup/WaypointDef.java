@@ -9,24 +9,47 @@ public class WaypointDef extends BaseTableDef {
     }
 
     public static final String TABLE_NAME = "waypoint";
+
+    // Int types
     public static final String COLUMN_NAME_NR_OF_SATTELITES = "nrOfSattelites";
-    public static final String COLUMN_NAME_POSITION_ID = "position_id";
+
+    // Datetime types
     public static final String COLUMN_NAME_DATETIME = "date_gps";
+
+    // Text types
+    public static final String COLUMN_PROVIDER = "provider";
+
+    // Float types
     public static final String COLUMN_ACCURACY = "accuracy";
     public static final String COLUMN_BEARING = "bearing";
-    public static final String COLUMN_PROVIDER = "provider";
     public static final String COLUMN_SPEED = "speed";
+
+    // Double types
+    public static final String COLUMN_NAME_LAT = "lat";
+    public static final String COLUMN_NAME_LNG = "lng";
+    public static final String COLUMN_NAME_ALTITUDE = "alt";
 
     @Override
     public String getSqlCreateColumns() {
-        return COLUMN_NAME_NR_OF_SATTELITES + TYPE_INT + COMMA_SEP +
-                COLUMN_NAME_POSITION_ID + TYPE_INT + COMMA_SEP +
+        return
+                // Int types
+                COLUMN_NAME_NR_OF_SATTELITES + TYPE_INT + COMMA_SEP +
+
+                // Datetime types
                 COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
+
+                // Float types
                 COLUMN_ACCURACY + TYPE_FLOAT + COMMA_SEP +
                 COLUMN_BEARING + TYPE_FLOAT + COMMA_SEP +
+                COLUMN_SPEED + TYPE_FLOAT + COMMA_SEP +
+
+                // Text types
                 COLUMN_PROVIDER + TYPE_TEXT + COMMA_SEP +
-                COLUMN_SPEED + TYPE_FLOAT
-                ;
+
+                // Dobule types
+                COLUMN_NAME_LAT + TYPE_DOUBLE + COMMA_SEP +
+                COLUMN_NAME_LNG + TYPE_DOUBLE + COMMA_SEP +
+                COLUMN_NAME_ALTITUDE + TYPE_DOUBLE;
     }
 
     @Override

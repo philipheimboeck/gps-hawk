@@ -10,12 +10,15 @@ import java.util.Calendar;
  */
 public class Waypoint extends DomainBase implements IJSONable {
     private long _id;
-    private long _positionId;
     private int _nrOfSattelites;
     private Calendar _timestampCaptured;
     private float _accuracy;
     private float _speed;
     private String _provider;
+    private double _lng;
+    private double _lat;
+    private double _altitude;
+
 
     /**
      * Bearing is the horizontal direction of travel of this device, and is not related to the device orientation.
@@ -29,14 +32,6 @@ public class Waypoint extends DomainBase implements IJSONable {
 
     public void setId(long id) {
         _id = id;
-    }
-
-    public long getPositionId() {
-        return _positionId;
-    }
-
-    public void setPositionId(long positionId) {
-        _positionId = positionId;
     }
 
     public int getNrOfSattelites() {
@@ -97,9 +92,36 @@ public class Waypoint extends DomainBase implements IJSONable {
             json.put("speed",getSpeed());
             json.put("provider",getProvider());
             json.put("bearing",getBearing());
+            json.put("lng",getLng());
+            json.put("lat",getLat());
+            json.put("altitude",getAltitude());
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return json.toString();
+    }
+
+    public double getLng() {
+        return _lng;
+    }
+
+    public void setLng(double lng) {
+        _lng = lng;
+    }
+
+    public double getLat() {
+        return _lat;
+    }
+
+    public void setLat(double lat) {
+        _lat = lat;
+    }
+
+    public double getAltitude() {
+        return _altitude;
+    }
+
+    public void setAltitude(double altitude) {
+        _altitude = altitude;
     }
 }
