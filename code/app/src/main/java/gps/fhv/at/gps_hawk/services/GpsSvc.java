@@ -21,7 +21,6 @@ import java.util.Locale;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.MainActivity;
-import gps.fhv.at.gps_hawk.domain.Position;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
@@ -111,7 +110,7 @@ public class GpsSvc implements IGpsSvc {
         cancelNotification();
     }
 
-    public void addNewLocation(Location location,NewLocationEventData data) {
+    public void addNewLocation(Location location, NewLocationEventData data) {
 
         DbFacade db = DbFacade.getInstance(mContext);
 
