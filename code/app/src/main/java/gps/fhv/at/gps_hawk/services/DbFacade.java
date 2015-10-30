@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.provider.BaseColumns;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -11,8 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.broker.BrokerBase;
+import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
@@ -27,6 +30,7 @@ public class DbFacade {
 
     static {
         mBrokerMap.put(Waypoint.class, new WaypointBroker());
+        mBrokerMap.put(Track.class, new TrackBroker());
     }
 
     public static DbFacade getInstance(Context context) {
@@ -62,7 +66,7 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<Waypoint> getAllWaypoints() {
+    public List<Waypoint> getAllWaypoints2Update() {
 
         List<Waypoint> listRet = new ArrayList<>();
 
@@ -92,7 +96,7 @@ public class DbFacade {
         Cursor c = getDb().query(
                 WaypointDef.TABLE_NAME,  // The table to query
                 projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
+                WaypointDef.COLUMN_NAME_IS_EXPORTED + " = 2",                                // The columns for the WHERE clause
                 null,                              // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
@@ -114,7 +118,36 @@ public class DbFacade {
         return listRet;
     }
 
-    public int getCount(String tbl) {
+    /**
+     * Masks Waypoints, that hasn't yet been exported, with `isExportet=2`
+     * @return
+     */
+    public int markWaypoints(int whereIsExport, int updValIsExport) {
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        BrokerBase broker = mBrokerMap.get(Waypoint.class);
+
+        ContentValues values = new ContentValues();
+
+        values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, updValIsExport);
+
+        // Which row to update, based on the ID
+        String selection = WaypointDef.COLUMN_NAME_IS_EXPORTED + " = ?";
+        String[] selectionArgs = { String.valueOf(whereIsExport) };
+
+
+        int count = db.update(
+                broker.getTblName(),
+                values,
+                selection,
+                null);
+
+        return count;
+
+    }
+
+    public int getCount(String tbl, String where) {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
@@ -124,7 +157,7 @@ public class DbFacade {
         Cursor c = getDb().query(
                 tbl,  // The table to query
                 projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
+                where,                                // The columns for the WHERE clause
                 null,                              // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
@@ -136,6 +169,33 @@ public class DbFacade {
         int ret = c.getInt(0);
 
         return ret;
+    }
+
+    /**
+     * Updates single entity base on its id
+     *
+     * @param domain
+     * @param <T>
+     * @return amount of results updated (should be 1)
+     */
+    public <T extends DomainBase> int update(T domain) {
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        BrokerBase broker = mBrokerMap.get(domain.getClass());
+        ContentValues values = broker.map2db(domain);
+
+        // Which row to update, based on the ID
+        String selection = BaseColumns._ID + " = ?";
+        String[] selectionArgs = {String.valueOf(domain.getId())};
+
+        int count = db.update(
+                broker.getTblName(),
+                values,
+                selection,
+                selectionArgs);
+
+        return count;
     }
 
 }

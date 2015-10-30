@@ -9,6 +9,7 @@ public abstract class BaseTableDef implements BaseColumns {
 
     protected static final String TYPE_TEXT = " TEXT";
     protected static final String TYPE_INT = " INTEGER";
+    protected static final String TYPE_TINYINT = " TINYINT";
     protected static final String TYPE_DATETIME = " DATETIME";
     protected static final String TYPE_FLOAT = " FLOAT";
     protected static final String TYPE_DOUBLE = " DOUBLE";

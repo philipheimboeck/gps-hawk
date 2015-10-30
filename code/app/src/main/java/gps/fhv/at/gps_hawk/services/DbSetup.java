@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
+import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
@@ -18,7 +19,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class DbSetup extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "GpwHawk.db";
 
     public DbSetup(Context context) {
@@ -31,6 +32,7 @@ public class DbSetup extends SQLiteOpenHelper {
 
         // Add Table-Def for each table
         tableDefs.add(new WaypointDef());
+        tableDefs.add(new TrackDef());
 
         return  tableDefs;
     }
@@ -53,18 +55,18 @@ public class DbSetup extends SQLiteOpenHelper {
 
         List<BaseTableDef> tableDefs = getTableDefs();
 
+        // Delte all tables
         for( BaseTableDef tdbDef : tableDefs ) {
             try {
-                // This database is only a cache for online data, so its upgrade policy is
-                // to simply to discard the data and start over
-                // Temporary don't delete all entries
-//                db.execSQL(tdbDef.getSqlDeleteEntries());
-                onCreate(db);
+                db.execSQL(tdbDef.getSqlDeleteEntries());
 
             } catch (Exception e) {
                 Log.e("FATAL","Error onUpgrade()",e);
             }
         }
+
+        // Then create database new
+        onCreate(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

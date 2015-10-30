@@ -11,8 +11,10 @@ import gps.fhv.at.gps_hawk.helper.DateHelper;
  * Created by Tobias on 24.10.2015.
  */
 public class Waypoint extends DomainBase implements IJSONable {
-    private long _id;
+    private int _id;
     private int _nrOfSattelites;
+    private int _trackId;
+    private int _isExported;
     private Calendar _timestampCaptured;
     private float _accuracy;
     private float _speed;
@@ -28,11 +30,12 @@ public class Waypoint extends DomainBase implements IJSONable {
      */
     private float _bearing;
 
-    public long getId() {
+    @Override
+    public int getId() {
         return _id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         _id = id;
     }
 
@@ -82,6 +85,22 @@ public class Waypoint extends DomainBase implements IJSONable {
 
     public void setBearing(float bearing) {
         _bearing = bearing;
+    }
+
+    public int getTrackId() {
+        return _trackId;
+    }
+
+    public void setTrackId(int trackId) {
+        _trackId = trackId;
+    }
+
+    public int getIsExported() {
+        return _isExported;
+    }
+
+    public void setIsExported(int isExported) {
+        _isExported = isExported;
     }
 
     @Override

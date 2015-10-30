@@ -51,9 +51,10 @@ public class ExportFragment extends Fragment {
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
 
         DbFacade db = DbFacade.getInstance(getActivity());
-        int amount = db.getCount(WaypointDef.TABLE_NAME);
+        int amount = db.getCount(WaypointDef.TABLE_NAME, null);
+        int amountExported = db.getCount(WaypointDef.TABLE_NAME,WaypointDef.COLUMN_NAME_IS_EXPORTED +" = 0");
 
-        mTextViewAmount.setText("" + amount);
+        mTextViewAmount.setText("" + amountExported +" von "+ amount +" exportiert");
 
         return view;
     }

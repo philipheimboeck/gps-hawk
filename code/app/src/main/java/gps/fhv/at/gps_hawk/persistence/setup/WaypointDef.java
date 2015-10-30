@@ -12,6 +12,8 @@ public class WaypointDef extends BaseTableDef {
 
     // Int types
     public static final String COLUMN_NAME_NR_OF_SATTELITES = "nrOfSattelites";
+    public static final String COLUMN_NAME_TRACK_ID = "track_id";
+    public static final String COLUMN_NAME_IS_EXPORTED = "isExported";
 
     // Datetime types
     public static final String COLUMN_NAME_DATETIME = "date_gps";
@@ -34,22 +36,24 @@ public class WaypointDef extends BaseTableDef {
         return
                 // Int types
                 COLUMN_NAME_NR_OF_SATTELITES + TYPE_INT + COMMA_SEP +
+                        COLUMN_NAME_TRACK_ID + TYPE_INT + COMMA_SEP +
+                        COLUMN_NAME_IS_EXPORTED + TYPE_INT + COMMA_SEP +
 
-                // Datetime types
-                COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
+                        // Datetime types
+                        COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
 
-                // Float types
-                COLUMN_ACCURACY + TYPE_FLOAT + COMMA_SEP +
-                COLUMN_BEARING + TYPE_FLOAT + COMMA_SEP +
-                COLUMN_SPEED + TYPE_FLOAT + COMMA_SEP +
+                        // Float types
+                        COLUMN_ACCURACY + TYPE_FLOAT + COMMA_SEP +
+                        COLUMN_BEARING + TYPE_FLOAT + COMMA_SEP +
+                        COLUMN_SPEED + TYPE_FLOAT + COMMA_SEP +
 
-                // Text types
-                COLUMN_PROVIDER + TYPE_TEXT + COMMA_SEP +
+                        // Text types
+                        COLUMN_PROVIDER + TYPE_TEXT + COMMA_SEP +
 
-                // Dobule types
-                COLUMN_NAME_LAT + TYPE_DOUBLE + COMMA_SEP +
-                COLUMN_NAME_LNG + TYPE_DOUBLE + COMMA_SEP +
-                COLUMN_NAME_ALTITUDE + TYPE_DOUBLE;
+                        // Dobule types
+                        COLUMN_NAME_LAT + TYPE_DOUBLE + COMMA_SEP +
+                        COLUMN_NAME_LNG + TYPE_DOUBLE + COMMA_SEP +
+                        COLUMN_NAME_ALTITUDE + TYPE_DOUBLE;
     }
 
     @Override
