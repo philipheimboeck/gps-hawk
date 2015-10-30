@@ -2,7 +2,9 @@ package gps.fhv.at.gps_hawk.services;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -18,6 +20,7 @@ import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.activities.MainActivity;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
@@ -78,12 +81,16 @@ public class GpsSvc implements IGpsSvc {
     }
 
     private void showNotification() {
+        Intent intent = new Intent(mContext, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         Notification notification = new Notification.Builder(mContext)
-                .setSmallIcon(R.drawable.cast_ic_notification_0) // Todo: Use other icon
+                .setSmallIcon(R.drawable.ic_hawk)
                 .setContentTitle(mContext.getString(R.string.notification_tracking_title))
                 .setContentText(mContext.getString(R.string.notification_tracking_text))
                 .setOngoing(true)
+                .setContentIntent(pendingIntent)
                 .build();
         // TODO: Add Action to disable tracking from the notification
         // TODO: Show Overview when clicking on notification
@@ -96,12 +103,14 @@ public class GpsSvc implements IGpsSvc {
     }
 
     public void stopGpsTracking() {
-        // TODO: Stop the tracking
+        // Stop the tracking
+        mLocationManager.removeUpdates(mLocationListener);
 
+        // Cancel the notification
         cancelNotification();
     }
 
-    public void addNewLocation(Location location,NewLocationEventData data) {
+    public void addNewLocation(Location location, NewLocationEventData data) {
 
         DbFacade db = DbFacade.getInstance(mContext);
 
