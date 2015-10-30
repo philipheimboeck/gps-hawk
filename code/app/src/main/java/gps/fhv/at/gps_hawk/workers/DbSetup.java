@@ -1,4 +1,4 @@
-package gps.fhv.at.gps_hawk.services;
+package gps.fhv.at.gps_hawk.workers;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

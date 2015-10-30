@@ -15,7 +15,7 @@ import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
-import gps.fhv.at.gps_hawk.services.DbFacade;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 

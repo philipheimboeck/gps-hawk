@@ -25,13 +25,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
-import gps.fhv.at.gps_hawk.services.GpsSvc;
+import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
+import gps.fhv.at.gps_hawk.services.LocationService;
+import gps.fhv.at.gps_hawk.workers.GpsSvc;
 
 
 public class CaptureFragment extends Fragment {
 
-    // TOdo: Remove static flag and check for running background service!
-    private static boolean mTracking;
     private static GpsSvc mGpsService;
 
     private LocationManager locationManager;
@@ -40,7 +40,7 @@ public class CaptureFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private SupportMapFragment mMapFragment;
     private MyLocationListener myLocationListener;
-    private Button mButStartTracking;
+    private Button mStartTrackingButton;
 
     public CaptureFragment() {
         // Required empty public constructor
@@ -74,12 +74,20 @@ public class CaptureFragment extends Fragment {
     }
 
     private void handleStartButton() {
-        // TODO: Check for running service instead of using a the static flag!
-        if(!mTracking) {
+        // Check if service is running
+        if (!ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
+
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
-            boolean gpsRS = mGpsService.initialize();
-            if (!gpsRS) {
+
+            if (mGpsService.isGpsAvailable()) {
+                // Start the service
+                Intent intent = new Intent(getActivity(), LocationService.class);
+                getActivity().startService(intent);
+                mStartTrackingButton.setText(R.string.stop_tracking);
+
+            } else {
+                // Show settings to enable GPS
                 showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -88,11 +96,12 @@ public class CaptureFragment extends Fragment {
                     }
                 });
             }
-            mTracking = true;
 
         } else {
-            mGpsService.stopGpsTracking();
-            mTracking = false;
+            // Stop the service
+            Intent intent = new Intent(getActivity(), LocationService.class);
+            getActivity().stopService(intent);
+            mStartTrackingButton.setText(R.string.start_tracking);
         }
     }
 
@@ -117,7 +126,7 @@ public class CaptureFragment extends Fragment {
             case Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mPermissionsGranted = true;
-                    mButStartTracking.setEnabled(true);
+                    mStartTrackingButton.setEnabled(true);
                 } else {
                     Toast.makeText(getActivity(), R.string.error_permission_location_required, Toast.LENGTH_LONG).show();
                 }
@@ -148,14 +157,19 @@ public class CaptureFragment extends Fragment {
             /* map is already there, just return view as it is */
         }
 
-        mButStartTracking = (Button) view.findViewById(R.id.button_tracking);
-        mButStartTracking.setEnabled(mPermissionsGranted);
-        mButStartTracking.setOnClickListener(new View.OnClickListener() {
+        mStartTrackingButton = (Button) view.findViewById(R.id.button_tracking);
+        mStartTrackingButton.setEnabled(mPermissionsGranted);
+        mStartTrackingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleStartButton();
             }
         });
+
+        // Change text of button if already tracking
+        if(ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
+            mStartTrackingButton.setText(R.string.stop_tracking);
+        }
 
         return view;
     }

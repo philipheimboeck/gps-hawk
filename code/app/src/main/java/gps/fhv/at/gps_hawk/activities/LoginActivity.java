@@ -3,10 +3,7 @@ package gps.fhv.at.gps_hawk.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,13 +21,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
-import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
-import gps.fhv.at.gps_hawk.services.DbSetup;
+import gps.fhv.at.gps_hawk.workers.DbSetup;
 import gps.fhv.at.gps_hawk.tasks.CheckUserTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.LoginTask;

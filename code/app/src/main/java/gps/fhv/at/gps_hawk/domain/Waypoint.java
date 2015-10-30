@@ -3,12 +3,13 @@ package gps.fhv.at.gps_hawk.domain;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 /**
  * Created by Tobias on 24.10.2015.
  */
-public class Waypoint extends DomainBase implements IJSONable {
+public class Waypoint extends DomainBase implements IJSONable, Serializable {
     private long _id;
     private int _nrOfSattelites;
     private Calendar _timestampCaptured;

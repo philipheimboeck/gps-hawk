@@ -3,7 +3,7 @@ package gps.fhv.at.gps_hawk.tasks;
 import android.os.AsyncTask;
 import gps.fhv.at.gps_hawk.communication.ExportClient;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
-import gps.fhv.at.gps_hawk.services.DbFacade;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
 
 /**
  * Created by Tobias on 25.10.2015.
