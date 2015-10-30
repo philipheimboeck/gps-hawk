@@ -39,6 +39,9 @@ public class WaypointBroker extends BrokerBase {
         values.put(WaypointDef.COLUMN_NAME_LNG,wp.getLng());
         values.put(WaypointDef.COLUMN_NAME_ALTITUDE,wp.getAltitude());
 
+        // Text
+        values.put(WaypointDef.COLUMN_PROVIDER,wp.getProvider());
+
         return values;
     }
 

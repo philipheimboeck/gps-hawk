@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 
+import gps.fhv.at.gps_hawk.helper.DateHelper;
+
 /**
  * Created by Tobias on 24.10.2015.
  */
@@ -88,7 +90,7 @@ public class Waypoint extends DomainBase implements IJSONable {
         try {
             json.put("accuracy",getAccuracy());
             json.put("nrOfSattelites",getNrOfSattelites());
-            json.put("timestampCaptured",getTimestampCaptured());
+            json.put("timestampCaptured", DateHelper.toSql(getTimestampCaptured()));
             json.put("speed",getSpeed());
             json.put("provider",getProvider());
             json.put("bearing",getBearing());

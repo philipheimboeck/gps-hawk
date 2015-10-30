@@ -81,7 +81,9 @@ public class DbFacade {
                 // Float
                 WaypointDef.COLUMN_SPEED,
                 WaypointDef.COLUMN_ACCURACY,
-                WaypointDef.COLUMN_BEARING
+                WaypointDef.COLUMN_BEARING,
+                // Text
+                WaypointDef.COLUMN_PROVIDER
         };
 
         // How you want the results sorted in the resulting Cursor
