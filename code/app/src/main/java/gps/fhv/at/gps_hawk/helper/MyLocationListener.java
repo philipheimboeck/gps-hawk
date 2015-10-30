@@ -8,10 +8,9 @@ import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
-import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
-import gps.fhv.at.gps_hawk.services.IGpsSvc;
+import gps.fhv.at.gps_hawk.workers.IGpsSvc;
 
 /**
  * Created by Tobias on 23.10.2015.

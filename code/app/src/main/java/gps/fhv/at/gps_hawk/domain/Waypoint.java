@@ -3,6 +3,7 @@ package gps.fhv.at.gps_hawk.domain;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 import gps.fhv.at.gps_hawk.helper.DateHelper;
@@ -10,11 +11,9 @@ import gps.fhv.at.gps_hawk.helper.DateHelper;
 /**
  * Created by Tobias on 24.10.2015.
  */
-public class Waypoint extends DomainBase implements IJSONable {
+public class Waypoint extends DomainBase implements IJSONable, Serializable {
     private int _id;
     private int _nrOfSattelites;
-    private int _trackId;
-    private int _isExported;
     private Calendar _timestampCaptured;
     private float _accuracy;
     private float _speed;
@@ -30,7 +29,6 @@ public class Waypoint extends DomainBase implements IJSONable {
      */
     private float _bearing;
 
-    @Override
     public int getId() {
         return _id;
     }
@@ -85,22 +83,6 @@ public class Waypoint extends DomainBase implements IJSONable {
 
     public void setBearing(float bearing) {
         _bearing = bearing;
-    }
-
-    public int getTrackId() {
-        return _trackId;
-    }
-
-    public void setTrackId(int trackId) {
-        _trackId = trackId;
-    }
-
-    public int getIsExported() {
-        return _isExported;
-    }
-
-    public void setIsExported(int isExported) {
-        _isExported = isExported;
     }
 
     @Override

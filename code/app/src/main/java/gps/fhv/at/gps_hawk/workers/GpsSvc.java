@@ -1,4 +1,4 @@
-package gps.fhv.at.gps_hawk.services;
+package gps.fhv.at.gps_hawk.workers;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -39,19 +39,7 @@ public class GpsSvc implements IGpsSvc {
         mLocationManager = locationManager;
         mContext = context;
         mListWaypoints = new ArrayList<>();
-    }
-
-    public boolean initialize() {
-
         mLocationListener = new MyLocationListener(mContext, this);
-
-        if (!isGpsAvailable()) {
-            return false;
-        } else {
-            startGpsTracking();
-            return true;
-        }
-
     }
 
     public void startGpsTracking() {
@@ -72,42 +60,22 @@ public class GpsSvc implements IGpsSvc {
             if (location != null) {
                 Log.i("Debug: ", location.toString());
             }
-
-            // Show Notification
-            showNotification();
+        } catch (SecurityException ex) {
+            Log.e("Security", "Permission not granted!");
         } catch (Exception ex) {
             Log.e("Debug", "Error at starting GpsTracking", ex);
         }
     }
 
-    private void showNotification() {
-        Intent intent = new Intent(mContext, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification = new Notification.Builder(mContext)
-                .setSmallIcon(R.drawable.ic_hawk)
-                .setContentTitle(mContext.getString(R.string.notification_tracking_title))
-                .setContentText(mContext.getString(R.string.notification_tracking_text))
-                .setOngoing(true)
-                .setContentIntent(pendingIntent)
-                .build();
-        // TODO: Add Action to disable tracking from the notification
-        // TODO: Show Overview when clicking on notification
-        notificationManager.notify(Constants.NOTIFICATION_TRACKING_ID, notification);
-    }
-
-    private void cancelNotification() {
-        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(Constants.NOTIFICATION_TRACKING_ID);
-    }
 
     public void stopGpsTracking() {
-        // Stop the tracking
-        mLocationManager.removeUpdates(mLocationListener);
-
-        // Cancel the notification
-        cancelNotification();
+        try {
+            // Stop the tracking
+            mLocationManager.removeUpdates(mLocationListener);
+        } catch (SecurityException ex) {
+            Log.e("Security", "Permission not granted!");
+        }
     }
 
     public void addNewLocation(Location location, NewLocationEventData data) {
@@ -165,7 +133,7 @@ public class GpsSvc implements IGpsSvc {
      *
      * @return
      */
-    protected boolean isGpsAvailable() {
+    public boolean isGpsAvailable() {
         if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) return true;
         if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) return true;
         return false;
