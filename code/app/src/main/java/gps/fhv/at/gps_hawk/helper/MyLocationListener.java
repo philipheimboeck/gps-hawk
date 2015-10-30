@@ -1,6 +1,5 @@
 package gps.fhv.at.gps_hawk.helper;
 
-import android.content.Context;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -10,21 +9,19 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
-import gps.fhv.at.gps_hawk.workers.IGpsSvc;
 
 /**
  * Created by Tobias on 23.10.2015.
  */
 public class MyLocationListener implements LocationListener, GpsStatus.Listener {
-    private Context mContext;
-    private IGpsSvc mGpsSvc;
+
+    private MyLocationListenerCaller caller;
     private Location mLastLocation;
     private long mLastLocationMillis;
     private int mNrOfSattelites = -1;
 
-    public MyLocationListener(Context context, IGpsSvc gpsSvc) {
-        mContext = context;
-        mGpsSvc = gpsSvc;
+    public MyLocationListener(MyLocationListenerCaller gpsSvc) {
+        caller = gpsSvc;
     }
 
     @Override
@@ -38,7 +35,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
         if (isSufficientLocation(loc)) {
             NewLocationEventData data = new NewLocationEventData();
             data.setNrOfSattelites(mNrOfSattelites);
-            mGpsSvc.addNewLocation(loc,data);
+            caller.onLocationChange(loc, data);
         }
         // else: throw away
 
@@ -47,12 +44,13 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
     @Override
     public void onProviderDisabled(String provider) {
         Log.i("Location Listener", "Provider disabled");
+        caller.onProviderDisabled(provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
         Log.i("Location Listener", "Provider enabled");
-        mGpsSvc.startGpsTracking();
+        caller.onProviderEnabled(provider);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
                     int satellites = 0;
                     int satellitesInFix = 0;
 
-                    for (GpsSatellite sat : mGpsSvc.getLocationManager().getGpsStatus(null).getSatellites()) {
+                    for (GpsSatellite sat : caller.getSatellites()) {
                         if (sat.usedInFix()) {
                             satellitesInFix++;
                         }
@@ -112,6 +110,16 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
                 break;
         }
+    }
+
+    public interface MyLocationListenerCaller {
+        void onLocationChange(Location location, NewLocationEventData data);
+
+        void onProviderEnabled(String provider);
+
+        void onProviderDisabled(String provider);
+
+        Iterable<GpsSatellite> getSatellites();
     }
 }
 
