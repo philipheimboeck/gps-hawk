@@ -22,17 +22,20 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
         DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
 
         // Mark unexported Waypoints as "ExportNow"
-        dbFacade.markWaypoints(0,2);
+        int count = dbFacade.markWaypoints(0,2);
 
-        // Get all Waypoints from DB to export
-        mExpContext.setWaypointList(dbFacade.getAllWaypoints2Update());
+        if ( count > 0 ) {
 
-        // Send via Web
-        ExportClient client = new ExportClient(mExpContext.getContext());
-        client.exportCollectedWaypoints(mExpContext);
+            // Get all Waypoints from DB to export
+            mExpContext.setWaypointList(dbFacade.getAllWaypoints2Update());
 
-        // Mark "ExportNow" Waypoints as "Exported"
-        dbFacade.markWaypoints(2,1);
+            // Send via Web
+            ExportClient client = new ExportClient(mExpContext.getContext());
+            client.exportCollectedWaypoints(mExpContext);
+
+            // Mark "ExportNow" Waypoints as "Exported"
+            dbFacade.markWaypoints(2, 1);
+        }
 
         return "";
     }

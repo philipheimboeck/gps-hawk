@@ -54,7 +54,7 @@ public class ExportFragment extends Fragment {
         int amount = db.getCount(WaypointDef.TABLE_NAME, null);
         int amountExported = db.getCount(WaypointDef.TABLE_NAME,WaypointDef.COLUMN_NAME_IS_EXPORTED +" = 0");
 
-        mTextViewAmount.setText("" + amountExported +" von "+ amount +" exportiert");
+        mTextViewAmount.setText("" + (amount - amountExported) +" von "+ amount +" exportiert");
 
         return view;
     }

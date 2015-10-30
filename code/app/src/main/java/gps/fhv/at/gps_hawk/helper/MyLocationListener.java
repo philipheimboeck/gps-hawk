@@ -34,7 +34,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
         mLastLocation = loc;
         mLastLocationMillis = SystemClock.elapsedRealtime();
-
+        Log.i("Debug","onLocationChanged");
         if (isSufficientLocation(loc)) {
             NewLocationEventData data = new NewLocationEventData();
             data.setNrOfSattelites(mNrOfSattelites);

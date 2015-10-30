@@ -136,12 +136,11 @@ public class DbFacade {
         String selection = WaypointDef.COLUMN_NAME_IS_EXPORTED + " = ?";
         String[] selectionArgs = { String.valueOf(whereIsExport) };
 
-
         int count = db.update(
                 broker.getTblName(),
                 values,
                 selection,
-                null);
+                selectionArgs);
 
         return count;
 

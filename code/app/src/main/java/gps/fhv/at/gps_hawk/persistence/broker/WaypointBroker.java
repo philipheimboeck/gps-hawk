@@ -25,26 +25,26 @@ public class WaypointBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Int
-        values.put(WaypointDef._ID,wp.getId());
+        if (wp.getId() > 0) values.put(WaypointDef._ID, wp.getId());
         values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSattelites());
-        values.put(WaypointDef.COLUMN_NAME_TRACK_ID,wp.getTrackId());
-        values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED,wp.getIsExported());
+        values.put(WaypointDef.COLUMN_NAME_TRACK_ID, wp.getTrackId());
+        values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, wp.getIsExported());
 
         // Datetime
         values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
 
         // Float
-        values.put(WaypointDef.COLUMN_ACCURACY,wp.getAccuracy());
-        values.put(WaypointDef.COLUMN_BEARING,wp.getBearing());
-        values.put(WaypointDef.COLUMN_SPEED,wp.getSpeed());
+        values.put(WaypointDef.COLUMN_ACCURACY, wp.getAccuracy());
+        values.put(WaypointDef.COLUMN_BEARING, wp.getBearing());
+        values.put(WaypointDef.COLUMN_SPEED, wp.getSpeed());
 
         // Double
-        values.put(WaypointDef.COLUMN_NAME_LAT,wp.getLat());
-        values.put(WaypointDef.COLUMN_NAME_LNG,wp.getLng());
-        values.put(WaypointDef.COLUMN_NAME_ALTITUDE,wp.getAltitude());
+        values.put(WaypointDef.COLUMN_NAME_LAT, wp.getLat());
+        values.put(WaypointDef.COLUMN_NAME_LNG, wp.getLng());
+        values.put(WaypointDef.COLUMN_NAME_ALTITUDE, wp.getAltitude());
 
         // Text
-        values.put(WaypointDef.COLUMN_PROVIDER,wp.getProvider());
+        values.put(WaypointDef.COLUMN_PROVIDER, wp.getProvider());
 
         return values;
     }

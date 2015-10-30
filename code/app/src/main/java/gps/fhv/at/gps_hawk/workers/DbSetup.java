@@ -19,7 +19,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class DbSetup extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "GpwHawk.db";
 
     public DbSetup(Context context) {
@@ -67,7 +67,7 @@ public class DbSetup extends SQLiteOpenHelper {
 
         // Then create database new
         onCreate(db);
-    }
+     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
