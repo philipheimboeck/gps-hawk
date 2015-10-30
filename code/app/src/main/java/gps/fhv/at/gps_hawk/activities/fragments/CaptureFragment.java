@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -12,19 +13,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.SupportMapFragment;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.helper.MyLocationListener;
+import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
@@ -39,8 +42,17 @@ public class CaptureFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private SupportMapFragment mMapFragment;
-    private MyLocationListener myLocationListener;
+    private TextView mWaypointCounterView;
     private Button mStartTrackingButton;
+
+    private WaypointCounter mWaypointCounter = new WaypointCounter() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            super.onReceive(context, intent);
+
+            mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
+        }
+    };
 
     public CaptureFragment() {
         // Required empty public constructor
@@ -60,17 +72,47 @@ public class CaptureFragment extends Fragment {
             if (Build.VERSION.SDK_INT >= 23) {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
             }
-
-            return;
-            // TODO: Consider calling
-            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
         }
 
+    }
+
+    // Todo: Dirty Hack! Get rid of this static variable
+    private static View view;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        // Todo: Dirty Hack! Shouldn't use nested fragments. CaptureFragment should therefore be an activity
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            // Inflate the layout for this fragment
+            view = inflater.inflate(R.layout.fragment_capture, container, false);
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
+
+        mStartTrackingButton = (Button) view.findViewById(R.id.button_tracking);
+        mStartTrackingButton.setEnabled(mPermissionsGranted);
+        mStartTrackingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleStartButton();
+            }
+        });
+
+        mWaypointCounterView = (TextView) view.findViewById(R.id.text_waypoint_counter);
+        mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
+
+        // Change text of button if already tracking
+        if(ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
+            mStartTrackingButton.setText(R.string.stop_tracking);
+        }
+
+        return view;
     }
 
     private void handleStartButton() {
@@ -86,6 +128,8 @@ public class CaptureFragment extends Fragment {
                 getActivity().startService(intent);
                 mStartTrackingButton.setText(R.string.stop_tracking);
 
+                // Add the listener
+                LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mWaypointCounter, new IntentFilter(Constants.BROADCAST_NEW_WAYPOINT));
             } else {
                 // Show settings to enable GPS
                 showMessageBox(getActivity(), getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
@@ -102,6 +146,10 @@ public class CaptureFragment extends Fragment {
             Intent intent = new Intent(getActivity(), LocationService.class);
             getActivity().stopService(intent);
             mStartTrackingButton.setText(R.string.start_tracking);
+
+            // Remove the listener
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mWaypointCounter);
+            WaypointCounter.resetCounter();
         }
     }
 
@@ -135,43 +183,6 @@ public class CaptureFragment extends Fragment {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
         }
-    }
-
-
-    // Todo: Dirty Hack! Get rid of this static variable
-    private static View view;
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        // Todo: Dirty Hack! Shouldn't use nested fragments. CaptureFragment should therefore be an activity
-        if (view != null) {
-            ViewGroup parent = (ViewGroup) view.getParent();
-            if (parent != null)
-                parent.removeView(view);
-        }
-        try {
-            // Inflate the layout for this fragment
-            view = inflater.inflate(R.layout.fragment_capture, container, false);
-        } catch (InflateException e) {
-            /* map is already there, just return view as it is */
-        }
-
-        mStartTrackingButton = (Button) view.findViewById(R.id.button_tracking);
-        mStartTrackingButton.setEnabled(mPermissionsGranted);
-        mStartTrackingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                handleStartButton();
-            }
-        });
-
-        // Change text of button if already tracking
-        if(ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
-            mStartTrackingButton.setText(R.string.stop_tracking);
-        }
-
-        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
