@@ -4,33 +4,34 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.LocationManager;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
-import android.os.Message;
-import android.os.Process;
+import android.support.v4.content.LocalBroadcastManager;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.MainActivity;
-import gps.fhv.at.gps_hawk.workers.GpsSvc;
-import gps.fhv.at.gps_hawk.workers.IGpsSvc;
+import gps.fhv.at.gps_hawk.broadcast.WaypointPersistor;
+import gps.fhv.at.gps_hawk.workers.GpsWorker;
+import gps.fhv.at.gps_hawk.workers.IGpsWorker;
 
 public class LocationService extends Service {
 
-    private IGpsSvc mGpsSvc;
+    private IGpsWorker mGpsSvc;
+    private BroadcastReceiver mWaypointPersistor;
 
     public LocationService() {
+        mWaypointPersistor = new WaypointPersistor();
     }
 
     @Override
     public void onCreate() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        mGpsSvc = new GpsSvc(locationManager, this);
+        mGpsSvc = new GpsWorker(locationManager, this);
     }
 
     @Override
@@ -38,6 +39,9 @@ public class LocationService extends Service {
         if(mGpsSvc.isGpsAvailable()) {
             // Show notification
             showNotification();
+
+            // Add Waypoint Listeners
+            addWaypointListeners();
 
             // Start GPS tracking
             mGpsSvc.startGpsTracking();
@@ -55,6 +59,9 @@ public class LocationService extends Service {
         // Cancel notification
         cancelNotification();
 
+        // Stop Waypoint Listeners
+        removeWaypointListeners();
+
         // Stop GPS tracking
         mGpsSvc.stopGpsTracking();
     }
@@ -63,6 +70,16 @@ public class LocationService extends Service {
     public IBinder onBind(Intent intent) {
         // No binding
         return null;
+    }
+
+    private void addWaypointListeners() {
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(mWaypointPersistor, new IntentFilter(Constants.BROADCAST_NEW_WAYPOINT));
+    }
+
+    private void removeWaypointListeners() {
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.unregisterReceiver(mWaypointPersistor);
     }
 
     private void showNotification() {

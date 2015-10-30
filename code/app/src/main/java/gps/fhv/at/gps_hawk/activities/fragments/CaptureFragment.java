@@ -27,12 +27,12 @@ import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.services.LocationService;
-import gps.fhv.at.gps_hawk.workers.GpsSvc;
+import gps.fhv.at.gps_hawk.workers.GpsWorker;
 
 
 public class CaptureFragment extends Fragment {
 
-    private static GpsSvc mGpsService;
+    private static GpsWorker mGpsService;
 
     private LocationManager locationManager;
     private boolean mPermissionsGranted = false;
@@ -78,7 +78,7 @@ public class CaptureFragment extends Fragment {
         if (!ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
 
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-            mGpsService = new GpsSvc(locationManager, getActivity().getApplicationContext());
+            mGpsService = new GpsWorker(locationManager, getActivity().getApplicationContext());
 
             if (mGpsService.isGpsAvailable()) {
                 // Start the service
