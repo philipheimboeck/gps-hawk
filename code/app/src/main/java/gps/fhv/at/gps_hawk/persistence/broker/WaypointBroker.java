@@ -54,6 +54,8 @@ public class WaypointBroker extends BrokerBase {
 
         Waypoint wp = new Waypoint();
 
+        // cursor.getColumnNames();
+
         // Int
         wp.setId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
         wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));

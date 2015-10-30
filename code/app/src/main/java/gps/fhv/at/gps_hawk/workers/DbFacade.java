@@ -76,6 +76,8 @@ public class DbFacade {
                 // Int
                 WaypointDef._ID,
                 WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
+                WaypointDef.COLUMN_NAME_IS_EXPORTED,
+                WaypointDef.COLUMN_NAME_TRACK_ID,
                 // Datetime
                 WaypointDef.COLUMN_NAME_DATETIME,
                 // Double
