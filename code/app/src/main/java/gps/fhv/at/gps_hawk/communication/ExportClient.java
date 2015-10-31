@@ -5,6 +5,8 @@ import android.content.Context;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
@@ -25,7 +27,11 @@ public class ExportClient extends RestClient {
 
             URL url = new URL(expCtx.getUrl());
 
-            HTTPAnswer answer = post(url, expCtx.getWaypointList(),"waypoints");
+            HashMap<String, String> params = new HashMap<>();
+            params.put("deviceid", expCtx.getAndroidId());
+
+            HTTPAnswer answer = post(url, expCtx.getWaypointList(), "waypoints", params);
+
             if (answer.responseCode != 200) {
                 throw new RegistrationException("Could not export data!");
             }
