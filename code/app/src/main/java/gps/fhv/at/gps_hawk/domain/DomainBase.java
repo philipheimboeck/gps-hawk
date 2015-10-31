@@ -5,4 +5,5 @@ package gps.fhv.at.gps_hawk.domain;
  */
 public abstract class DomainBase {
     public abstract int getId();
+    public abstract void setId(int id);
 }

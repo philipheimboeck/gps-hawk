@@ -28,8 +28,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.services.LocationService;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
+import gps.fhv.at.gps_hawk.workers.DbSetup;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 
 
@@ -44,6 +47,7 @@ public class CaptureFragment extends Fragment {
     private SupportMapFragment mMapFragment;
     private TextView mWaypointCounterView;
     private Button mStartTrackingButton;
+    private Track mCurrentTrack;
 
     private WaypointCounter mWaypointCounter = new WaypointCounter() {
         @Override
@@ -108,7 +112,7 @@ public class CaptureFragment extends Fragment {
         mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
 
         // Change text of button if already tracking
-        if(ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
+        if (ServiceDetectionHelper.isServiceRunning(getActivity().getApplicationContext(), LocationService.class)) {
             mStartTrackingButton.setText(R.string.stop_tracking);
         }
 
@@ -121,10 +125,15 @@ public class CaptureFragment extends Fragment {
 
             locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
             mGpsService = new GpsWorker(locationManager, getActivity().getApplicationContext());
+            mCurrentTrack = new Track();
+            DbFacade db = DbFacade.getInstance(getActivity());
+            int trackID =  (int) db.saveEntity(mCurrentTrack);
+            mCurrentTrack.setId(trackID);
 
             if (mGpsService.isGpsAvailable()) {
                 // Start the service
                 Intent intent = new Intent(getActivity(), LocationService.class);
+                intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
                 getActivity().startService(intent);
                 mStartTrackingButton.setText(R.string.stop_tracking);
 

@@ -14,13 +14,12 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class WaypointBroker extends BrokerBase {
 
     @Override
-    public <T extends DomainBase> ContentValues map2db(T domain) {
+    public <T extends DomainBase> ContentValues map2dbImpl(T domain) {
         Waypoint wp = (Waypoint) domain;
 
         ContentValues values = new ContentValues();
 
         // Int
-        if (wp.getId() > 0) values.put(WaypointDef._ID, wp.getId());
         values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSattelites());
         values.put(WaypointDef.COLUMN_NAME_TRACK_ID, wp.getTrackId());
         values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, wp.getIsExported());
@@ -50,7 +49,6 @@ public class WaypointBroker extends BrokerBase {
         Waypoint wp = new Waypoint();
 
         // Int
-        wp.setId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
         wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
         wp.setIsExported(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED));
         wp.setTrackId(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID));

@@ -11,6 +11,7 @@ public class Constants {
     public static final int NOTIFICATION_TRACKING_ID = 1;
     public static final String BROADCAST_NEW_WAYPOINT = "new-waypoint";
     public static final String EXTRA_WAYPOINT = "extra-waypoint";
+    public static final String EXTRA_TRACK = "extra-track";
 
     /**
      * GPS-Constants

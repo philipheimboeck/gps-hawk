@@ -59,10 +59,12 @@ public class WaypointFactory {
         waypoint.setProvider(location.getProvider());
         // Int
         waypoint.setNrOfSattelites(data.getNrOfSattelites());
+        waypoint.setTrackId(data.getTrack().getId());
 
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(location.getTime());
         waypoint.setTimestampCaptured(cal);
+
 
         return waypoint;
     }

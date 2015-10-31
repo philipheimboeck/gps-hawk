@@ -148,6 +148,29 @@ public class DbFacade {
 
     }
 
+    public <T extends DomainBase> T select(int id, Class<T> cl) {
+
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        String where = BaseColumns._ID +" = "+ id;
+
+        Cursor c = getDb().query(
+                broker.getTblName(),  // The table to query
+                null,                               // The columns to return
+                where,                                // The columns for the WHERE clause
+                null,                              // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        c.moveToFirst();
+
+        T domain = broker.map2domain(c);
+
+        return domain;
+    }
+
     public int getCount(String tbl, String where) {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
