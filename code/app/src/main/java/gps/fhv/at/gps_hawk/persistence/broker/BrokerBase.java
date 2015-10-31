@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 
@@ -11,7 +12,17 @@ import gps.fhv.at.gps_hawk.domain.DomainBase;
 public abstract class BrokerBase {
 
     public abstract  <T extends DomainBase> ContentValues map2db(T domain);
-    public abstract <T extends DomainBase> T map2domain(Cursor cursor);
+
+    public <T extends DomainBase> T map2domain(Cursor cursor) {
+        try {
+            return map2domainImpl(cursor);
+        } catch (IllegalArgumentException e) {
+            Log.e("FATAL","Tried to access unfetched column in cursor",e);
+            throw e;
+        }
+    }
+    protected abstract <T extends DomainBase> T map2domainImpl(Cursor cursor);
+
     public abstract String getTblName();
 
 }

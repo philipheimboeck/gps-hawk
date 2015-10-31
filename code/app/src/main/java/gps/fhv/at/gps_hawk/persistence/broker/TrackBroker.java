@@ -31,7 +31,7 @@ public class TrackBroker extends BrokerBase {
     }
 
     @Override
-    public <T extends DomainBase> T map2domain(Cursor cursor) {
+    protected  <T extends DomainBase> T map2domainImpl(Cursor cursor) {
         Track t = new Track();
 
         // Int

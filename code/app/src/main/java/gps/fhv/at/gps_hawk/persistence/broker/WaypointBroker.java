@@ -3,11 +3,6 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
@@ -50,11 +45,9 @@ public class WaypointBroker extends BrokerBase {
     }
 
     @Override
-    public <T extends DomainBase> T map2domain(Cursor cursor) {
+    protected  <T extends DomainBase> T map2domainImpl(Cursor cursor) throws IllegalArgumentException{
 
         Waypoint wp = new Waypoint();
-
-        // cursor.getColumnNames();
 
         // Int
         wp.setId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef._ID)));
