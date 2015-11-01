@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
@@ -237,7 +238,9 @@ public class CaptureActivity extends AppCompatActivity {
 
     private void addMapPoint(LatLng point) {
         if(mPolyline != null) {
-            mPolyline.getPoints().add(point);
+            List<LatLng> points = mPolyline.getPoints();
+            points.add(point);
+            mPolyline.setPoints(points); // Set again so that it will redraw
         }
     }
 
