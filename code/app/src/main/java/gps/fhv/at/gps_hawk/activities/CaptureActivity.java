@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,11 +20,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -33,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -100,13 +97,17 @@ public class CaptureActivity extends AppCompatActivity {
             Waypoint waypoint = (Waypoint) intent.getSerializableExtra(Constants.EXTRA_WAYPOINT);
             if (waypoint != null) {
                 LatLng point = new LatLng(waypoint.getLat(), waypoint.getLng());
-                addMapPoint(point);
 
-                // Show position
-                mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
+                if(mMapFragment != null && mMapFragment.getMap() != null) {
+                    addMapPoint(point);
 
-                // Zoom in the Google Map
-                mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(15));
+                    // Show position
+                    mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
+
+                    // Zoom in the Google Map
+                    mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(15));
+                }
+
             }
         }
     };
@@ -177,13 +178,13 @@ public class CaptureActivity extends AppCompatActivity {
         mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
 
         // Initialize the map
-        initializeMap();
+        initializeMapFragment();
 
         // When already tracking, show some other elements
         initializeViewInTrackingMode();
     }
 
-    private void initializeMap() {
+    private void initializeMapFragment() {
         // Map options
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if(mMapFragment == null) {
@@ -193,19 +194,25 @@ public class CaptureActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.map, mMapFragment).commit();
         }
 
+        initializeMap();
+    }
+
+    private void initializeMap() {
         if(mMapFragment != null) {
             // Map options
-            GoogleMap map = mMapFragment.getMap();
-            if(map != null) {
-                map.setMyLocationEnabled(true);
+            mMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    googleMap.setMyLocationEnabled(true);
 
-                // Set polyline
-                PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.width(5);
-                polylineOptions.visible(true);
-                polylineOptions.color(Color.parseColor("#CC0000FF"));
-                mPolyline = map.addPolyline(polylineOptions);
-            }
+                    // Set polyline
+                    PolylineOptions polylineOptions = new PolylineOptions();
+                    polylineOptions.width(5);
+                    polylineOptions.visible(true);
+                    polylineOptions.color(Color.parseColor("#CC0000FF"));
+                    mPolyline = googleMap.addPolyline(polylineOptions);
+                }
+            });
         }
     }
 
@@ -229,7 +236,9 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void addMapPoint(LatLng point) {
-        mPolyline.getPoints().add(point);
+        if(mPolyline != null) {
+            mPolyline.getPoints().add(point);
+        }
     }
 
     /**
@@ -245,7 +254,6 @@ public class CaptureActivity extends AppCompatActivity {
             DbFacade db = DbFacade.getInstance(this);
             int trackID =  (int) db.saveEntity(mCurrentTrack);
             mCurrentTrack.setId(trackID);
-
 
             if (mGpsService.isGpsAvailable()) {
                 // Start the service
