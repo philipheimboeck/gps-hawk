@@ -46,9 +46,11 @@ import gps.fhv.at.gps_hawk.activities.navigation.Navigation;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationItem;
 import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.services.LocationService;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 
 
@@ -68,6 +70,8 @@ public class CaptureActivity extends AppCompatActivity {
     private ListView mDrawerList;
 
     private Polyline mPolyline;
+
+    private Track mCurrentTrack;
 
     /**
      * State of the waypoint listeners (Registered/Not Registered)
@@ -106,6 +110,7 @@ public class CaptureActivity extends AppCompatActivity {
             }
         }
     };
+
 
 
     public CaptureActivity() {
@@ -236,10 +241,16 @@ public class CaptureActivity extends AppCompatActivity {
 
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             mGpsService = new GpsWorker(locationManager, getApplicationContext());
+            mCurrentTrack = new Track();
+            DbFacade db = DbFacade.getInstance(this);
+            int trackID =  (int) db.saveEntity(mCurrentTrack);
+            mCurrentTrack.setId(trackID);
+
 
             if (mGpsService.isGpsAvailable()) {
                 // Start the service
                 Intent intent = new Intent(this, LocationService.class);
+                intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
                 this.startService(intent);
                 mStartTrackingButton.setText(R.string.stop_tracking);
 
