@@ -14,7 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.activities.MainActivity;
+import gps.fhv.at.gps_hawk.activities.FragmentsActivity;
 import gps.fhv.at.gps_hawk.broadcast.WaypointPersistor;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.IGpsWorker;
@@ -83,7 +83,7 @@ public class LocationService extends Service {
     }
 
     private void showNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, FragmentsActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

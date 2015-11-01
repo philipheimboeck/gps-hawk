@@ -1,8 +1,5 @@
 package gps.fhv.at.gps_hawk.activities.navigation;
 
-
-import android.support.v4.app.Fragment;
-
 /**
  * Author: Philip Heimböck
  * Date: 22.10.15
@@ -12,28 +9,25 @@ public class NavigationItem {
     private String mText;
     private int mIconRes;
     private boolean mVisible;
-    private Fragment mFragment;
+    private NavigationAction mAction;
 
-    public NavigationItem() {
+    public NavigationItem(NavigationAction action, String text, int iconRes) {
+        this(action, text, iconRes, true);
     }
 
-    public NavigationItem(Fragment fragment, String text, int iconRes) {
-        this(fragment, text, iconRes, true);
-    }
-
-    public NavigationItem(Fragment fragment, String text, int iconRes, boolean visible) {
-        mFragment = fragment;
+    public NavigationItem(NavigationAction action, String text, int iconRes, boolean visible) {
+        mAction = action;
         mText = text;
         mIconRes = iconRes;
         mVisible = visible;
     }
 
-    public Fragment getFragment() {
-        return mFragment;
+    public NavigationAction getAction() {
+        return mAction;
     }
 
-    public void setFragment(Fragment fragment) {
-        mFragment = fragment;
+    public void setAction(NavigationAction action) {
+        mAction = action;
     }
 
     public String getText() {

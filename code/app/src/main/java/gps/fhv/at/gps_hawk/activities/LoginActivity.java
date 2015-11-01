@@ -404,7 +404,7 @@ public class LoginActivity extends AppCompatActivity {
      * Will close this activity and call the next one.
      */
     private void loginFinished() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, CaptureActivity.class);
         startActivity(intent);
         finish();
     }

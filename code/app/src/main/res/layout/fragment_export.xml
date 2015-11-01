@@ -12,29 +12,29 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="@dimen/activity_horizontal_margin"
-            android:text="@string/amount_of_captured_waypoints" />
+            android:text="@string/amount_of_captured_waypoints"/>
 
         <TextView
+            android:id="@+id/tbx_amount_of_waypoints"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/activity_horizontal_margin"
-            android:id="@+id/tbx_amount_of_waypoints" />
+            android:layout_height="@dimen/activity_horizontal_margin"/>
 
         <Button
+            android:id="@+id/button_do_export"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/start_export"
-            android:id="@+id/button_do_export"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"/>
+            android:layout_alignParentEnd="true"
+            android:text="@string/start_export"/>
 
 
     </LinearLayout>
     <!--<RelativeLayout-->
-        <!--android:orientation="vertical"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_margin="@dimen/activity_horizontal_margin"-->
-        <!--android:theme="@style/AppTheme">-->
+    <!--android:orientation="vertical"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_margin="@dimen/activity_horizontal_margin"-->
+    <!--android:theme="@style/AppTheme">-->
 
 
     <!--</RelativeLayout>-->

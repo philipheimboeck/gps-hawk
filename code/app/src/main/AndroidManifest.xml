@@ -22,7 +22,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MainActivity" >
+        <activity android:name=".activities.FragmentsActivity" >
+        </activity>
+        <activity android:name=".activities.CaptureActivity" >
         </activity>
 
         <meta-data
