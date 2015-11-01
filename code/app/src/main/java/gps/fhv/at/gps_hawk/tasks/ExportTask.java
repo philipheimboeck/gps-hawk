@@ -1,6 +1,8 @@
 package gps.fhv.at.gps_hawk.tasks;
 
 import android.os.AsyncTask;
+import android.provider.Settings;
+
 import gps.fhv.at.gps_hawk.communication.ExportClient;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.workers.DbFacade;

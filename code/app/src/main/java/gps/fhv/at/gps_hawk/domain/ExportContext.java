@@ -12,6 +12,7 @@ public class ExportContext {
     private List<Waypoint> _waypointList;
     private String _url;
     private Context _context;
+    private String androidId;
 
     public List<Waypoint> getWaypointList() {
         return _waypointList;
@@ -35,5 +36,13 @@ public class ExportContext {
 
     public void setContext(Context context) {
         _context = context;
+    }
+
+    public String getAndroidId() {
+        return androidId;
+    }
+
+    public void setAndroidId(String androidId) {
+        this.androidId = androidId;
     }
 }

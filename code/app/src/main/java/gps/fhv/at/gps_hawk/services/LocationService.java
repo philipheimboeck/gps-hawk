@@ -16,6 +16,8 @@ import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.FragmentsActivity;
 import gps.fhv.at.gps_hawk.broadcast.WaypointPersistor;
+import gps.fhv.at.gps_hawk.domain.Track;
+import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.IGpsWorker;
 
@@ -44,7 +46,8 @@ public class LocationService extends Service {
             addWaypointListeners();
 
             // Start GPS tracking
-            mGpsSvc.startGpsTracking();
+            Track t = (Track) intent.getSerializableExtra(Constants.EXTRA_TRACK);
+            mGpsSvc.startGpsTracking(t);
         } else {
             // No GPS? Stop the service right away!
             stopSelf();

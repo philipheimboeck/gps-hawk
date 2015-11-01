@@ -85,15 +85,29 @@ public class RestClient {
     }
 
     public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key) throws IOException, NoConnectionException {
+        return post(url, list, key, null);
+    }
+
+    public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key, Map<String, String> otherParams) throws IOException, NoConnectionException {
+
         StringBuilder result = new StringBuilder();
+
+        if (otherParams != null && !otherParams.isEmpty()) {
+            String otherContent = getPostDataString(otherParams);
+            result.append(otherContent);
+        }
+
+        if (list.size() > 0 && result.length() > 0) result.append("&");
 
         String content = getJsonArray(list);
         result.append(URLEncoder.encode(key, "UTF-8"));
         result.append("=");
         result.append(URLEncoder.encode(content, "UTF-8"));
 
+
         return post(url, result.toString());
     }
+
 
     private HTTPAnswer post(URL url, String content) throws IOException, NoConnectionException {
         if (!checkConnection()) {

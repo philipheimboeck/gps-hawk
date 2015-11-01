@@ -13,10 +13,12 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 import gps.fhv.at.gps_hawk.helper.MyLocationListener;
@@ -29,6 +31,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     private LocationManager mLocationManager;
     private Context mContext;
     private MyLocationListener mLocationListener;
+    private Track mCurrentTrack;
 
     public GpsWorker(LocationManager locationManager, Context context) {
         mLocationManager = locationManager;
@@ -37,9 +40,11 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     }
 
     @Override
-    public void startGpsTracking() {
+    public void startGpsTracking(Track t) {
 
         try {
+
+            mCurrentTrack = t;
 
             //noinspection ResourceType
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.MIN_TIME, Constants.MIN_DIST_CHANGE, mLocationListener);
@@ -67,6 +72,15 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
         try {
             // Stop the tracking
             mLocationManager.removeUpdates(mLocationListener);
+
+            Calendar end = Calendar.getInstance();
+
+            // In case through UI the track changed, reload it
+            DbFacade db = DbFacade.getInstance(mContext);
+            Track t = db.select(mCurrentTrack.getId(),Track.class);
+            t.setEndDateTime(end);
+
+            db.saveEntity(t);
         } catch (SecurityException ex) {
             Log.e("Security", "Permission not granted!");
         }
@@ -105,6 +119,9 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
     @Override
     public void onLocationChange(Location location, NewLocationEventData data) {
+
+        data.setTrack(mCurrentTrack);
+
         Waypoint waypoint = WaypointFactory.getInstance().createWaypoint(location, data);
 
         // Send a new message
@@ -115,7 +132,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
     @Override
     public void onProviderEnabled(String provider) {
-        startGpsTracking();
+        // Todo
+//        startGpsTracking();
     }
 
     @Override

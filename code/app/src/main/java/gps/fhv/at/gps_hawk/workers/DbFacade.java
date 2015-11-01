@@ -76,6 +76,8 @@ public class DbFacade {
                 // Int
                 WaypointDef._ID,
                 WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
+                WaypointDef.COLUMN_NAME_IS_EXPORTED,
+                WaypointDef.COLUMN_NAME_TRACK_ID,
                 // Datetime
                 WaypointDef.COLUMN_NAME_DATETIME,
                 // Double
@@ -144,6 +146,29 @@ public class DbFacade {
 
         return count;
 
+    }
+
+    public <T extends DomainBase> T select(int id, Class<T> cl) {
+
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        String where = BaseColumns._ID +" = "+ id;
+
+        Cursor c = getDb().query(
+                broker.getTblName(),  // The table to query
+                null,                               // The columns to return
+                where,                                // The columns for the WHERE clause
+                null,                              // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        c.moveToFirst();
+
+        T domain = broker.map2domain(c);
+
+        return domain;
     }
 
     public int getCount(String tbl, String where) {
