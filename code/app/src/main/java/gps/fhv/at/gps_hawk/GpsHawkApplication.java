@@ -4,6 +4,8 @@ import android.app.Application;
 import android.util.Log;
 
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -26,6 +28,14 @@ public class GpsHawkApplication extends Application {
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
                 // Do some custom exception handling
+
+                // Save Exception to local db
+                Exception2Log exception2Log = new Exception2Log();
+                exception2Log.setStackTrace(ex.getStackTrace().toString());
+                exception2Log.setMessage(ex.getMessage());
+                DbFacade db = DbFacade.getInstance();
+                db.saveEntity(exception2Log);
+
                 ex.printStackTrace();
                 Log.e("UNCAUGHT", ex.getMessage());
 

@@ -11,7 +11,7 @@ import gps.fhv.at.gps_hawk.helper.DateHelper;
 /**
  * Created by Tobias on 24.10.2015.
  */
-public class Waypoint extends DomainBase implements IJSONable, Serializable {
+public class Waypoint extends DomainBase implements IJSONable, Serializable , IExportable {
     private int _id;
     private int _trackId;
     private int _isExported;

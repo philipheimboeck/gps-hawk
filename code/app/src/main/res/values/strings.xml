@@ -34,4 +34,5 @@
     <string name="notification_tracking_title">GPS Hawk Tracking</string>
     <string name="notification_tracking_text">GPS Hawk is tracking your location</string>
     <string name="number_of_waypoints">Number of tracked Waypoints: %1$d</string>
+    <string name="amount_of_exceptions">Amount of captured errors</string>
 </resources>

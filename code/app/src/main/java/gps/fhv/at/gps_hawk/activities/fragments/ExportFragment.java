@@ -14,7 +14,9 @@ import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
+import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
@@ -27,6 +29,7 @@ public class ExportFragment extends Fragment {
 
     private Button mButStartExport;
     private TextView mTextViewAmount;
+    private TextView mTextViewAmountExc;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,12 +53,18 @@ public class ExportFragment extends Fragment {
         });
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
+        mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
 
         DbFacade db = DbFacade.getInstance(getActivity());
         int amount = db.getCount(WaypointDef.TABLE_NAME, null);
-        int amountExported = db.getCount(WaypointDef.TABLE_NAME,WaypointDef.COLUMN_NAME_IS_EXPORTED +" = 0");
+        int amountExported = db.getCount(WaypointDef.TABLE_NAME, WaypointDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
-        mTextViewAmount.setText("" + (amount - amountExported) +" von "+ amount +" exportiert");
+        mTextViewAmount.setText("" + (amount - amountExported) + " from " + amount + " exported");
+
+        amount = db.getCount(Exception2LogDef.TABLE_NAME, null);
+        amountExported = db.getCount(Exception2LogDef.TABLE_NAME, Exception2LogDef.COLUMN_NAME_IS_EXPORTED);
+
+        mTextViewAmountExc.setText((amount - amountExported) + " from " + amount + " exported");
 
         return view;
     }

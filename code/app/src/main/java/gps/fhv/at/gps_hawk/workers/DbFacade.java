@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -12,9 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.broker.BrokerBase;
+import gps.fhv.at.gps_hawk.persistence.broker.Exception2LogBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
@@ -31,6 +34,7 @@ public class DbFacade {
     static {
         mBrokerMap.put(Waypoint.class, new WaypointBroker());
         mBrokerMap.put(Track.class, new TrackBroker());
+        mBrokerMap.put(Exception2Log.class, new Exception2LogBroker());
     }
 
     public static DbFacade getInstance(Context context) {
@@ -172,25 +176,31 @@ public class DbFacade {
     }
 
     public int getCount(String tbl, String where) {
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
-        String[] projection = {
-                "COUNT(*)"
-        };
+        int ret = -1;
+        try {
+            // Define a projection that specifies which columns from the database
+            // you will actually use after this query.
+            String[] projection = {
+                    "COUNT(*)"
+            };
 
-        Cursor c = getDb().query(
-                tbl,  // The table to query
-                projection,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                null,                              // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
+            Cursor c = getDb().query(
+                    tbl,  // The table to query
+                    projection,                               // The columns to return
+                    where,                                // The columns for the WHERE clause
+                    null,                              // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
 
-        c.moveToFirst();
+            c.moveToFirst();
 
-        int ret = c.getInt(0);
+            ret = c.getInt(0);
+
+        } catch (Exception e) {
+            Log.e("FATAL","Error fetching COUNT(*) FROM table"+tbl,e);
+        }
 
         return ret;
     }

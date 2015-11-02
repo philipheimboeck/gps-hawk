@@ -7,18 +7,18 @@ import java.util.List;
 /**
  * Created by Tobias on 25.10.2015.
  */
-public class ExportContext {
+public class ExportContext<T extends IExportable> {
 
-    private List<Waypoint> _waypointList;
+    private List<T> _waypointList;
     private String _url;
     private Context _context;
     private String androidId;
 
-    public List<Waypoint> getWaypointList() {
+    public List<T> getWaypointList() {
         return _waypointList;
     }
 
-    public void setWaypointList(List<Waypoint> waypointList) {
+    public void setWaypointList(List<T> waypointList) {
         _waypointList = waypointList;
     }
 

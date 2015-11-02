@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
+import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
@@ -19,7 +20,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class DbSetup extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 6;
     public static final String DATABASE_NAME = "GpwHawk.db";
 
     public DbSetup(Context context) {
@@ -33,6 +34,7 @@ public class DbSetup extends SQLiteOpenHelper {
         // Add Table-Def for each table
         tableDefs.add(new WaypointDef());
         tableDefs.add(new TrackDef());
+        tableDefs.add(new Exception2LogDef());
 
         return  tableDefs;
     }
