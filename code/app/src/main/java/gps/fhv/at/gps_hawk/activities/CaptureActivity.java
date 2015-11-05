@@ -49,6 +49,7 @@ import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
+import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
@@ -56,6 +57,7 @@ import gps.fhv.at.gps_hawk.workers.GpsWorker;
 
 public class CaptureActivity extends AppCompatActivity {
 
+    public static final int MAP_ZOOM = 15;
     private static GpsWorker mGpsService;
 
     private LocationManager locationManager;
@@ -78,6 +80,7 @@ public class CaptureActivity extends AppCompatActivity {
     private Polyline mPolyline;
 
     private Track mCurrentTrack;
+    private boolean mZoomed = false;
 
     /**
      * State of the waypoint listeners (Registered/Not Registered)
@@ -105,22 +108,25 @@ public class CaptureActivity extends AppCompatActivity {
             // Add the waypoint to the map
             Waypoint waypoint = (Waypoint) intent.getSerializableExtra(Constants.EXTRA_WAYPOINT);
             if (waypoint != null) {
-                LatLng point = new LatLng(waypoint.getLat(), waypoint.getLng());
+                LatLng point = waypoint.createLatLng();
 
-                if(mMapFragment != null && mMapFragment.getMap() != null) {
+                if (mMapFragment != null && mMapFragment.getMap() != null) {
                     addMapPoint(point);
 
                     // Show position
                     mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
 
                     // Zoom in the Google Map
-                    mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(15));
+                    if(!mZoomed) {
+                        mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM));
+                        mZoomed = true;
+                    }
+
                 }
 
             }
         }
     };
-
 
 
     public CaptureActivity() {
@@ -203,7 +209,7 @@ public class CaptureActivity extends AppCompatActivity {
     private void initializeMapFragment() {
         // Map options
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if(mMapFragment == null) {
+        if (mMapFragment == null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             mMapFragment = SupportMapFragment.newInstance();
@@ -214,7 +220,7 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void initializeMap() {
-        if(mMapFragment != null) {
+        if (mMapFragment != null) {
             // Map options
             mMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
@@ -243,16 +249,34 @@ public class CaptureActivity extends AppCompatActivity {
             mStartTrackingButton.setText(R.string.stop_tracking);
 
             // Add route when currently tracking
-            // TODO Add all points from current track to list
-            // for(LatLng point : getAllPoints) addMapPoint(point);
+            if (mCurrentTrack != null) {
+
+                // Remove old waypoints
+                clearWaypoints();
+
+                // Add all points from current track to list
+                for (Waypoint waypoint: getAllPoints(mCurrentTrack)) {
+                    addMapPoint(waypoint.createLatLng());
+                }
+            }
 
             // Add the waypoint listeners
             addWaypointListener();
         }
     }
 
-    private void addMapPoint(LatLng point) {
+    private void clearWaypoints() {
         if(mPolyline != null) {
+            mPolyline.setPoints(new ArrayList<LatLng>());
+        }
+    }
+
+    private Iterable<Waypoint> getAllPoints(Track currentTrack) {
+        return DbFacade.getInstance(this).selectWhere(WaypointDef.COLUMN_NAME_TRACK_ID + " = " + currentTrack.getId(), Waypoint.class);
+    }
+
+    private void addMapPoint(LatLng point) {
+        if (mPolyline != null) {
             List<LatLng> points = mPolyline.getPoints();
             points.add(point);
             mPolyline.setPoints(points); // Set again so that it will redraw
@@ -270,7 +294,7 @@ public class CaptureActivity extends AppCompatActivity {
             mGpsService = new GpsWorker(locationManager, getApplicationContext());
             mCurrentTrack = new Track();
             DbFacade db = DbFacade.getInstance(this);
-            int trackID =  (int) db.saveEntity(mCurrentTrack);
+            int trackID = (int) db.saveEntity(mCurrentTrack);
             mCurrentTrack.setId(trackID);
 
             if (mGpsService.isGpsAvailable()) {
@@ -279,6 +303,12 @@ public class CaptureActivity extends AppCompatActivity {
                 intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
                 this.startService(intent);
                 mStartTrackingButton.setText(R.string.stop_tracking);
+
+                // Remove old waypoint
+                clearWaypoints();
+
+                // Reset zoom
+                mZoomed = false;
 
                 // Add the listener
                 addWaypointListener();
