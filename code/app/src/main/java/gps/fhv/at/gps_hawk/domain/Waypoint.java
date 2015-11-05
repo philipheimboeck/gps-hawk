@@ -1,5 +1,7 @@
 package gps.fhv.at.gps_hawk.domain;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -144,5 +146,9 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
 
     public void setAltitude(double altitude) {
         _altitude = altitude;
+    }
+
+    public LatLng createLatLng() {
+        return new LatLng(getLat(), getLng());
     }
 }

@@ -175,6 +175,30 @@ public class DbFacade {
         return domain;
     }
 
+    public <T extends DomainBase> List<T> selectWhere(String condition, Class<T> cl) {
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        Cursor c = getDb().query(
+                broker.getTblName(), // Table to query
+                null,
+                condition,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+
+        ArrayList<T> list = new ArrayList<>();
+        for(int i = 0; i < c.getCount(); i++) {
+            T domain = broker.map2domain(c);
+            list.add(domain);
+
+            c.moveToNext();
+        }
+        return list;
+    }
+
     public int getCount(String tbl, String where) {
         int ret = -1;
         try {
