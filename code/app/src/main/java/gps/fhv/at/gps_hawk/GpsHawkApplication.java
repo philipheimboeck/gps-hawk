@@ -3,6 +3,9 @@ package gps.fhv.at.gps_hawk;
 import android.app.Application;
 import android.util.Log;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
@@ -30,8 +33,11 @@ public class GpsHawkApplication extends Application {
                 // Do some custom exception handling
 
                 // Save Exception to local db
+                StringWriter sw = new StringWriter();
+                ex.printStackTrace(new PrintWriter(sw));
+
                 Exception2Log exception2Log = new Exception2Log();
-                exception2Log.setStackTrace(ex.getStackTrace().toString());
+                exception2Log.setStackTrace(sw.toString());
                 exception2Log.setMessage(ex.getMessage());
                 DbFacade db = DbFacade.getInstance();
                 db.saveEntity(exception2Log);
