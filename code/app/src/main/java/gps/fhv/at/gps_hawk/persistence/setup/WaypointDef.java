@@ -14,6 +14,7 @@ public class WaypointDef extends BaseTableDef {
     public static final String COLUMN_NAME_NR_OF_SATTELITES = "nrOfSattelites";
     public static final String COLUMN_NAME_TRACK_ID = "track_id";
     public static final String COLUMN_NAME_IS_EXPORTED = "isExported";
+    public static final String COLUMN_NAME_VEHICLE_ID = "vehicleId";
 
     // Datetime types
     public static final String COLUMN_NAME_DATETIME = "date_gps";
@@ -38,6 +39,7 @@ public class WaypointDef extends BaseTableDef {
                 COLUMN_NAME_NR_OF_SATTELITES + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_TRACK_ID + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_IS_EXPORTED + TYPE_INT + COMMA_SEP +
+                        COLUMN_NAME_VEHICLE_ID + TYPE_INT + COMMA_SEP +
 
                         // Datetime types
                         COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +

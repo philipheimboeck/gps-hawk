@@ -18,6 +18,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
     private int _trackId;
     private int _isExported;
     private int _nrOfSattelites;
+    private int _vehicleId;
     private Calendar _timestampCaptured;
     private float _accuracy;
     private float _speed;
@@ -26,6 +27,9 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
     private double _lat;
     private double _altitude;
 
+    // Referencec, that should be set only to export via JSON!
+    private Vehicle _vehicle;
+    private Track _track;
 
     /**
      * Bearing is the horizontal direction of travel of this device, and is not related to the device orientation.
@@ -118,6 +122,19 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
             json.put("lng",getLng());
             json.put("lat",getLat());
             json.put("altitude",getAltitude());
+
+            if ( getVehicle() != null ) {
+                json.put("vehicle",getVehicle().toJSON());
+            } else  {
+                json.put("vehicleid",getVehicleId());
+            }
+
+            if ( getTrack() != null ) {
+                json.put("track",getTrack().toJSON());
+            } else  {
+                json.put("trackid",getTrackId());
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -150,5 +167,29 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
 
     public LatLng createLatLng() {
         return new LatLng(getLat(), getLng());
+    }
+
+    public int getVehicleId() {
+        return _vehicleId;
+    }
+
+    public void setVehicleId(int vehicleId) {
+        _vehicleId = vehicleId;
+    }
+
+    public Vehicle getVehicle() {
+        return _vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        _vehicle = vehicle;
+    }
+
+    public Track getTrack() {
+        return _track;
+    }
+
+    public void setTrack(Track track) {
+        _track = track;
     }
 }

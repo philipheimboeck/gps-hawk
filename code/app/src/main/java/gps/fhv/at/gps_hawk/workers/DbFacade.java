@@ -82,6 +82,7 @@ public class DbFacade {
                 WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
                 WaypointDef.COLUMN_NAME_IS_EXPORTED,
                 WaypointDef.COLUMN_NAME_TRACK_ID,
+                WaypointDef.COLUMN_NAME_VEHICLE_ID,
                 // Datetime
                 WaypointDef.COLUMN_NAME_DATETIME,
                 // Double
@@ -126,6 +127,7 @@ public class DbFacade {
 
     /**
      * Masks Waypoints, that hasn't yet been exported, with `isExportet=2`
+     *
      * @return
      */
     public int markWaypoints(int whereIsExport, int updValIsExport) {
@@ -140,7 +142,7 @@ public class DbFacade {
 
         // Which row to update, based on the ID
         String selection = WaypointDef.COLUMN_NAME_IS_EXPORTED + " = ?";
-        String[] selectionArgs = { String.valueOf(whereIsExport) };
+        String[] selectionArgs = {String.valueOf(whereIsExport)};
 
         int count = db.update(
                 broker.getTblName(),
@@ -154,24 +156,30 @@ public class DbFacade {
 
     public <T extends DomainBase> T select(int id, Class<T> cl) {
 
-        BrokerBase broker = mBrokerMap.get(cl);
+        T domain = null;
 
-        String where = BaseColumns._ID +" = "+ id;
+        try {
+            BrokerBase broker = mBrokerMap.get(cl);
 
-        Cursor c = getDb().query(
-                broker.getTblName(),  // The table to query
-                null,                               // The columns to return
-                where,                                // The columns for the WHERE clause
-                null,                              // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
+            String where = BaseColumns._ID + " = " + id;
 
-        c.moveToFirst();
+            Cursor c = getDb().query(
+                    broker.getTblName(),  // The table to query
+                    null,
+//                new String[]{" * "},                               // The columns to return
+                    where,                                // The columns for the WHERE clause
+                    null,                              // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
 
-        T domain = broker.map2domain(c);
+            c.moveToFirst();
 
+            domain = broker.map2domain(c);
+        } catch (Exception e) {
+            Log.e("FATAL", e.getMessage(), e);
+        }
         return domain;
     }
 
@@ -189,8 +197,9 @@ public class DbFacade {
                 null
         );
 
+        c.moveToFirst();
         ArrayList<T> list = new ArrayList<>();
-        for(int i = 0; i < c.getCount(); i++) {
+        for (int i = 0; i < c.getCount(); i++) {
             T domain = broker.map2domain(c);
             list.add(domain);
 
@@ -223,7 +232,7 @@ public class DbFacade {
             ret = c.getInt(0);
 
         } catch (Exception e) {
-            Log.e("FATAL","Error fetching COUNT(*) FROM table"+tbl,e);
+            Log.e("FATAL", "Error fetching COUNT(*) FROM table" + tbl, e);
         }
 
         return ret;

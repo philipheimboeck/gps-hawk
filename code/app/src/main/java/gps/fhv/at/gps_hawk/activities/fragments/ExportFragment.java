@@ -41,6 +41,11 @@ public class ExportFragment extends Fragment {
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.preferences, true);
 
+        // TODO: Test only
+        DbFacade dbFacade = DbFacade.getInstance(getActivity());
+        dbFacade.markWaypoints(2, 0); // Reset all waypoints
+        dbFacade.markWaypoints(1, 0); // Reset all waypoints
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
 
