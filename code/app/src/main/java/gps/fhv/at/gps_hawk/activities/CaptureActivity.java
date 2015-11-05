@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -66,6 +68,12 @@ public class CaptureActivity extends AppCompatActivity {
     private Navigation mNavigation;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+
+    private ImageButton mNowFoot;
+    private ImageButton mNowBicycle;
+    private ImageButton mNowBus;
+    private ImageButton mNowTrain;
+    private ImageButton mNowCar;
 
     private Polyline mPolyline;
 
@@ -177,6 +185,13 @@ public class CaptureActivity extends AppCompatActivity {
 
         mWaypointCounterView = (TextView) findViewById(R.id.text_waypoint_counter);
         mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
+
+        // ImageButtons
+        mNowFoot = (ImageButton) findViewById(R.id.butNowFoot);
+        mNowBicycle = (ImageButton) findViewById(R.id.butNowBicycle);
+        mNowBus = (ImageButton) findViewById(R.id.butNowBus);
+        mNowTrain = (ImageButton) findViewById(R.id.butNowTrain);
+        mNowCar = (ImageButton) findViewById(R.id.butNowCar);
 
         // Initialize the map
         initializeMapFragment();
