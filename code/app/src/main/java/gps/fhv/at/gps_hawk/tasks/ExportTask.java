@@ -13,6 +13,7 @@ import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.exceptions.UnExpectedResultException;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 
@@ -22,9 +23,19 @@ import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 public class ExportTask extends AsyncTask<Void, Void, String> {
 
     private ExportContext mExpContext;
+    private IAsyncTaskCaller<Void, String> mCaller;
 
-    public ExportTask(ExportContext expContext, final IAsyncTaskCaller<Void, Boolean> caller) {
+    public ExportTask(ExportContext expContext, final IAsyncTaskCaller<Void, String> caller) {
         mExpContext = expContext;
+        mCaller = caller;
+    }
+
+    protected void onPreExecute() {
+        mCaller.onPreExecute();
+    }
+
+    protected void onPostExecute(final String result) {
+        mCaller.onPostExecute(result);
     }
 
     @Override
@@ -40,15 +51,22 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             // Get all Waypoints from DB to export
             mExpContext.setWaypointList(dbFacade.getAllWaypoints2Update());
 
-            // TODO: Test only
-//            ArrayList<Track> allTracks = (ArrayList<Track>) dbFacade.selectWhere(null,Track.class);
-
             // Insert Tracks and Vehicles as Objects
-            setDomainObjects(dbFacade,mExpContext);
+            setDomainObjects(dbFacade, mExpContext);
 
             // Send via Web
             ExportClient client = new ExportClient(mExpContext.getContext());
-            client.exportCollectedWaypoints(mExpContext);
+            try {
+
+                client.exportCollectedWaypoints(mExpContext);
+
+            } catch (UnExpectedResultException e) {
+                e.printStackTrace();
+
+                // Reset not exported waypoints
+                dbFacade.markWaypoints(2, 0);
+                return "ERROR";
+            }
 
             // Mark "ExportNow" Waypoints as "Exported"
             dbFacade.markWaypoints(2, 1);

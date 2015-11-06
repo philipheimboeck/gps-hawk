@@ -1,5 +1,7 @@
 package gps.fhv.at.gps_hawk.activities.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,7 +16,6 @@ import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
@@ -30,6 +31,8 @@ public class ExportFragment extends Fragment {
     private Button mButStartExport;
     private TextView mTextViewAmount;
     private TextView mTextViewAmountExc;
+    private View mProgressView;
+    private ExportTask mExportTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,8 @@ public class ExportFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
+
+        mProgressView = view.findViewById(R.id.export_progress);
 
         mButStartExport = (Button) view.findViewById(R.id.button_do_export);
         mButStartExport.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +79,21 @@ public class ExportFragment extends Fragment {
         return view;
     }
 
+    private void showLoading(final boolean show) {
+
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
+
+    }
+
     private void handleButExport() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String key = Constants.PREF_EXPORT_URL;
@@ -89,16 +109,16 @@ public class ExportFragment extends Fragment {
             exportContext.setAndroidId(Settings.Secure.getString(getActivity().getContentResolver(),
                     Settings.Secure.ANDROID_ID));
 
-            ExportTask exportTask = new ExportTask(exportContext, new IAsyncTaskCaller<Void, Boolean>() {
+            mExportTask = new ExportTask(exportContext, new IAsyncTaskCaller<Void, String>() {
 
                 @Override
-                public void onPostExecute(Boolean success) {
-
+                public void onPostExecute(String success) {
+                    showLoading(false);
                 }
 
                 @Override
                 public void onCancelled() {
-
+                    showLoading(true);
                 }
 
                 @Override
@@ -108,10 +128,10 @@ public class ExportFragment extends Fragment {
 
                 @Override
                 public void onPreExecute() {
-
+                    showLoading(true);
                 }
             });
-            exportTask.execute();
+            mExportTask.execute();
         }
     }
 

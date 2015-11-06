@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
 
         <TableLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
             <TableRow>
@@ -22,23 +22,33 @@
                 <ImageButton
                     android:id="@+id/butNowFoot"
                     android:layout_column="0"
-                    android:src="@drawable/ic_hawk_white"/>
+                    android:src="@drawable/walk"
+                    android:background="@drawable/current_vehicle"
+                    style="@style/VehicleButtons"/>
                 <ImageButton
                     android:id="@+id/butNowBicycle"
                     android:layout_column="1"
-                    android:src="@drawable/ic_hawk_white"/>
+                    android:src="@drawable/bicycle"
+                    android:background="@drawable/inactive_vehicle"
+                    style="@style/VehicleButtons" />
                 <ImageButton
                     android:id="@+id/butNowTrain"
                     android:layout_column="2"
-                    android:src="@drawable/ic_hawk_white"/>
+                    android:src="@drawable/bus"
+                    android:background="@drawable/inactive_vehicle"
+                    style="@style/VehicleButtons" />
                 <ImageButton
                     android:id="@+id/butNowBus"
                     android:layout_column="3"
-                    android:src="@drawable/ic_hawk_white"/>
+                    android:src="@drawable/train"
+                    android:background="@drawable/inactive_vehicle"
+                    style="@style/VehicleButtons"/>
                 <ImageButton
                     android:id="@+id/butNowCar"
                     android:layout_column="4"
-                    android:src="@drawable/ic_hawk_white"/>
+                    android:src="@drawable/car"
+                    android:background="@drawable/inactive_vehicle"
+                    style="@style/VehicleButtons"/>
 
             </TableRow>
         </TableLayout>
