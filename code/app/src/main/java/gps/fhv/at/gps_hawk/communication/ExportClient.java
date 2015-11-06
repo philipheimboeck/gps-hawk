@@ -2,6 +2,9 @@ package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,6 +13,7 @@ import java.util.HashMap;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
+import gps.fhv.at.gps_hawk.exceptions.UnExpectedResultException;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -21,7 +25,7 @@ public class ExportClient extends RestClient {
         super(context);
     }
 
-    public boolean exportCollectedWaypoints(ExportContext expCtx) {
+    public boolean exportCollectedWaypoints(ExportContext expCtx) throws UnExpectedResultException {
 
         try {
 
@@ -35,6 +39,15 @@ public class ExportClient extends RestClient {
             if (answer.responseCode != 200) {
                 throw new RegistrationException("Could not export data!");
             }
+
+            // Expects as return-string:
+            // {"waypoints":4}
+
+            JSONObject response = new JSONObject(answer.content);
+            if (!(response.has("waypoints") && response.getInt("waypoints") == expCtx.getWaypointList().size())) {
+                throw new UnExpectedResultException("Amount of saved waypoints does not match amount of transferred waypoints");
+            }
+
             return true;
 
         } catch (MalformedURLException e) {
@@ -44,6 +57,8 @@ public class ExportClient extends RestClient {
         } catch (NoConnectionException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return false;

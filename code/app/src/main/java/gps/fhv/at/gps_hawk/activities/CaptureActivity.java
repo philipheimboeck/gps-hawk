@@ -207,12 +207,18 @@ public class CaptureActivity extends AppCompatActivity {
             public void onClick(View v) {
                 ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
                 Vehicle ourVehicle = null;
+                int i = -1;
                 for (Vehicle vehicle : vList) {
+                    ++i;
                     if ( v.getId() == vehicle.getUiId()) {
                         ourVehicle = vehicle;
-                        break;
+                        mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
+                        continue;
                     }
+//                    mImgVehicleButtons[i].setBackgroundResource(0);
+                    mImgVehicleButtons[i].setBackgroundResource(R.drawable.inactive_vehicle);
                 }
+//                mImgVehicleButtons[i].setBackground();
                 WaypointFactory.getInstance().setVehicle(ourVehicle);
             }
         };

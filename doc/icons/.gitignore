@@ -1,0 +1,4 @@
+results/*
+generated/*
+*.ps1
+svg/*
