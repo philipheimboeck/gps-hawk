@@ -38,12 +38,4 @@ public interface ILoginClient {
      * @throws LoginException
      */
     String login(String username, String password, String deviceID) throws LoginException;
-
-    /**
-     * Checks if the token is still valid
-     *
-     * @param token
-     * @return
-     */
-    boolean tokenValid(String token);
 }

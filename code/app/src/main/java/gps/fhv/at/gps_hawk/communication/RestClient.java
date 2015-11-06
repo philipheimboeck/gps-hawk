@@ -32,6 +32,8 @@ import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
  */
 public class RestClient {
 
+    protected static final String REST_SERVER = "http://172.22.25.195:8080/webservice/fhvgis/";
+
     private Context mContext;
 
     public RestClient(Context context) {
@@ -42,12 +44,13 @@ public class RestClient {
      * GET the URL data
      *
      * @param url The url to GET
+     * @param headers The headers to add
      * @return The Answer of the server
      * @throws NoConnectionException
      * @throws IOException
      */
-    public HTTPAnswer get(URL url) throws NoConnectionException, IOException {
-        if (checkConnection()) {
+    public HTTPAnswer get(URL url, HashMap<String, String> headers) throws NoConnectionException, IOException {
+        if (!checkConnection()) {
             throw new NoConnectionException();
         }
 
@@ -59,15 +62,28 @@ public class RestClient {
             connection = createConnection(url, "GET");
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
+            // Provide the headers
+            if(headers != null) {
+                for (String header : headers.keySet()) {
+                    connection.setRequestProperty(header, headers.get(header));
+                }
+            }
+
             // Start the query
             connection.connect();
 
             // Get the response code
             answer = new HTTPAnswer();
             answer.responseCode = connection.getResponseCode();
+            answer.contentType = connection.getContentType();
 
             // Get the content
-            inputStream = connection.getInputStream();
+            if(answer.responseCode >= 400) {
+                inputStream = connection.getErrorStream();
+            } else {
+                inputStream = connection.getInputStream();
+            }
+
             answer.content = getContent(inputStream);
 
         } finally {
@@ -82,6 +98,18 @@ public class RestClient {
         }
 
         return answer;
+    }
+
+    /**
+     * GET the URL data
+     *
+     * @param url The url to GET
+     * @return The Answer of the server
+     * @throws NoConnectionException
+     * @throws IOException
+     */
+    public HTTPAnswer get(URL url) throws NoConnectionException, IOException {
+        return get(url, null);
     }
 
     public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key) throws IOException, NoConnectionException {
@@ -137,9 +165,14 @@ public class RestClient {
             // Get the response code
             answer = new HTTPAnswer();
             answer.responseCode = connection.getResponseCode();
+            answer.contentType = connection.getContentType();
 
             // Get the content
-            inputStream = connection.getInputStream();
+            if(answer.responseCode >= 400) {
+                inputStream = connection.getErrorStream();
+            } else {
+                inputStream = connection.getInputStream();
+            }
             answer.content = getContent(inputStream);
 
         } finally {
@@ -245,7 +278,9 @@ public class RestClient {
         connection.setConnectTimeout(10000);
         connection.setRequestMethod(method);
         connection.setDoInput(true);
-        connection.setDoOutput(true);
+
+        if(method.equals("POST"))
+            connection.setDoOutput(true);
 
         return connection;
     }

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
-import gps.fhv.at.gps_hawk.communication.LoginTestClient;
+import gps.fhv.at.gps_hawk.communication.LoginRestClient;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
 
 /**
@@ -17,17 +17,19 @@ public class RegisterTask extends AsyncTask<Void, Void, String> {
     private final String mPassword;
     private final String mAndroidId;
     private final IAsyncTaskCaller<Void, String> mCaller;
+    private final Context mContext;
 
-    public RegisterTask(final String user, final String password, final String androidId, IAsyncTaskCaller<Void, String> mCaller) {
+    public RegisterTask(final String user, final String password, final String androidId, IAsyncTaskCaller<Void, String> caller, Context context) {
         this.mUser = user;
         this.mPassword = password;
         this.mAndroidId = androidId;
-        this.mCaller = mCaller;
+        this.mCaller = caller;
+        this.mContext = context;
     }
 
     @Override
     protected String doInBackground(Void... params) {
-        ILoginClient loginClient = new LoginTestClient();
+        ILoginClient loginClient = new LoginRestClient(mContext);
 
         try {
             return loginClient.register(mUser, mPassword, mAndroidId);

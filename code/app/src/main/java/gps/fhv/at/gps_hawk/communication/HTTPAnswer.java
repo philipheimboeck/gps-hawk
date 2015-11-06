@@ -7,12 +7,14 @@ package gps.fhv.at.gps_hawk.communication;
 public class HTTPAnswer {
     int responseCode;
     String content;
+    String contentType;
 
     public HTTPAnswer() {
     }
 
-    public HTTPAnswer(String content, int responseCode) {
+    public HTTPAnswer(String content, int responseCode, String contentType) {
         this.responseCode = responseCode;
         this.content = content;
+        this.contentType = contentType;
     }
 }

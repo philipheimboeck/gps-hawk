@@ -217,7 +217,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onPreExecute() {
 
                 }
-            });
+            }, this);
             mCheckUserTask.execute();
         }
 
@@ -325,7 +325,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onPreExecute() {
 
             }
-        });
+        }, this);
 
         mAuthTask.execute();
     }
@@ -358,7 +358,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onPreExecute() {
 
             }
-        });
+        }, this);
 
         mAuthTask.execute();
     }

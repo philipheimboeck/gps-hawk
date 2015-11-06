@@ -5,10 +5,11 @@ package gps.fhv.at.gps_hawk.tasks;
  * Date: 17.10.15
  */
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
-import gps.fhv.at.gps_hawk.communication.LoginTestClient;
+import gps.fhv.at.gps_hawk.communication.LoginRestClient;
 import gps.fhv.at.gps_hawk.exceptions.LoginException;
 
 /**
@@ -21,18 +22,20 @@ public class LoginTask extends AsyncTask<Void, Void, String> {
     private final String mPassword;
     private final String mAndroidId;
     private final IAsyncTaskCaller<Void, String> mCaller;
+    private final Context mContext;
 
-    public LoginTask(final String user, final String password, String androidId, final IAsyncTaskCaller<Void, String> caller) {
+    public LoginTask(final String user, final String password, String androidId, final IAsyncTaskCaller<Void, String> caller, Context context) {
         mUser = user;
         mPassword = password;
         mAndroidId = androidId;
         mCaller = caller;
+        mContext = context;
     }
 
     @Override
     protected String doInBackground(Void... params) {
 
-        ILoginClient loginClient = new LoginTestClient();
+        ILoginClient loginClient = new LoginRestClient(mContext);
 
         try {
             return loginClient.login(mUser, mPassword, mAndroidId);

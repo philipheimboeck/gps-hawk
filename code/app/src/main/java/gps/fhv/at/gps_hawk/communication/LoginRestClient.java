@@ -1,6 +1,10 @@
 package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
+import android.util.Base64;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -18,10 +22,10 @@ import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
  */
 public class LoginRestClient extends RestClient implements ILoginClient {
 
-    private static final String REST_USER_CHECK = "http://10.0.2.2:8080/check/$USER";
-    private static final String REST_USER_REGISTER = "http://10.0.2.2:8080/register";
-    private static final String REST_USER_LOGIN = "http://10.0.2.2:8080/login";
-    private static final String REST_USER_TOKEN = "http://10.0.2.2:8080/token/$TOKEN";
+    public static final String REST_USER = "app/users/";
+    private static final String REST_USER_EXISTS = REST_SERVER + REST_USER + "exists/$USER";
+    private static final String REST_USER_REGISTER = REST_SERVER + REST_USER + "register";
+    private static final String REST_USER_LOGIN = REST_SERVER + REST_USER + "login/$DEVICE";
 
     public LoginRestClient(Context context) {
         super(context);
@@ -30,10 +34,15 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     @Override
     public boolean userExists(String username) {
         try {
-            String urlString = REST_USER_CHECK.replace("$USER", URLEncoder.encode(username, "UTF-8"));
+            String urlString = REST_USER_EXISTS.replace("$USER", URLEncoder.encode(username, "UTF-8"));
             URL url = new URL(urlString);
             HTTPAnswer answer = get(url);
-            return answer.responseCode == 200;
+            if(answer.responseCode == 200) {
+                return true;
+            }
+            if(answer.responseCode == 404) {
+                return false;
+            }
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");
@@ -43,7 +52,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
         }
 
         // Todo Error
-        return false;
+        return true;
     }
 
     @Override
@@ -55,7 +64,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             HashMap<String, String> params = new HashMap<>();
             params.put("username", username);
             params.put("password", password);
-            params.put("deviceID", deviceID);
+            params.put("deviceId", deviceID);
 
             HTTPAnswer answer = post(url, params);
             if (answer.responseCode != 200) {
@@ -77,20 +86,25 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     @Override
     public String login(String username, String password, String deviceID) throws LoginException {
         try {
-            String urlString = REST_USER_LOGIN;
+            String urlString = REST_USER_LOGIN.replace("$DEVICE", URLEncoder.encode(deviceID, "UTF-8"));
+
             URL url = new URL(urlString);
 
-            HashMap<String, String> params = new HashMap<>();
-            params.put("username", username);
-            params.put("password", password);
-            params.put("deviceID", password);
+            HashMap<String, String> headers = new HashMap<>();
+            byte[] credentials = (username + ":" + password).getBytes();
+            headers.put("Authorization", "basic " + Base64.encodeToString(credentials, Base64.NO_WRAP));
 
-            HTTPAnswer answer = post(url, params);
+            HTTPAnswer answer = get(url, headers);
             if (answer.responseCode != 200) {
                 throw new LoginException("Login was not successful!");
             }
 
-            return answer.content;
+            JSONObject object = new JSONObject(answer.content);
+            if(!object.has("token") ) {
+                throw new LoginException("Login failed due to missing token!");
+            }
+
+            return object.getString("token");
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");
@@ -99,25 +113,10 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             e.printStackTrace();
 
             throw new LoginException("Login failed", e);
-        }
-    }
-
-    @Override
-    public boolean tokenValid(String token) {
-        try {
-            String urlString = REST_USER_TOKEN.replace("$TOKEN", URLEncoder.encode(token, "UTF-8"));
-            URL url = new URL(urlString);
-            HTTPAnswer answer = get(url);
-            return answer.responseCode == 200;
-
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Invalid URL!");
-
-        } catch (NoConnectionException | IOException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
-        }
 
-        // Todo Error
-        return false;
+            throw new LoginException("Login failed due to invalid answer", e);
+        }
     }
 }

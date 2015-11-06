@@ -1,9 +1,10 @@
 package gps.fhv.at.gps_hawk.tasks;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
-import gps.fhv.at.gps_hawk.communication.LoginTestClient;
+import gps.fhv.at.gps_hawk.communication.LoginRestClient;
 
 /**
  * Author: Philip Heimböck
@@ -13,15 +14,17 @@ public class CheckUserTask extends AsyncTask<Void, Void, Boolean> {
 
     private String mUser;
     private IAsyncTaskCaller<Void, Boolean> mCaller;
+    private Context mContext;
 
-    public CheckUserTask(String user, IAsyncTaskCaller<Void, Boolean> caller) {
+    public CheckUserTask(String user, IAsyncTaskCaller<Void, Boolean> caller, Context context) {
         this.mUser = user;
         this.mCaller = caller;
+        this.mContext = context;
     }
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-        ILoginClient loginClient = new LoginTestClient();
+        ILoginClient loginClient = new LoginRestClient(mContext);
         return loginClient.userExists(mUser);
     }
 

@@ -138,6 +138,8 @@ public class CaptureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture);
 
+        initializeView();
+
         // Check for permissions
         mPermissionsGranted =
                 PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
@@ -149,8 +151,6 @@ public class CaptureActivity extends AppCompatActivity {
                 requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
             }
 
-        } else {
-            initializeView();
         }
 
     }
@@ -410,7 +410,7 @@ public class CaptureActivity extends AppCompatActivity {
             case Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mPermissionsGranted = true;
-                    mStartTrackingButton.setEnabled(true);
+                    mStartTrackingButton.setEnabled(mPermissionsGranted);
 
                     initializeView();
                 } else {
@@ -427,7 +427,9 @@ public class CaptureActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mNavigation.syncState();
+        if(mNavigation != null) { // Is maybe null if the permissions are not set
+            mNavigation.syncState();
+        }
     }
 
     @Override
