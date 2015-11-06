@@ -205,6 +205,7 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void initializeMap() {
+
         if (mMapFragment != null) {
             // Map options
             mMapFragment.getMapAsync(new OnMapReadyCallback() {

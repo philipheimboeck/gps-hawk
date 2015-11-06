@@ -30,24 +30,29 @@ public class GpsHawkApplication extends Application {
 
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
-                // Do some custom exception handling
 
-                // Save Exception to local db
-                StringWriter sw = new StringWriter();
-                ex.printStackTrace(new PrintWriter(sw));
 
-                Exception2Log exception2Log = new Exception2Log();
-                exception2Log.setStackTrace(sw.toString());
-                exception2Log.setMessage(ex.getMessage());
-                DbFacade db = DbFacade.getInstance();
-                db.saveEntity(exception2Log);
+                try {
+                    // Save Exception to local db
+                    StringWriter sw = new StringWriter();
+                    ex.printStackTrace(new PrintWriter(sw));
 
-                ex.printStackTrace();
-                Log.e("UNCAUGHT", ex.getMessage());
+                    Exception2Log exception2Log = new Exception2Log();
+                    exception2Log.setStackTrace(sw.toString());
+                    exception2Log.setMessage(ex.getMessage());
+                    DbFacade db = DbFacade.getInstance(getApplicationContext());
+                    db.saveEntity(exception2Log);
 
-                // Rethrow the exception to the OS!
-                if(mDefaultExceptionHandler != null) {
-                    mDefaultExceptionHandler.uncaughtException(thread, ex);
+                    ex.printStackTrace();
+                    Log.e("UNCAUGHT", ex.getMessage());
+
+
+
+                } finally {
+                    // Rethrow the exception to the OS!
+                    if(mDefaultExceptionHandler != null) {
+                        mDefaultExceptionHandler.uncaughtException(thread, ex);
+                    }
                 }
             }
         });
