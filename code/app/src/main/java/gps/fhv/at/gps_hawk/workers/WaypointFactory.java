@@ -18,7 +18,7 @@ public class WaypointFactory {
     private static WaypointFactory instance;
 
     public static WaypointFactory getInstance() {
-        if(instance == null) {
+        if (instance == null) {
             instance = new WaypointFactory();
         }
         return instance;
@@ -28,10 +28,12 @@ public class WaypointFactory {
     private Vehicle mVehicle;
     private POI mPOI;
 
-    private WaypointFactory() {}
+    private WaypointFactory() {
+    }
 
     /**
      * Creates a new waypoint instance
+     *
      * @param location
      * @param data
      * @return
@@ -47,6 +49,7 @@ public class WaypointFactory {
     }
 
     private Waypoint setLocationData(Waypoint waypoint, Location location, NewLocationEventData data) {
+
         // Double
         waypoint.setLat(location.getLatitude());
         waypoint.setLng(location.getLongitude());
@@ -65,13 +68,12 @@ public class WaypointFactory {
         cal.setTimeInMillis(location.getTime());
         waypoint.setTimestampCaptured(cal);
 
-
         return waypoint;
     }
 
     private Waypoint setPOIData(Waypoint waypoint) {
         POI poi = getPOI();
-        if(poi != null) {
+        if (poi != null) {
             // Todo: Add POI to waypoint
             setPOI(null); // No other waypoint will get this data
         }
@@ -80,8 +82,10 @@ public class WaypointFactory {
 
     private Waypoint setVehicleData(Waypoint waypoint) {
         Vehicle vehicle = getVehicle();
-        if(vehicle != null) {
-            // Todo: Add Vehicle to waypoint
+        if (vehicle != null) {
+            waypoint.setVehicle(vehicle);
+            waypoint.setVehicleId(vehicle.getId());
+            setVehicle(null); // Reset vehicle
         }
         return waypoint;
     }

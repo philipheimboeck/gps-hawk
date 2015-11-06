@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,9 +21,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,12 +48,15 @@ import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationItem;
 import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.domain.Track;
+import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
+import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
+import gps.fhv.at.gps_hawk.workers.WaypointFactory;
 
 
 public class CaptureActivity extends AppCompatActivity {
@@ -68,6 +74,8 @@ public class CaptureActivity extends AppCompatActivity {
     private Navigation mNavigation;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+
+    private ImageButton[] mImgVehicleButtons;
 
     private Polyline mPolyline;
 
@@ -109,7 +117,7 @@ public class CaptureActivity extends AppCompatActivity {
                     mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
 
                     // Zoom in the Google Map
-                    if(!mZoomed) {
+                    if (!mZoomed) {
                         mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM));
                         mZoomed = true;
                     }
@@ -184,12 +192,47 @@ public class CaptureActivity extends AppCompatActivity {
         mWaypointCounterView = (TextView) findViewById(R.id.text_waypoint_counter);
         mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
 
+        // ImageButtons
+        int i = 0;
+        ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
+        mImgVehicleButtons = new ImageButton[5]; // TODO: Constant for nr of vehicles
+        mImgVehicleButtons[i++] = (ImageButton) findViewById(R.id.butNowFoot);
+        mImgVehicleButtons[i++] = (ImageButton) findViewById(R.id.butNowBicycle);
+        mImgVehicleButtons[i++] = (ImageButton) findViewById(R.id.butNowBus);
+        mImgVehicleButtons[i++] = (ImageButton) findViewById(R.id.butNowTrain);
+        mImgVehicleButtons[i++] = (ImageButton) findViewById(R.id.butNowCar);
+
+        mVehicleClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
+                Vehicle ourVehicle = null;
+                for (Vehicle vehicle : vList) {
+                    if ( v.getId() == vehicle.getUiId()) {
+                        ourVehicle = vehicle;
+                        break;
+                    }
+                }
+                WaypointFactory.getInstance().setVehicle(ourVehicle);
+            }
+        };
+
+        // Connect registered vehicles with the button on the ui
+        i = 0;
+        for (Vehicle vehicle : vList) {
+            vehicle.setUiId(mImgVehicleButtons[i].getId());
+            mImgVehicleButtons[i].setOnClickListener(mVehicleClickListener);
+            ++i;
+        }
+
         // Initialize the map
         initializeMapFragment();
 
         // When already tracking, show some other elements
         initializeViewInTrackingMode();
     }
+
+    private View.OnClickListener mVehicleClickListener;
 
     private void initializeMapFragment() {
         // Map options
@@ -241,7 +284,7 @@ public class CaptureActivity extends AppCompatActivity {
                 clearWaypoints();
 
                 // Add all points from current track to list
-                for (Waypoint waypoint: getAllPoints(mCurrentTrack)) {
+                for (Waypoint waypoint : getAllPoints(mCurrentTrack)) {
                     addMapPoint(waypoint.createLatLng());
                 }
             }
@@ -252,7 +295,7 @@ public class CaptureActivity extends AppCompatActivity {
     }
 
     private void clearWaypoints() {
-        if(mPolyline != null) {
+        if (mPolyline != null) {
             mPolyline.setPoints(new ArrayList<LatLng>());
         }
     }

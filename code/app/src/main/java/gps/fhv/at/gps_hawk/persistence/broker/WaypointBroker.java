@@ -23,6 +23,7 @@ public class WaypointBroker extends BrokerBase {
         values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSattelites());
         values.put(WaypointDef.COLUMN_NAME_TRACK_ID, wp.getTrackId());
         values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, wp.getIsExported());
+        values.put(WaypointDef.COLUMN_NAME_VEHICLE_ID, wp.getVehicleId());
 
         // Datetime
         values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
@@ -44,14 +45,15 @@ public class WaypointBroker extends BrokerBase {
     }
 
     @Override
-    protected  <T extends DomainBase> T map2domainImpl(Cursor cursor) throws IllegalArgumentException{
+    protected <T extends DomainBase> T map2domainImpl(Cursor cursor) throws IllegalArgumentException {
 
         Waypoint wp = new Waypoint();
 
         // Int
         wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
-        wp.setIsExported(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED));
-        wp.setTrackId(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID));
+        wp.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED)));
+        wp.setTrackId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID)));
+        wp.setVehicleId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_VEHICLE_ID)));
 
         // Double
         wp.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_LAT)));

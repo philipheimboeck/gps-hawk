@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
+import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -19,6 +20,9 @@ public class GpsHawkApplication extends Application {
 
     public GpsHawkApplication() {
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+
+        // Initialize volatile domain-data
+        VolatileInstancePool.getInstance().initialize();
     }
 
     @Override

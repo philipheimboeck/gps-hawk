@@ -1,9 +1,10 @@
-<android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
-                                        xmlns:android="http://schemas.android.com/apk/res/android"
-                                        xmlns:tools="http://schemas.android.com/tools"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="match_parent"
-                                        tools:context="gps.fhv.at.gps_hawk.activities.fragments.CaptureFragment">
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="gps.fhv.at.gps_hawk.activities.fragments.CaptureFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,6 +12,36 @@
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:orientation="vertical"
         android:theme="@style/AppTheme">
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow>
+
+                <ImageButton
+                    android:id="@+id/butNowFoot"
+                    android:layout_column="0"
+                    android:src="@drawable/ic_hawk_white"/>
+                <ImageButton
+                    android:id="@+id/butNowBicycle"
+                    android:layout_column="1"
+                    android:src="@drawable/ic_hawk_white"/>
+                <ImageButton
+                    android:id="@+id/butNowTrain"
+                    android:layout_column="2"
+                    android:src="@drawable/ic_hawk_white"/>
+                <ImageButton
+                    android:id="@+id/butNowBus"
+                    android:layout_column="3"
+                    android:src="@drawable/ic_hawk_white"/>
+                <ImageButton
+                    android:id="@+id/butNowCar"
+                    android:layout_column="4"
+                    android:src="@drawable/ic_hawk_white"/>
+
+            </TableRow>
+        </TableLayout>
 
         <fragment
             android:id="@+id/map"
