@@ -138,11 +138,12 @@ public class CaptureActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_capture);
 
-        initializeView();
 
         // Check for permissions
         mPermissionsGranted =
                 PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        initializeView();
 
         if (!mPermissionsGranted) {
             Toast.makeText(this, "Please enable GPS", Toast.LENGTH_LONG).show();
