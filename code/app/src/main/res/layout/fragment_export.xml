@@ -45,7 +45,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <TextView
@@ -60,6 +60,32 @@
 
             <Button
                 android:id="@+id/button_do_exception_export"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:text="@string/start_export"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/activity_horizontal_margin"
+                android:text="@string/amount_of_motions"/>
+
+            <TextView
+                android:id="@+id/tbx_amount_of_motions"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/activity_horizontal_margin"/>
+
+            <Button
+                android:id="@+id/button_do_motion_export"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"

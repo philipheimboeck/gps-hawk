@@ -10,7 +10,6 @@ public class Exception2LogDef extends BaseTableDef {
     public static final String COLUMN_NAME_DATETIME = "dateTime";
     public static final String COLUMN_NAME_STACK_TRACE = "stackTrace";
     public static final String COLUMN_NAME_MSG = "msg";
-    public static final String COLUMN_NAME_IS_EXPORTED = "isExported";
 
     @Override
     protected String getTableName() {

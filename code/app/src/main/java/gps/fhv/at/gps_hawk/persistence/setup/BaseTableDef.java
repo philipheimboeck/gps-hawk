@@ -13,7 +13,10 @@ public abstract class BaseTableDef implements BaseColumns {
     protected static final String TYPE_DATETIME = " DATETIME";
     protected static final String TYPE_FLOAT = " FLOAT";
     protected static final String TYPE_DOUBLE = " DOUBLE";
+    protected static final String TYPE_LONG = " BIGINT";
     protected static final String COMMA_SEP = ",";
+
+    public static final String COLUMN_NAME_IS_EXPORTED = "isExported";
 
     /**
      * gets the table name

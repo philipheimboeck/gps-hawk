@@ -34,7 +34,7 @@ public class ExportClient extends RestClient {
             HashMap<String, String> params = new HashMap<>();
             params.put("deviceid", expCtx.getAndroidId());
 
-            HTTPAnswer answer = post(url, expCtx.getWaypointList(), "waypoints", params);
+            HTTPAnswer answer = post(url, expCtx.getExportList(), expCtx.getCollectionName(), params);
 
             if (answer.responseCode != 200) {
                 throw new RegistrationException("Could not export data!");
@@ -44,8 +44,8 @@ public class ExportClient extends RestClient {
             // {"waypoints":4}
 
             JSONObject response = new JSONObject(answer.content);
-            if (!(response.has("waypoints") && response.getInt("waypoints") == expCtx.getWaypointList().size())) {
-                throw new UnExpectedResultException("Amount of saved waypoints does not match amount of transferred waypoints");
+            if (!(response.has("amount") && response.getInt("amount") == expCtx.getExportList().size())) {
+                throw new UnExpectedResultException("Amount of saved items does not match amount of transferred items");
             }
 
             return true;

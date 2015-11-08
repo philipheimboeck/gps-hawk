@@ -55,6 +55,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
+import gps.fhv.at.gps_hawk.workers.MotionWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 import gps.fhv.at.gps_hawk.workers.WaypointFactory;
 
@@ -81,6 +82,8 @@ public class CaptureActivity extends AppCompatActivity {
 
     private Track mCurrentTrack;
     private boolean mZoomed = false;
+
+    private MotionWorker mMotionWorker;
 
     /**
      * State of the waypoint listeners (Registered/Not Registered)
@@ -142,6 +145,10 @@ public class CaptureActivity extends AppCompatActivity {
         // Check for permissions
         mPermissionsGranted =
                 PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        // TODO: Testing motion sensors
+        mMotionWorker = new MotionWorker(getApplicationContext());
+        mMotionWorker.initialize();
 
         initializeView();
 
@@ -211,7 +218,7 @@ public class CaptureActivity extends AppCompatActivity {
                 int i = -1;
                 for (Vehicle vehicle : vList) {
                     ++i;
-                    if ( v.getId() == vehicle.getUiId()) {
+                    if (v.getId() == vehicle.getUiId()) {
                         ourVehicle = vehicle;
                         mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
                         continue;
@@ -434,7 +441,7 @@ public class CaptureActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        if(mNavigation != null) { // Is maybe null if the permissions are not set
+        if (mNavigation != null) { // Is maybe null if the permissions are not set
             mNavigation.syncState();
         }
     }

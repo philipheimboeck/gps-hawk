@@ -13,7 +13,6 @@ public class WaypointDef extends BaseTableDef {
     // Int types
     public static final String COLUMN_NAME_NR_OF_SATTELITES = "nrOfSattelites";
     public static final String COLUMN_NAME_TRACK_ID = "track_id";
-    public static final String COLUMN_NAME_IS_EXPORTED = "isExported";
     public static final String COLUMN_NAME_VEHICLE_ID = "vehicleId";
 
     // Datetime types

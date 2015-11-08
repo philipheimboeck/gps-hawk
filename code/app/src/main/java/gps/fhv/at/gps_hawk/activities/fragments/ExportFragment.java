@@ -16,8 +16,12 @@ import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
+import gps.fhv.at.gps_hawk.domain.MotionValues;
+import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
+import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
@@ -29,8 +33,15 @@ import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 public class ExportFragment extends Fragment {
 
     private Button mButStartExport;
+    private Button mButStartExportExc;
+    private Button mButStartExportMotions;
+
+    private View.OnClickListener mButExportListener;
+
     private TextView mTextViewAmount;
     private TextView mTextViewAmountExc;
+    private TextView mTextViewAmountMotion;
+
     private View mProgressView;
     private ExportTask mExportTask;
 
@@ -44,37 +55,49 @@ public class ExportFragment extends Fragment {
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.preferences, true);
 
-        // TODO: Test only
-        DbFacade dbFacade = DbFacade.getInstance(getActivity());
-        dbFacade.markWaypoints(2, 0); // Reset all waypoints
-        dbFacade.markWaypoints(1, 0); // Reset all waypoints
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
 
         mProgressView = view.findViewById(R.id.export_progress);
 
+        // Buttons
         mButStartExport = (Button) view.findViewById(R.id.button_do_export);
-        mButStartExport.setOnClickListener(new View.OnClickListener() {
+        mButStartExportExc = (Button) view.findViewById(R.id.button_do_exception_export);
+        mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
+
+        mButExportListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                handleButExport();
+                handleButExport(v.getId());
             }
-        });
+        };
+        mButStartExport.setOnClickListener(mButExportListener);
+        mButStartExportExc.setOnClickListener(mButExportListener);
+        mButStartExportMotions.setOnClickListener(mButExportListener);
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
+        mTextViewAmountMotion = (TextView) view.findViewById(R.id.tbx_amount_of_motions);
 
         DbFacade db = DbFacade.getInstance(getActivity());
+
+        // Waypoints
         int amount = db.getCount(WaypointDef.TABLE_NAME, null);
         int amountExported = db.getCount(WaypointDef.TABLE_NAME, WaypointDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
         mTextViewAmount.setText("" + (amount - amountExported) + " from " + amount + " exported");
 
+        // Exceptions
         amount = db.getCount(Exception2LogDef.TABLE_NAME, null);
-        amountExported = db.getCount(Exception2LogDef.TABLE_NAME, Exception2LogDef.COLUMN_NAME_IS_EXPORTED);
+        amountExported = db.getCount(Exception2LogDef.TABLE_NAME, Exception2LogDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
         mTextViewAmountExc.setText((amount - amountExported) + " from " + amount + " exported");
+
+        // Motions
+        amount = db.getCount(MotionValuesDef.TABLE_NAME, null);
+        amountExported = db.getCount(MotionValuesDef.TABLE_NAME, MotionValuesDef.COLUMN_NAME_IS_EXPORTED + " = 0");
+
+        mTextViewAmountMotion.setText((amount - amountExported) + " from " + amount + " exported");
 
         return view;
     }
@@ -94,10 +117,9 @@ public class ExportFragment extends Fragment {
 
     }
 
-    private void handleButExport() {
+    private void handleButExport(int id) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String key = Constants.PREF_EXPORT_URL;
-
 
         if (prefs.contains(key)) {
             String url = prefs.getString(key, "");
@@ -109,10 +131,32 @@ public class ExportFragment extends Fragment {
             exportContext.setAndroidId(Settings.Secure.getString(getActivity().getContentResolver(),
                     Settings.Secure.ANDROID_ID));
 
+            switch (id) {
+                case R.id.button_do_export:
+                    exportContext.setT(Waypoint.class);
+                    exportContext.setCollectionName("waypoints");
+                    break;
+                case R.id.button_do_exception_export:
+                    exportContext.setT(Exception2Log.class);
+                    exportContext.setCollectionName("exceptions");
+                    break;
+                case R.id.button_do_motion_export:
+                    exportContext.setT(MotionValues.class);
+                    exportContext.setCollectionName("motionValues");
+                    break;
+                default:
+                    throw new RuntimeException("Unallowed button invokd handleButExport");
+            }
+
             mExportTask = new ExportTask(exportContext, new IAsyncTaskCaller<Void, String>() {
 
                 @Override
                 public void onPostExecute(String success) {
+
+                    if ("ERROR".equals(success)) {
+                        Toast.makeText(getContext(), getString(R.string.error_export_failed), Toast.LENGTH_LONG).show();
+                    }
+
                     showLoading(false);
                 }
 

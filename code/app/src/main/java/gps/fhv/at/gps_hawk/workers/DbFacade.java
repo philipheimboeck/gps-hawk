@@ -8,18 +8,24 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.lang.reflect.Type;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
+import gps.fhv.at.gps_hawk.domain.IExportable;
+import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.persistence.broker.BrokerBase;
 import gps.fhv.at.gps_hawk.persistence.broker.Exception2LogBroker;
+import gps.fhv.at.gps_hawk.persistence.broker.MotionValuesBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
+import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
@@ -35,6 +41,7 @@ public class DbFacade {
         mBrokerMap.put(Waypoint.class, new WaypointBroker());
         mBrokerMap.put(Track.class, new TrackBroker());
         mBrokerMap.put(Exception2Log.class, new Exception2LogBroker());
+        mBrokerMap.put(MotionValues.class, new MotionValuesBroker());
     }
 
     public static DbFacade getInstance(Context context) {
@@ -70,78 +77,58 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<Waypoint> getAllWaypoints2Update() {
+    public List<IExportable> getAllEntities2Export(Type t) {
 
-        List<Waypoint> listRet = new ArrayList<>();
+        List<IExportable> listRet = new ArrayList<>();
+        try {
 
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
-        String[] projection = {
-                // Int
-                WaypointDef._ID,
-                WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
-                WaypointDef.COLUMN_NAME_IS_EXPORTED,
-                WaypointDef.COLUMN_NAME_TRACK_ID,
-                WaypointDef.COLUMN_NAME_VEHICLE_ID,
-                // Datetime
-                WaypointDef.COLUMN_NAME_DATETIME,
-                // Double
-                WaypointDef.COLUMN_NAME_LAT,
-                WaypointDef.COLUMN_NAME_LNG,
-                WaypointDef.COLUMN_NAME_ALTITUDE,
-                // Float
-                WaypointDef.COLUMN_SPEED,
-                WaypointDef.COLUMN_ACCURACY,
-                WaypointDef.COLUMN_BEARING,
-                // Text
-                WaypointDef.COLUMN_PROVIDER
-        };
+            BrokerBase broker = mBrokerMap.get(t);
 
-        // How you want the results sorted in the resulting Cursor
-        String sortOrder = WaypointDef.COLUMN_NAME_DATETIME + " ASC";
+            // How you want the results sorted in the resulting Cursor
+            String sortOrder = BaseTableDef._ID + " ASC";
 
-        Cursor c = getDb().query(
-                WaypointDef.TABLE_NAME,  // The table to query
-                projection,                               // The columns to return
-                WaypointDef.COLUMN_NAME_IS_EXPORTED + " = 2",                                // The columns for the WHERE clause
-                null,                              // The values for the WHERE clause
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                sortOrder                                 // The sort order
-        );
+            Cursor c = getDb().query(
+                    broker.getTblName(),  // The table to query
+                    null,                               // The columns to return - simply all
+                    BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2",                                // The columns for the WHERE clause
+                    null,                              // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    sortOrder                                 // The sort order
+            );
 
-        c.moveToFirst();
-        BrokerBase broker = mBrokerMap.get(Waypoint.class);
+            c.moveToFirst();
 
-        int i = 0;
-        while (i < c.getCount()) {
+            int i = 0;
+            while (i < c.getCount()) {
 
-            Waypoint wp = broker.map2domain(c);
-            listRet.add(wp);
-            c.moveToNext();
-            ++i;
+                listRet.add((IExportable) broker.map2domain(c));
+                c.moveToNext();
+                ++i;
 
+            }
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, "Error getting exportable data", e);
         }
         return listRet;
     }
 
     /**
-     * Masks Waypoints, that hasn't yet been exported, with `isExportet=2`
+     * Masks Waypoints, that hasn't yet been exported, with `isExportet=updValIsExport`
      *
      * @return
      */
-    public int markWaypoints(int whereIsExport, int updValIsExport) {
+    public int markExportable(int whereIsExport, int updValIsExport, Type t) {
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
-
-        BrokerBase broker = mBrokerMap.get(Waypoint.class);
+        BrokerBase broker = mBrokerMap.get(t);
 
         ContentValues values = new ContentValues();
 
-        values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, updValIsExport);
+        values.put(BaseTableDef.COLUMN_NAME_IS_EXPORTED, updValIsExport);
 
         // Which row to update, based on the ID
-        String selection = WaypointDef.COLUMN_NAME_IS_EXPORTED + " = ?";
+        String selection = BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
         String[] selectionArgs = {String.valueOf(whereIsExport)};
 
         int count = db.update(

@@ -2,7 +2,6 @@ package gps.fhv.at.gps_hawk.tasks;
 
 import android.os.AsyncTask;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,32 +43,39 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
         DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
 
         // Mark unexported Waypoints as "ExportNow"
-        int count = dbFacade.markWaypoints(0, 2);
+        int count = dbFacade.markExportable(0, 2, mExpContext.getT());
 
         if (count > 0) {
 
             // Get all Waypoints from DB to export
-            mExpContext.setWaypointList(dbFacade.getAllWaypoints2Update());
+            mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT()));
 
             // Insert Tracks and Vehicles as Objects
-            setDomainObjects(dbFacade, mExpContext);
+            if ( mExpContext.getT().equals(Waypoint.class)) {
+                setDomainObjects(dbFacade, mExpContext);
+            }
 
             // Send via Web
             ExportClient client = new ExportClient(mExpContext.getContext());
             try {
 
-                client.exportCollectedWaypoints(mExpContext);
+                boolean result = client.exportCollectedWaypoints(mExpContext);
+
+                // If no successful - be sure to reset flags
+                if (!result) {
+                    throw new UnExpectedResultException("An unexpected result occured while exporting data");
+                }
 
             } catch (UnExpectedResultException e) {
                 e.printStackTrace();
 
                 // Reset not exported waypoints
-                dbFacade.markWaypoints(2, 0);
+                dbFacade.markExportable(2, 0, mExpContext.getT());
                 return "ERROR";
             }
 
             // Mark "ExportNow" Waypoints as "Exported"
-            dbFacade.markWaypoints(2, 1);
+            dbFacade.markExportable(2, 1, mExpContext.getT());
         }
 
         return "";
@@ -85,7 +91,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             mapVehicles.put(v.getId(), v);
         }
 
-        for (Waypoint w : (ArrayList<Waypoint>) mExpContext.getWaypointList()) {
+        for (Waypoint w : (ArrayList<Waypoint>) mExpContext.getExportList()) {
             if (w.getTrackId() != 0 && !setTracks.contains(w.getTrackId())) {
                 setTracks.add(w.getTrackId());
             }
@@ -98,7 +104,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             if (t != null) mapTracks.put(t.getId(), t);
         }
 
-        for (Waypoint w : (ArrayList<Waypoint>) mExpContext.getWaypointList()) {
+        for (Waypoint w : (ArrayList<Waypoint>) mExpContext.getExportList()) {
             if (w.getTrackId() != 0) w.setTrack(mapTracks.get(w.getTrackId()));
         }
 

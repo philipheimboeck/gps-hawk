@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.domain;
 
 import android.content.Context;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -9,17 +10,19 @@ import java.util.List;
  */
 public class ExportContext<T extends IExportable> {
 
-    private List<T> _waypointList;
+    private List<T> _exportList;
     private String _url;
     private Context _context;
     private String androidId;
+    private Type t;
+    private String collectionName;
 
-    public List<T> getWaypointList() {
-        return _waypointList;
+    public List<T> getExportList() {
+        return _exportList;
     }
 
-    public void setWaypointList(List<T> waypointList) {
-        _waypointList = waypointList;
+    public void setExportList(List<T> waypointList) {
+        _exportList = waypointList;
     }
 
     public String getUrl() {
@@ -44,5 +47,21 @@ public class ExportContext<T extends IExportable> {
 
     public void setAndroidId(String androidId) {
         this.androidId = androidId;
+    }
+
+    public Type getT() {
+        return t;
+    }
+
+    public void setT(Type t) {
+        this.t = t;
+    }
+
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 }
