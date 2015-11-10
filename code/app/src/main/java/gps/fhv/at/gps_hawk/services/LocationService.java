@@ -15,17 +15,18 @@ import android.support.v4.content.LocalBroadcastManager;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.CaptureActivity;
-import gps.fhv.at.gps_hawk.activities.FragmentsActivity;
 import gps.fhv.at.gps_hawk.broadcast.WaypointPersistor;
 import gps.fhv.at.gps_hawk.domain.Track;
-import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.IGpsWorker;
+import gps.fhv.at.gps_hawk.workers.IMotionWorker;
+import gps.fhv.at.gps_hawk.workers.MotionWorker;
 
 public class LocationService extends Service {
 
     private IGpsWorker mGpsSvc;
     private BroadcastReceiver mWaypointPersistor;
+    private IMotionWorker mMotionWorker;
 
     public LocationService() {
         mWaypointPersistor = new WaypointPersistor();
@@ -35,6 +36,7 @@ public class LocationService extends Service {
     public void onCreate() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mGpsSvc = new GpsWorker(locationManager, this);
+        mMotionWorker = new MotionWorker(getApplicationContext());
     }
 
     @Override
@@ -49,6 +51,10 @@ public class LocationService extends Service {
             // Start GPS tracking
             Track t = (Track) intent.getSerializableExtra(Constants.EXTRA_TRACK);
             mGpsSvc.startGpsTracking(t);
+
+            // Start Motion-Tracking
+            mMotionWorker.initialize();
+
         } else {
             // No GPS? Stop the service right away!
             stopSelf();
@@ -68,6 +74,9 @@ public class LocationService extends Service {
 
         // Stop GPS tracking
         mGpsSvc.stopGpsTracking();
+
+        // Stop Motion tracking
+        mMotionWorker.stop();
     }
 
     @Override

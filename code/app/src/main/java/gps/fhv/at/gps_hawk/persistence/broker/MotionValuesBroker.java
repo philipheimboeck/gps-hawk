@@ -59,4 +59,13 @@ public class MotionValuesBroker extends BrokerBase {
     public String getTblName() {
         return MotionValuesDef.TABLE_NAME;
     }
+
+    @Override
+    public String[] getColumns() {
+        return new String[]{MotionValuesDef.COLUMN_NAME_DATETIME_CAPTURED,
+                MotionValuesDef.COLUMN_NAME_X,
+                MotionValuesDef.COLUMN_NAME_Y,
+                MotionValuesDef.COLUMN_NAME_Z,
+                MotionValuesDef.COLUMN_NAME_MOTION_TYPE};
+    }
 }

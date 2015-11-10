@@ -79,4 +79,19 @@ public class WaypointBroker extends BrokerBase {
         return WaypointDef.TABLE_NAME;
     }
 
+    public String[] getColumns() {
+        return new String[]{WaypointDef.COLUMN_NAME_NR_OF_SATTELITES,
+                WaypointDef.COLUMN_NAME_IS_EXPORTED,
+                WaypointDef.COLUMN_NAME_TRACK_ID,
+                WaypointDef.COLUMN_NAME_VEHICLE_ID,
+                WaypointDef.COLUMN_NAME_LAT,
+                WaypointDef.COLUMN_NAME_LNG,
+                WaypointDef.COLUMN_NAME_ALTITUDE,
+                WaypointDef.COLUMN_PROVIDER,
+                WaypointDef.COLUMN_SPEED,
+                WaypointDef.COLUMN_ACCURACY,
+                WaypointDef.COLUMN_BEARING,
+                WaypointDef.COLUMN_NAME_DATETIME};
+    }
+
 }

@@ -20,25 +20,30 @@ public class TrackBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Datetime
-        values.put(TrackDef.COLUMN_NAME_DATETIME_START,DateHelper.toSql(t.getStartDateTime()));
-        values.put(TrackDef.COLUMN_NAME_DATETIME_END,DateHelper.toSql(t.getEndDateTime()));
+        values.put(TrackDef.COLUMN_NAME_DATETIME_START, DateHelper.toSql(t.getStartDateTime()));
+        values.put(TrackDef.COLUMN_NAME_DATETIME_END, DateHelper.toSql(t.getEndDateTime()));
 
         return values;
     }
 
     @Override
-    protected  <T extends DomainBase> T map2domainImpl(Cursor cursor) {
+    protected <T extends DomainBase> T map2domainImpl(Cursor cursor) {
         Track t = new Track();
 
         // Datetime
         t.setStartDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START))));
         t.setEndDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END))));
 
-        return (T)t;
+        return (T) t;
     }
 
     @Override
     public String getTblName() {
         return TrackDef.TABLE_NAME;
+    }
+
+    @Override
+    public String[] getColumns() {
+        return new String[]{TrackDef.COLUMN_NAME_DATETIME_END, TrackDef.COLUMN_NAME_DATETIME_START};
     }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.lang.reflect.Type;
 import java.security.spec.ECField;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +74,59 @@ public class DbFacade {
         return newRowId;
     }
 
+    /**
+     * Saves array of objects to database using bulk insert
+     * @param arr
+     * @param length of array to save
+     * @param <T>
+     * @return
+     * @throws SQLException
+     */
+    public <T extends DomainBase> int saveEntities(T[] arr, int length) throws SQLException {
+
+        int numInserted = 0;
+
+        if (arr.length <= 0) return numInserted;
+
+        BrokerBase broker = mBrokerMap.get(arr[0].getClass());
+
+        SQLiteDatabase db = getDb();
+        db.beginTransaction();
+
+        // Create SQL-Statement
+        StringBuilder sql = new StringBuilder("INSERT INTO ").append(broker.getTblName()).append("(");
+        String separator = "";
+        for (String colName : broker.getColumns()) {
+            sql.append(separator).append(" ").append(colName);
+            separator = ",";
+        }
+        sql.append(") VALUES ");
+
+        try {
+            // Provide values as String foreach column: `( 'val1' , ... , 'valn' )`
+            String outerSeparator = "";
+            for (int i = 0 ; i < length ; i++) {
+                ContentValues cv = broker.map2db(arr[i]);
+                sql.append(outerSeparator).append("(");
+                separator = "";
+                for (String colName : broker.getColumns()) {
+                    sql.append(separator).append("'").append(cv.getAsString(colName)).append("'");
+                    separator = ",";
+                }
+                sql.append(")");
+                outerSeparator = ", ";
+            }
+
+            Log.d(Constants.PREFERENCES, sql.toString());
+            db.execSQL(sql.toString());
+            db.setTransactionSuccessful();
+            numInserted = arr.length;
+        } finally {
+            db.endTransaction();
+        }
+
+        return numInserted;
+    }
 
     /**
      * ## From here - start type-sepcific SELECT-queries ##

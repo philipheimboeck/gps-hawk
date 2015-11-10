@@ -147,8 +147,8 @@ public class CaptureActivity extends AppCompatActivity {
                 PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         // TODO: Testing motion sensors
-        mMotionWorker = new MotionWorker(getApplicationContext());
-        mMotionWorker.initialize();
+//        mMotionWorker = new MotionWorker(getApplicationContext());
+//        mMotionWorker.initialize();
 
         initializeView();
 

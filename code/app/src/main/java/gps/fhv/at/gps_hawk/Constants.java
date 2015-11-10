@@ -19,11 +19,22 @@ public class Constants {
     /**
      * GPS-Constants
      */
-    public static float MIN_DIST_CHANGE = 0.1F; // Minimum change in meters that needs to happen to get new coordinate
-    public static int MIN_TIME = 5000; // Minimum time to report new coordinate
+    public static float GPS_MIN_DIST_CHANGE = 0.1F; // Minimum change in meters that needs to happen to get new coordinate
+    public static int GPS_MIN_TIME = 5000; // Minimum time to report new coordinate
 
     /**
      * Pferences-Keys
      */
     public static String PREF_EXPORT_URL = "export_url";
+
+    /**
+     * Motion capturing
+     */
+    public static final int MOTION_TO_DB_THRESHOLD = 100;
+
+    /**
+     * Setting-Names
+     */
+    public static final int SETTING_GPS_MIN_DIST_CHANGE = 0;
+    public static final int SETTING_GPS_MIN_TIME = 1;
 }

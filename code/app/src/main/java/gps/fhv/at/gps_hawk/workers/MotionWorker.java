@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -15,14 +16,40 @@ import gps.fhv.at.gps_hawk.domain.MotionValues;
 /**
  * Created by Tobias on 07.11.2015.
  */
-public class MotionWorker implements SensorEventListener {
+public class MotionWorker implements IMotionWorker, SensorEventListener {
 
     private Context mContext;
 
     private SensorManager mSensorManager;
     private Sensor mSensor;
 
-    private ArrayList<MotionValues> mMotionValues = new ArrayList<>();
+    /**
+     * Indicates whether a background thread is running saving MotionValues to database
+     */
+    private static boolean mIsThreadWorking = false;
+
+    private ArrayList<MotionValues> mBuffy = new ArrayList<>();
+    private MotionValues[] mMotionValues = new MotionValues[Constants.MOTION_TO_DB_THRESHOLD];
+    private int mCurrentMV = 0;
+
+    private AsyncTask<Integer, Void, String> getTaskSave2Db() {
+        return new AsyncTask<Integer, Void, String>() {
+
+            @Override
+            protected String doInBackground(Integer... params) {
+                try {
+                    DbFacade db = DbFacade.getInstance(mContext);
+                    db.saveEntities(mMotionValues, params[0]);
+                } catch (Exception e) {
+                    Log.e(Constants.PREFERENCES, "ERROR at inserting MotionValues", e);
+                }
+                mIsThreadWorking = false;
+                Log.d(Constants.PREFERENCES, "Leave saving MotionValues");
+
+                return "";
+            }
+        };
+    }
 
     public MotionWorker(Context mContext) {
         this.mContext = mContext;
@@ -41,6 +68,14 @@ public class MotionWorker implements SensorEventListener {
         }
     }
 
+    public void stop() {
+        mSensorManager.unregisterListener(this);
+
+        // Save currently unsaved MotionValues
+        // ignore the few values in buffy
+        if (!mIsThreadWorking) getTaskSave2Db().execute(mCurrentMV + 1);
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.values.length >= 3) {
@@ -51,20 +86,33 @@ public class MotionWorker implements SensorEventListener {
             values._dateTimeCaptured = event.timestamp;
             values._motionType = MotionValues.MOTION_TYPE_ACCELEROMETER;
 
-//            mMotionValues.add(values);
-            Log.d(Constants.PREFERENCES, values.toString());
+            // Add to arr (or buffy in case of currently saving to db)
+            if (mIsThreadWorking) {
+                mBuffy.add(values);
+            } else {
+                mMotionValues[mCurrentMV] = values;
+                for (MotionValues mv : mBuffy) {
+                    // cannot add more values from buffy because array is already full
+                    if (mCurrentMV >= mMotionValues.length) break;
+                    mMotionValues[mCurrentMV++] = mv;
+                }
+                if (mBuffy.size() > 0) Log.i(Constants.PREFERENCES, "Buffy-Size: " + mBuffy.size());
+                mBuffy.clear();
 
-            // Save 2 DB
-            try {
-                DbFacade db = DbFacade.getInstance(mContext);
-                db.saveEntity(values);
-            } catch (Exception e) {
-                Log.e(Constants.PREFERENCES, "ERROR at inserting MotionValues", e);
+                ++mCurrentMV;
             }
-        }
 
-        // Save 2 DB?
-        if (mMotionValues.size() > 100) {
+            if (mCurrentMV % Constants.MOTION_TO_DB_THRESHOLD == 0 && !mIsThreadWorking) {
+
+                mIsThreadWorking = true;
+                Log.d(Constants.PREFERENCES, "Enter saving MotionValues");
+
+                // start new thread saving all 100 MotionValues
+                getTaskSave2Db().execute(mCurrentMV);
+
+            }
+
+            mCurrentMV %= Constants.MOTION_TO_DB_THRESHOLD;
 
         }
 

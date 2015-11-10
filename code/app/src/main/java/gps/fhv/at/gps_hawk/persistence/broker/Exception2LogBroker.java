@@ -24,11 +24,11 @@ public class Exception2LogBroker extends BrokerBase {
         values.put(Exception2LogDef.COLUMN_NAME_DATETIME, DateHelper.toSql(e.getDateTime()));
 
         // String
-        values.put(Exception2LogDef.COLUMN_NAME_MSG,e.getMessage());
-        values.put(Exception2LogDef.COLUMN_NAME_STACK_TRACE,e.getStackTrace());
+        values.put(Exception2LogDef.COLUMN_NAME_MSG, e.getMessage());
+        values.put(Exception2LogDef.COLUMN_NAME_STACK_TRACE, e.getStackTrace());
 
         // int
-        values.put(Exception2LogDef.COLUMN_NAME_IS_EXPORTED,e.getIsExported());
+        values.put(Exception2LogDef.COLUMN_NAME_IS_EXPORTED, e.getIsExported());
 
         return values;
     }
@@ -54,6 +54,14 @@ public class Exception2LogBroker extends BrokerBase {
     @Override
     public String getTblName() {
         return Exception2LogDef.TABLE_NAME;
+    }
+
+    @Override
+    public String[] getColumns() {
+        return new String[]{Exception2LogDef.COLUMN_NAME_DATETIME,
+                Exception2LogDef.COLUMN_NAME_MSG,
+                Exception2LogDef.COLUMN_NAME_STACK_TRACE,
+                Exception2LogDef.COLUMN_NAME_IS_EXPORTED};
     }
 
 }

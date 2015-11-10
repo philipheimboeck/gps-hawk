@@ -39,4 +39,6 @@ public abstract class BrokerBase {
 
     public abstract String getTblName();
 
+    public abstract String[] getColumns();
+
 }
