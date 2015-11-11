@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,7 @@ public class ExportFragment extends Fragment {
 
     private View mProgressView;
     private ExportTask mExportTask;
+    private LinearLayout mExpWrapper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,7 @@ public class ExportFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_export, container, false);
 
         mProgressView = view.findViewById(R.id.export_progress);
+        mExpWrapper = (LinearLayout) view.findViewById(R.id.export_wrapper);
 
         // Buttons
         mButStartExport = (Button) view.findViewById(R.id.button_do_export);
@@ -79,6 +83,17 @@ public class ExportFragment extends Fragment {
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
         mTextViewAmountMotion = (TextView) view.findViewById(R.id.tbx_amount_of_motions);
 
+        updText();
+
+        return view;
+    }
+
+    /**
+     * Setting all text-values
+     * quite dirty, but should work for us!
+     */
+    private void updText() {
+
         DbFacade db = DbFacade.getInstance(getActivity());
 
         // Waypoints
@@ -98,8 +113,6 @@ public class ExportFragment extends Fragment {
         amountExported = db.getCount(MotionValuesDef.TABLE_NAME, MotionValuesDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
         mTextViewAmountMotion.setText((amount - amountExported) + " from " + amount + " exported");
-
-        return view;
     }
 
     private void showLoading(final boolean show) {
@@ -115,11 +128,33 @@ public class ExportFragment extends Fragment {
             }
         });
 
+        disableRek(mExpWrapper, !show);
+
+        // Update text when buttons are enabled again
+        if ( !show ) {
+            updText();
+        }
+
+    }
+
+    private void disableRek(ViewGroup view, boolean isEnabled) {
+        int i = 0;
+        while (i < view.getChildCount()) {
+            View v = view.getChildAt(i);
+            if (v instanceof ViewGroup) {
+                disableRek((ViewGroup) v, isEnabled);
+            } else if (v instanceof Button) {
+                v.setEnabled(isEnabled);
+            }
+            ++i;
+        }
     }
 
     private void handleButExport(int id) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String key = Constants.PREF_EXPORT_URL;
+
+        Log.v(Constants.PREFERENCES, "Hit Export-Button!");
 
         if (prefs.contains(key)) {
             String url = prefs.getString(key, "");

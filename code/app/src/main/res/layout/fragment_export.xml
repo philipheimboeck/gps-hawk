@@ -4,7 +4,7 @@
              android:layout_height="match_parent"
              tools:context="gps.fhv.at.gps_hawk.activities.fragments.ExportFragment">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -14,87 +14,100 @@
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
-            android:visibility="gone"/>
+            android:indeterminate="false"
+            android:visibility="invisible"
+            android:layout_alignParentTop="false"
+            android:layout_centerHorizontal="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/export_wrapper">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/exp_lay_0"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"
-                android:text="@string/amount_of_captured_waypoints"/>
-
-            <TextView
-                android:id="@+id/tbx_amount_of_waypoints"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"/>
-
-            <Button
-                android:id="@+id/button_do_export"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:text="@string/start_export"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"
+                    android:text="@string/amount_of_captured_waypoints"/>
+
+                <TextView
+                    android:id="@+id/tbx_amount_of_waypoints"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"/>
+
+                <Button
+                    android:id="@+id/button_do_export"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/start_export"/>
 
 
-        </LinearLayout>
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/exp_lyt_1"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"
-                android:text="@string/amount_of_exceptions"/>
-
-            <TextView
-                android:id="@+id/tbx_amount_of_exceptions"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"/>
-
-            <Button
-                android:id="@+id/button_do_exception_export"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:text="@string/start_export"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"
+                    android:text="@string/amount_of_exceptions"/>
+
+                <TextView
+                    android:id="@+id/tbx_amount_of_exceptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"/>
+
+                <Button
+                    android:id="@+id/button_do_exception_export"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/start_export"/>
 
 
-        </LinearLayout>
+            </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TextView
+            <LinearLayout
+                android:id="@+id/exp_lyt_2"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"
-                android:text="@string/amount_of_motions"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tbx_amount_of_motions"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/activity_horizontal_margin"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"
+                    android:text="@string/amount_of_motions"/>
 
-            <Button
-                android:id="@+id/button_do_motion_export"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:text="@string/start_export"/>
+                <TextView
+                    android:id="@+id/tbx_amount_of_motions"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"/>
 
+                <Button
+                    android:id="@+id/button_do_motion_export"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/start_export"/>
 
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
     <!--<RelativeLayout-->
     <!--android:orientation="vertical"-->
     <!--android:layout_width="match_parent"-->

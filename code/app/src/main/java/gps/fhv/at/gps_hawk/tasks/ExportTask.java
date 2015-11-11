@@ -51,7 +51,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT()));
 
             // Insert Tracks and Vehicles as Objects
-            if ( mExpContext.getT().equals(Waypoint.class)) {
+            if (mExpContext.getT().equals(Waypoint.class)) {
                 setDomainObjects(dbFacade, mExpContext);
             }
 
