@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
@@ -41,7 +42,6 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
             protected String doInBackground(Integer... params) {
                 try {
                     DbFacade db = DbFacade.getInstance(mContext);
-                    Log.d(Constants.PREFERENCES, "i of MotionValues to save: " + params[0]);
                     db.saveEntities(mMotionValues, params[0]);
                     Log.d(Constants.PREFERENCES, "Leave saving MotionValues");
                 } catch (Exception e) {
@@ -89,7 +89,10 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
             values._x = event.values[0];
             values._y = event.values[1];
             values._z = event.values[2];
-            values._dateTimeCaptured = event.timestamp;
+
+            // convert to millis
+            values._dateTimeCaptured = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
+
             values._motionType = MotionValues.MOTION_TYPE_ACCELEROMETER;
 
             // Add to arr (or buffy in case of currently saving to db)

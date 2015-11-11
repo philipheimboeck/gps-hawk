@@ -25,6 +25,10 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
 
     public long _dateTimeCaptured;
 
+    public MotionValues() {
+        _isExported = 0; // set default value
+    }
+
     public String toString() {
         return new StringBuilder().append("{ x: ").append(_x).append(", y: ").append(_y).append(", z: ").append(_z).append(" }").toString();
     }
@@ -54,10 +58,10 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
     public String toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("x",_x);
-            json.put("y",_y);
-            json.put("z",_z);
-            json.put("capturedAt",_dateTimeCaptured);
+            json.put("x", _x);
+            json.put("y", _y);
+            json.put("z", _z);
+            json.put("capturedAt", _dateTimeCaptured);
             json.put("type", _motionType);
             json.put("id", _id);
         } catch (JSONException e) {

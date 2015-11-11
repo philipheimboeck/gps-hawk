@@ -66,6 +66,7 @@ public class MotionValuesBroker extends BrokerBase {
                 MotionValuesDef.COLUMN_NAME_X,
                 MotionValuesDef.COLUMN_NAME_Y,
                 MotionValuesDef.COLUMN_NAME_Z,
-                MotionValuesDef.COLUMN_NAME_MOTION_TYPE};
+                MotionValuesDef.COLUMN_NAME_MOTION_TYPE,
+                MotionValuesDef.COLUMN_NAME_IS_EXPORTED};
     }
 }
