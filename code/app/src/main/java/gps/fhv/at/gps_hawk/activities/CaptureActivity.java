@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,11 +10,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.location.LocationManager;
-import android.media.Image;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -21,7 +24,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.content.PermissionChecker;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.GpsHawkApplication;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.navigation.Navigation;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
@@ -53,6 +57,8 @@ import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.LocationService;
+import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
+import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.MotionWorker;
@@ -67,6 +73,11 @@ public class CaptureActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private boolean mPermissionsGranted = false;
+
+    /**
+     * Temporary saves the update path
+     */
+    private Uri mDownloadUri;
 
     private SupportMapFragment mMapFragment;
     private TextView mWaypointCounterView;
@@ -156,11 +167,69 @@ public class CaptureActivity extends AppCompatActivity {
             Toast.makeText(this, "Please enable GPS", Toast.LENGTH_LONG).show();
 
             if (Build.VERSION.SDK_INT >= 23) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, Constants.REQUEST_CODE_PERMISSION_GPS);
             }
 
         }
 
+        checkForUpdate();
+    }
+
+    /**
+     * Checks for an update
+     */
+    private void checkForUpdate() {
+
+        // Start update task
+        final Context context = this;
+        CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, Uri>() {
+            @Override
+            public void onPostExecute(final Uri updateUrl) {
+                if (updateUrl != null) {
+                    // New update
+                    android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
+                    dialogBuilder.setMessage(R.string.update_available)
+                            .setTitle(R.string.update_available_title)
+                            .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    if (checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                        downloadUpdate(updateUrl);
+                                    } else if (Build.VERSION.SDK_INT >= 23) {
+                                        // Temporary save the download url
+                                        mDownloadUri = updateUrl;
+                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_PERMISSION_STORAGE);
+                                    }
+                                }
+                            })
+                            .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Todo
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
+            }
+        });
+        updateTask.execute();
     }
 
     /**
@@ -403,7 +472,7 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
-    protected void showMessageBox(Context context, String message, String positiveText, DialogInterface.OnClickListener listener) {
+    private void showMessageBox(Context context, String message, String positiveText, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder dlgAlert = new AlertDialog.Builder(context);
 
         dlgAlert.setMessage(message);
@@ -416,12 +485,59 @@ public class CaptureActivity extends AppCompatActivity {
         dlgAlert.create().show();
     }
 
+    /**
+     * Downloads the file
+     *
+     * @param uri
+     */
+    private void downloadUpdate(Uri uri) {
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GPSHawk.apk");
+        final DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+        downloadManager.enqueue(request);
+
+        // Register download receiver
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Cursor c = null;
+                try {
+                    long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, 0);
+                    c = downloadManager.query(new DownloadManager.Query().setFilterById(id));
+
+                    if (c.moveToFirst()) {
+                        // Check if status was successful
+                        int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+
+                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                            Intent installIntent = new Intent(Intent.ACTION_VIEW).setDataAndType(
+                                    Uri.parse(c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))), "application/vnd.android.package-archive"
+                            );
+                            startActivity(installIntent);
+                        } else {
+                            String reason = c.getString(c.getColumnIndex(DownloadManager.COLUMN_REASON));
+                            Log.e("Update", "Update failed" + reason);
+                        }
+
+                        // Deregister
+                        unregisterReceiver(this);
+                    }
+                } finally {
+                    if (c != null) {
+                        c.close();
+                    }
+                }
+            }
+        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         switch (requestCode) {
-            case Constants.REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS:
+            case Constants.REQUEST_CODE_PERMISSION_GPS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     mPermissionsGranted = true;
                     mStartTrackingButton.setEnabled(mPermissionsGranted);
@@ -431,6 +547,10 @@ public class CaptureActivity extends AppCompatActivity {
                     Toast.makeText(this, R.string.error_permission_location_required, Toast.LENGTH_LONG).show();
                 }
                 break;
+            case Constants.REQUEST_CODE_PERMISSION_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    downloadUpdate(mDownloadUri);
+                }
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;

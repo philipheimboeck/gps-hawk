@@ -37,4 +37,8 @@
     <string name="amount_of_exceptions">Amount of captured errors</string>
     <string name="error_export_failed">An error occured while exporting data - Be sure to have permissions and internet connectivity</string>
     <string name="amount_of_motions">Amount of captured motions</string>
+    <string name="update_available">There is an update available. Do you want to install it?</string>
+    <string name="update_available_title">Update available</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
 </resources>

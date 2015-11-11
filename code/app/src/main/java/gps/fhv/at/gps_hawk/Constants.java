@@ -7,7 +7,8 @@ package gps.fhv.at.gps_hawk;
 public class Constants {
     public static final String PREFERENCES = "gps.fhv.at.gps_hawk";
     public static final String PREF_DEVICE_TOKEN = "dev_token";
-    public static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 111;
+    public static final int REQUEST_CODE_PERMISSION_GPS = 111;
+    public static final int REQUEST_CODE_PERMISSION_STORAGE = 112;
     public static final int NOTIFICATION_TRACKING_ID = 1;
     public static final String BROADCAST_NEW_WAYPOINT = "new-waypoint";
     public static final String EXTRA_WAYPOINT = "extra-waypoint";
