@@ -32,6 +32,8 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
     private MotionValues[] mMotionValues = new MotionValues[Constants.MOTION_TO_DB_THRESHOLD];
     private int mCurrentMV = 0;
 
+    private AsyncTask<Integer, Void, String> mTaskSave2Db;
+
     private AsyncTask<Integer, Void, String> getTaskSave2Db() {
         return new AsyncTask<Integer, Void, String>() {
 
@@ -39,12 +41,13 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
             protected String doInBackground(Integer... params) {
                 try {
                     DbFacade db = DbFacade.getInstance(mContext);
+                    Log.d(Constants.PREFERENCES, "i of MotionValues to save: " + params[0]);
                     db.saveEntities(mMotionValues, params[0]);
+                    Log.d(Constants.PREFERENCES, "Leave saving MotionValues");
                 } catch (Exception e) {
                     Log.e(Constants.PREFERENCES, "ERROR at inserting MotionValues", e);
                 }
                 mIsThreadWorking = false;
-                Log.d(Constants.PREFERENCES, "Leave saving MotionValues");
 
                 return "";
             }
@@ -73,7 +76,10 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
 
         // Save currently unsaved MotionValues
         // ignore the few values in buffy
-        if (!mIsThreadWorking) getTaskSave2Db().execute(mCurrentMV + 1);
+        if (!mIsThreadWorking) {
+            mTaskSave2Db = getTaskSave2Db();
+            mTaskSave2Db.execute(mCurrentMV + 1);
+        }
     }
 
     @Override
@@ -108,7 +114,8 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
                 Log.d(Constants.PREFERENCES, "Enter saving MotionValues");
 
                 // start new thread saving all 100 MotionValues
-                getTaskSave2Db().execute(mCurrentMV);
+                mTaskSave2Db = getTaskSave2Db();
+                mTaskSave2Db.execute(mCurrentMV);
 
             }
 

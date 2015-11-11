@@ -117,7 +117,6 @@ public class DbFacade {
                 outerSeparator = ", ";
             }
 
-            Log.d(Constants.PREFERENCES, sql.toString());
             db.execSQL(sql.toString());
             db.setTransactionSuccessful();
             numInserted = arr.length;

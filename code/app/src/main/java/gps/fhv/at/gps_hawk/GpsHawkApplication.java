@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
+import gps.fhv.at.gps_hawk.workers.LogWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 
 /**
@@ -17,24 +18,33 @@ import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 public class GpsHawkApplication extends Application {
 
     private final Thread.UncaughtExceptionHandler mDefaultExceptionHandler;
+    private final LogWorker mLogWorker;
 
     public GpsHawkApplication() {
         mDefaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
 
         // Initialize volatile domain-data
         VolatileInstancePool.getInstance().initialize();
+
+        // Initialize reading from Logcat
+        mLogWorker = new LogWorker();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
+        // Be sure to set application context globally (singleton)
+        DbFacade.getInstance(getApplicationContext());
+
+        // Start reading Logs
+        mLogWorker.initialize();
+
         // Add some custom exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
             @Override
             public void uncaughtException(Thread thread, Throwable ex) {
-
 
                 try {
                     // Save Exception to local db
@@ -51,10 +61,9 @@ public class GpsHawkApplication extends Application {
                     Log.e("UNCAUGHT", ex.getMessage());
 
 
-
                 } finally {
                     // Rethrow the exception to the OS!
-                    if(mDefaultExceptionHandler != null) {
+                    if (mDefaultExceptionHandler != null) {
                         mDefaultExceptionHandler.uncaughtException(thread, ex);
                     }
                 }
