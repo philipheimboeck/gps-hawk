@@ -6,7 +6,6 @@ import android.util.Log;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.LogWorker;
@@ -54,8 +53,10 @@ public class GpsHawkApplication extends Application {
                     Exception2Log exception2Log = new Exception2Log();
                     exception2Log.setStackTrace(sw.toString());
                     exception2Log.setMessage(ex.getMessage());
+                    exception2Log.setLevel(Log.ASSERT);
                     DbFacade db = DbFacade.getInstance(getApplicationContext());
                     db.saveEntity(exception2Log);
+
 
                     ex.printStackTrace();
                     Log.e("UNCAUGHT", ex.getMessage());

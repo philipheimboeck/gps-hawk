@@ -10,7 +10,7 @@ public class SettingsWorker {
 
     private static SettingsWorker mInstance;
 
-    public  static  SettingsWorker getmInstance() {
+    public  static  SettingsWorker getInstance() {
         if ( mInstance == null ) {
             mInstance = new SettingsWorker();
         }
@@ -30,8 +30,13 @@ public class SettingsWorker {
         switch (key) {
             case Constants.SETTING_GPS_MIN_DIST_CHANGE:
                 return Constants.GPS_MIN_DIST_CHANGE;
+            case Constants.SETTING_GPS_MIN_TIME:
+                return Constants.GPS_MIN_TIME;
+            case Constants.SETTING_ACCELERATION_MIN_TIME_GAP:
+                return Constants.ACCELERATION_MIN_TIME_GAP;
+            default:
+                throw new RuntimeException("Desired config key is not available!");
         }
-        return null;
     }
 
 }

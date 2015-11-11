@@ -76,6 +76,7 @@ public class DbFacade {
 
     /**
      * Saves array of objects to database using bulk insert
+     *
      * @param arr
      * @param length of array to save
      * @param <T>
@@ -105,7 +106,7 @@ public class DbFacade {
         try {
             // Provide values as String foreach column: `( 'val1' , ... , 'valn' )`
             String outerSeparator = "";
-            for (int i = 0 ; i < length ; i++) {
+            for (int i = 0; i < length; i++) {
                 ContentValues cv = broker.map2db(arr[i]);
                 sql.append(outerSeparator).append("(");
                 separator = "";
@@ -120,6 +121,9 @@ public class DbFacade {
             db.execSQL(sql.toString());
             db.setTransactionSuccessful();
             numInserted = arr.length;
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, sql.toString());
+            throw e;
         } finally {
             db.endTransaction();
         }
