@@ -47,7 +47,10 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             mCurrentTrack = t;
 
             //noinspection ResourceType
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Constants.GPS_MIN_TIME, Constants.GPS_MIN_DIST_CHANGE, mLocationListener);
+            int gpsTime = (int) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_TIME);
+            int gpsDistance = (int) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_DIST_CHANGE);
+
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, gpsTime, gpsDistance, mLocationListener);
             mLocationManager.addGpsStatusListener(mLocationListener);
 
             Criteria criteria = new Criteria();

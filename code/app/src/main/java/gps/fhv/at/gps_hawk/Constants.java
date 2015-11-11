@@ -23,6 +23,11 @@ public class Constants {
     public static int GPS_MIN_TIME = 5000; // Minimum time to report new coordinate
 
     /**
+     * Acceleration
+     */
+    public static int ACCELERATION_MIN_TIME_GAP = 100; // in millis
+
+    /**
      * Pferences-Keys
      */
     public static String PREF_EXPORT_URL = "export_url";
@@ -33,8 +38,10 @@ public class Constants {
     public static final int MOTION_TO_DB_THRESHOLD = 100;
 
     /**
-     * Setting-Names
+     * Setting-Names (easiest to use sequential numbers)
      */
     public static final int SETTING_GPS_MIN_DIST_CHANGE = 0;
     public static final int SETTING_GPS_MIN_TIME = 1;
+    // Minimum time (in millis) to be elapsed between to MotionValues to save
+    public static final int SETTING_ACCELERATION_MIN_TIME_GAP = 2;
 }

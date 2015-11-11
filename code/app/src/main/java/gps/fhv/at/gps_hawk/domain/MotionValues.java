@@ -54,6 +54,7 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
         _isExported = isExported;
     }
 
+
     @Override
     public String toJSON() {
         JSONObject json = new JSONObject();
