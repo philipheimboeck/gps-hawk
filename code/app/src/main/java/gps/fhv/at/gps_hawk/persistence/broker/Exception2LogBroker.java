@@ -29,6 +29,7 @@ public class Exception2LogBroker extends BrokerBase {
 
         // int
         values.put(Exception2LogDef.COLUMN_NAME_IS_EXPORTED, e.getIsExported());
+        values.put(Exception2LogDef.COLUMN_NAME_LEVEL, e.getLevel());
 
         return values;
     }
@@ -47,6 +48,7 @@ public class Exception2LogBroker extends BrokerBase {
 
         // Int
         e.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_IS_EXPORTED)));
+        e.setLevel(cursor.getInt(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_LEVEL)));
 
         return (T) e;
     }
@@ -61,6 +63,7 @@ public class Exception2LogBroker extends BrokerBase {
         return new String[]{Exception2LogDef.COLUMN_NAME_DATETIME,
                 Exception2LogDef.COLUMN_NAME_MSG,
                 Exception2LogDef.COLUMN_NAME_STACK_TRACE,
+                Exception2LogDef.COLUMN_NAME_LEVEL,
                 Exception2LogDef.COLUMN_NAME_IS_EXPORTED};
     }
 
