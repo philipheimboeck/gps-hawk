@@ -1,6 +1,7 @@
 package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
@@ -51,15 +53,15 @@ public class ExportClient extends RestClient {
             return true;
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Export failed: ", e);
         } catch (RegistrationException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Export failed: ", e);
         } catch (NoConnectionException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Export failed: ", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Export failed: ", e);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Export failed: ", e);
         }
         return false;
     }

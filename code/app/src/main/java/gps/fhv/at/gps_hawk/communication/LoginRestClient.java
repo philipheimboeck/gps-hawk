@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
 import android.util.Base64;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.exceptions.LoginException;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
@@ -48,7 +50,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             throw new RuntimeException("Invalid URL!");
 
         } catch (NoConnectionException | IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Checking user failed", e);
         }
 
         // Todo Error
@@ -77,7 +79,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             throw new RuntimeException("Invalid URL!");
 
         } catch (NoConnectionException | IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Registration of user failed", e);
 
             throw new RegistrationException("Registration failed", e);
         }
@@ -110,11 +112,11 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             throw new RuntimeException("Invalid URL!");
 
         } catch (NoConnectionException | IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Login failed", e);
 
             throw new LoginException("Login failed", e);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Login failed due to JSON-Problem", e);
 
             throw new LoginException("Login failed due to invalid answer", e);
         }

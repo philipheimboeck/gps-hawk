@@ -1,7 +1,11 @@
 package gps.fhv.at.gps_hawk.domain;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import gps.fhv.at.gps_hawk.Constants;
 
 /**
  * Author: Philip Heimböck
@@ -40,7 +44,7 @@ public class Vehicle extends DomainBase implements IJSONable {
         try {
             json.put("id",getId());
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
         return json.toString();
 

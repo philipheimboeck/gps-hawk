@@ -1,11 +1,14 @@
 package gps.fhv.at.gps_hawk.domain;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.Calendar;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
@@ -53,7 +56,7 @@ public class Track extends DomainBase implements Serializable, IJSONable {
             json.put("endDateTime", DateHelper.toSql(getEndDateTime()));
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
         return json.toString();
 

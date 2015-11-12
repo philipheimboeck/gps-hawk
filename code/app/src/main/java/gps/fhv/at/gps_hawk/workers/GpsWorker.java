@@ -103,7 +103,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
         try {
             addresses = gcd.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Failed to resolve adress from location", e);
         }
         return addresses;
     }

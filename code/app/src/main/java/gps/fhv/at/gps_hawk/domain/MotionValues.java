@@ -1,10 +1,13 @@
 package gps.fhv.at.gps_hawk.domain;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
@@ -66,7 +69,7 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
             json.put("type", _motionType);
             json.put("id", _id);
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
         return json.toString();
     }

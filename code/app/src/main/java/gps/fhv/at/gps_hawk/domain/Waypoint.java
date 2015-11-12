@@ -1,5 +1,7 @@
 package gps.fhv.at.gps_hawk.domain;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
@@ -8,6 +10,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
@@ -136,7 +139,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
         return json.toString();
     }
