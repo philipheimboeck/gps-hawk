@@ -7,7 +7,9 @@ package gps.fhv.at.gps_hawk.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.ILoginClient;
 import gps.fhv.at.gps_hawk.communication.LoginRestClient;
 import gps.fhv.at.gps_hawk.exceptions.LoginException;
@@ -41,7 +43,7 @@ public class LoginTask extends AsyncTask<Void, Void, String> {
             return loginClient.login(mUser, mPassword, mAndroidId);
 
         } catch (LoginException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES, "Login failed", e);
             return null;
         }
     }

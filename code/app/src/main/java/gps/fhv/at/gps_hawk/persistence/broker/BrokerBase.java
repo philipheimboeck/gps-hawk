@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 
 /**
@@ -31,7 +32,7 @@ public abstract class BrokerBase {
 
             return domain;
         } catch (IllegalArgumentException e) {
-            Log.e("FATAL","Tried to access unfetched column in cursor",e);
+            Log.e(Constants.PREFERENCES,"Tried to access unfetched column in cursor",e);
             throw e;
         }
     }

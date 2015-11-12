@@ -8,6 +8,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
@@ -38,18 +39,18 @@ public class DbSetup extends SQLiteOpenHelper {
         tableDefs.add(new Exception2LogDef());
         tableDefs.add(new MotionValuesDef());
 
-        return  tableDefs;
+        return tableDefs;
     }
 
     public void onCreate(SQLiteDatabase db) {
 
         List<BaseTableDef> tableDefs = getTableDefs();
 
-        for( BaseTableDef tdbDef : tableDefs ) {
+        for (BaseTableDef tdbDef : tableDefs) {
             try {
                 db.execSQL(tdbDef.getSqlCreateTable());
             } catch (Exception e) {
-                Log.e("FATAL","Error onCreate()",e);
+                Log.e(Constants.PREFERENCES, "Error in DbSetup.onCreate()", e);
             }
         }
 
@@ -60,24 +61,24 @@ public class DbSetup extends SQLiteOpenHelper {
         List<BaseTableDef> tableDefs = getTableDefs();
 
         // Delte all tables
-        for( BaseTableDef tdbDef : tableDefs ) {
+        for (BaseTableDef tdbDef : tableDefs) {
             try {
                 db.execSQL(tdbDef.getSqlDeleteEntries());
 
             } catch (Exception e) {
-                Log.e("FATAL","Error onUpgrade()",e);
+                Log.e(Constants.PREFERENCES, "Error in DbSetup.onUpgrade()", e);
             }
         }
 
         // Then create database new
         onCreate(db);
-     }
+    }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
             onUpgrade(db, oldVersion, newVersion);
         } catch (Exception e) {
-            Log.e("FATAL","Error onDowngrade()",e);
+            Log.e(Constants.PREFERENCES, "Error onDowngrade()", e);
         }
     }
 

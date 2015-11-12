@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RestException;
 
@@ -35,7 +36,7 @@ public class AppClient extends RestClient implements IAppClient {
             HTTPAnswer answer = get(url);
 
             if (answer.responseCode != 200) {
-                Log.w("Rest", "Rest exception: " + answer.content);
+                Log.w(Constants.PREFERENCES, "Rest exception: " + answer.content);
                 throw new RestException("Some error occurred");
             }
 
@@ -63,7 +64,8 @@ public class AppClient extends RestClient implements IAppClient {
             throw new RuntimeException("Invalid URL!");
 
         } catch (NoConnectionException | IOException e) {
-            e.printStackTrace();
+            Log.e(Constants.PREFERENCES,"Error receiving current-version from server",e);
+            Log.e(Constants.PREFERENCES,e.getStackTrace().toString());
 
         } catch (JSONException e) {
             throw new RestException("Invalid answer!");

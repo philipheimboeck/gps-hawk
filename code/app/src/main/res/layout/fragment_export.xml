@@ -51,7 +51,6 @@
                     android:layout_alignParentEnd="true"
                     android:text="@string/start_export"/>
 
-
             </LinearLayout>
 
             <LinearLayout

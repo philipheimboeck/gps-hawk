@@ -222,7 +222,7 @@ public class DbFacade {
 
             domain = broker.map2domain(c);
         } catch (Exception e) {
-            Log.e("FATAL", e.getMessage(), e);
+            Log.e(Constants.PREFERENCES, e.getMessage(), e);
         }
         return domain;
     }
@@ -276,7 +276,7 @@ public class DbFacade {
             ret = c.getInt(0);
 
         } catch (Exception e) {
-            Log.e("FATAL", "Error fetching COUNT(*) FROM table" + tbl, e);
+            Log.e(Constants.PREFERENCES, "Error fetching COUNT(*) FROM table" + tbl, e);
         }
 
         return ret;

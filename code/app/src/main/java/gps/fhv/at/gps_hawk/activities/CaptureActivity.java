@@ -282,6 +282,7 @@ public class CaptureActivity extends AppCompatActivity {
         mVehicleClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.v(Constants.PREFERENCES, "Hit vehicle-Button: " + v.getId());
                 ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
                 Vehicle ourVehicle = null;
                 int i = -1;
@@ -290,12 +291,11 @@ public class CaptureActivity extends AppCompatActivity {
                     if (v.getId() == vehicle.getUiId()) {
                         ourVehicle = vehicle;
                         mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
+                        Log.i(Constants.PREFERENCES, "Vehicle changed: " + ourVehicle.getId());
                         continue;
                     }
-//                    mImgVehicleButtons[i].setBackgroundResource(0);
                     mImgVehicleButtons[i].setBackgroundResource(R.drawable.inactive_vehicle);
                 }
-//                mImgVehicleButtons[i].setBackground();
                 WaypointFactory.getInstance().setVehicle(ourVehicle);
             }
         };
@@ -516,7 +516,7 @@ public class CaptureActivity extends AppCompatActivity {
                             startActivity(installIntent);
                         } else {
                             String reason = c.getString(c.getColumnIndex(DownloadManager.COLUMN_REASON));
-                            Log.e("Update", "Update failed" + reason);
+                            Log.e(Constants.PREFERENCES, "Update failed" + reason);
                         }
 
                         // Deregister

@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.location.LocationManager;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
@@ -41,6 +42,9 @@ public class LocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Log.v(Constants.PREFERENCES, "LocationService - OnStartCommand");
+
         if(mGpsSvc.isGpsAvailable()) {
             // Show notification
             showNotification();
@@ -56,6 +60,9 @@ public class LocationService extends Service {
             mMotionWorker.initialize();
 
         } else {
+
+            Log.v(Constants.PREFERENCES, "No GPS available - call stopSelf()");
+
             // No GPS? Stop the service right away!
             stopSelf();
         }
@@ -66,6 +73,9 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
+
+        Log.v(Constants.PREFERENCES, "LocationService - onDestroy");
+
         // Cancel notification
         cancelNotification();
 

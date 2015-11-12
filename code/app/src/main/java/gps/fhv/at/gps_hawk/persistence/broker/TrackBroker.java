@@ -21,7 +21,8 @@ public class TrackBroker extends BrokerBase {
 
         // Datetime
         values.put(TrackDef.COLUMN_NAME_DATETIME_START, DateHelper.toSql(t.getStartDateTime()));
-        values.put(TrackDef.COLUMN_NAME_DATETIME_END, DateHelper.toSql(t.getEndDateTime()));
+        if (t.getEndDateTime() != null)
+            values.put(TrackDef.COLUMN_NAME_DATETIME_END, DateHelper.toSql(t.getEndDateTime()));
 
         return values;
     }
@@ -32,7 +33,10 @@ public class TrackBroker extends BrokerBase {
 
         // Datetime
         t.setStartDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START))));
-        t.setEndDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END))));
+
+        String toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END));
+        if (toConvert != null)
+            t.setEndDateTime(DateHelper.fromSql(toConvert));
 
         return (T) t;
     }

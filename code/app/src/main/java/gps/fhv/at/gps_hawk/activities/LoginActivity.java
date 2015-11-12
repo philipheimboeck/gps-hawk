@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
 import gps.fhv.at.gps_hawk.workers.DbSetup;
@@ -145,7 +146,7 @@ public class LoginActivity extends AppCompatActivity {
             DbSetup db = new DbSetup(this);
             db.getWritableDatabase();
         } catch (Exception e) {
-            Log.e("FATAL", "Could not create Database", e);
+            Log.e(Constants.PREFERENCES, "Could not create Database", e);
         }
     }
 

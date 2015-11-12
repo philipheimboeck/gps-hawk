@@ -1,12 +1,14 @@
 package gps.fhv.at.gps_hawk.tasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.ExportClient;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.Track;
@@ -67,7 +69,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                 }
 
             } catch (UnExpectedResultException e) {
-                e.printStackTrace();
+                Log.e(Constants.PREFERENCES, "Unexpected result", e);
 
                 // Reset not exported waypoints
                 dbFacade.markExportable(2, 0, mExpContext.getT());

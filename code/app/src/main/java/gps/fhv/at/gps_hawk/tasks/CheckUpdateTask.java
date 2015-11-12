@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.AppClient;
 import gps.fhv.at.gps_hawk.communication.IAppClient;
 import gps.fhv.at.gps_hawk.exceptions.RestException;
@@ -40,9 +41,9 @@ public class CheckUpdateTask extends AsyncTask<Void, Void, Uri> {
             }
 
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e("Update", "Retrieval of version failed!", e);
+            Log.e(Constants.PREFERENCES, "Retrieval of version failed!", e);
         } catch (RestException e) {
-            Log.e("Update", "Failed to get update link!", e);
+            Log.e(Constants.PREFERENCES, "Failed to get update link!", e);
         }
 
         return null;

@@ -59,7 +59,7 @@ public class GpsHawkApplication extends Application {
 
 
                     ex.printStackTrace();
-                    Log.e("UNCAUGHT", ex.getMessage());
+                    Log.e(Constants.PREFERENCES, ex.getMessage());
 
 
                 } finally {

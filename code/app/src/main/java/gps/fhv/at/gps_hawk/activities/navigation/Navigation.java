@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import java.util.List;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.navigation.adapter.NavigationListAdapter;
 
@@ -54,7 +55,7 @@ public class Navigation {
             });
 
         } catch (Exception e) {
-            Log.e("FATAL", "Error creating Navigation", e);
+            Log.e(Constants.PREFERENCES, "Error creating Navigation", e);
         }
     }
 

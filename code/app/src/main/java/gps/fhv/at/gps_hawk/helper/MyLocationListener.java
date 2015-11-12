@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.events.NewLocationEventData;
 
 /**
@@ -31,7 +32,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
         mLastLocation = loc;
         mLastLocationMillis = SystemClock.elapsedRealtime();
-        Log.i("Debug","onLocationChanged");
+        Log.i(Constants.PREFERENCES,"onLocationChanged");
         if (isSufficientLocation(loc)) {
             NewLocationEventData data = new NewLocationEventData();
             data.setNrOfSattelites(mNrOfSattelites);
@@ -43,19 +44,19 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
     @Override
     public void onProviderDisabled(String provider) {
-        Log.i("Location Listener", "Provider disabled");
+        Log.i(Constants.PREFERENCES, "Provider disabled");
         caller.onProviderDisabled(provider);
     }
 
     @Override
     public void onProviderEnabled(String provider) {
-        Log.i("Location Listener", "Provider enabled");
+        Log.i(Constants.PREFERENCES, "Provider enabled");
         caller.onProviderEnabled(provider);
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.i("Location Listener", "onStatusChanged");
+        Log.i(Constants.PREFERENCES, "onStatusChanged");
     }
 
     /**
