@@ -282,20 +282,7 @@ public class CaptureActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.v(Constants.PREFERENCES, "Hit vehicle-Button: " + v.getId());
-                ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
-                Vehicle ourVehicle = null;
-                int i = -1;
-                for (Vehicle vehicle : vList) {
-                    ++i;
-                    if (v.getId() == vehicle.getUiId()) {
-                        ourVehicle = vehicle;
-                        mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
-                        Log.i(Constants.PREFERENCES, "Vehicle changed: " + ourVehicle.getId());
-                        continue;
-                    }
-                    mImgVehicleButtons[i].setBackgroundResource(R.drawable.inactive_vehicle);
-                }
-                WaypointFactory.getInstance().setVehicle(ourVehicle);
+                changeVehicle(v.getId());
             }
         };
 
@@ -312,6 +299,28 @@ public class CaptureActivity extends AppCompatActivity {
 
         // When already tracking, show some other elements
         initializeViewInTrackingMode();
+    }
+
+    /**
+     * Change the vehicle
+     *
+     * @param id
+     */
+    private void changeVehicle(int id) {
+        ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
+        Vehicle ourVehicle = null;
+        int i = -1;
+        for (Vehicle vehicle : vList) {
+            ++i;
+            if (id == vehicle.getUiId()) {
+                ourVehicle = vehicle;
+                mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
+                Log.i(Constants.PREFERENCES, "Vehicle changed: " + ourVehicle.getId());
+                continue;
+            }
+            mImgVehicleButtons[i].setBackgroundResource(R.drawable.inactive_vehicle);
+        }
+        WaypointFactory.getInstance().setVehicle(ourVehicle);
     }
 
     private View.OnClickListener mVehicleClickListener;
