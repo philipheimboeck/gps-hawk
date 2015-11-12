@@ -48,7 +48,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
             //noinspection ResourceType
             int gpsTime = (int) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_TIME);
-            int gpsDistance = (int) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_DIST_CHANGE);
+            float gpsDistance = (float) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_DIST_CHANGE);
 
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, gpsTime, gpsDistance, mLocationListener);
             mLocationManager.addGpsStatusListener(mLocationListener);
@@ -57,16 +57,18 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = mLocationManager.getBestProvider(criteria, false);
 
+            Log.v(Constants.PREFERENCES,"GpsWorker started GPS Tracking");
+
             @SuppressWarnings("ResourceType")
             Location location = mLocationManager.getLastKnownLocation(provider);
 
             if (location != null) {
-                Log.i("Debug: ", location.toString());
+                Log.i(Constants.PREFERENCES, location.toString());
             }
         } catch (SecurityException ex) {
-            Log.e("Security", "Permission not granted!");
+            Log.e(Constants.PREFERENCES, "Permission not granted!");
         } catch (Exception ex) {
-            Log.e("Debug", "Error at starting GpsTracking", ex);
+            Log.e(Constants.PREFERENCES, "Error at starting GpsTracking", ex);
         }
     }
 
@@ -85,7 +87,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
             db.saveEntity(t);
         } catch (SecurityException ex) {
-            Log.e("Security", "Permission not granted!");
+            Log.e(Constants.PREFERENCES, "Permission not granted!");
         }
     }
 
@@ -136,6 +138,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     @Override
     public void onProviderEnabled(String provider) {
         // Todo
+        Log.d(Constants.PREFERENCES,"ProviderEnabled - startGpsTracking?");
 //        startGpsTracking();
     }
 
