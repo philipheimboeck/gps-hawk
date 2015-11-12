@@ -28,12 +28,12 @@ public class FragmentsActivity extends AppCompatActivity {
 
     // Fragments
     private ExportFragment mExportFragment;
-    private SettingsFragment mSettingsFragment;
+//    private SettingsFragment mSettingsFragment;
     private Navigation mNavigation;
 
     public FragmentsActivity() {
         mExportFragment = new ExportFragment();
-        mSettingsFragment = new SettingsFragment();
+//        mSettingsFragment = new SettingsFragment();
     }
 
     @Override
@@ -55,8 +55,8 @@ public class FragmentsActivity extends AppCompatActivity {
                 getString(R.string.navigation_capture), R.drawable.ic_hawk_white));
         navigationItems.add(new NavigationItem(new NavigationAction(mExportFragment),
                 getString(R.string.navigation_export), 0));
-        navigationItems.add(new NavigationItem(new NavigationAction(mSettingsFragment),
-                getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
+//        navigationItems.add(new NavigationItem(new NavigationAction(mSettingsFragment),
+//                getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
 
         mNavigation = new Navigation(this, mDrawerLayout, mDrawerList);
         mNavigation.populateNavigation(navigationItems);

@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.GpsHawkApplication;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.navigation.Navigation;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
@@ -250,7 +249,7 @@ public class CaptureActivity extends AppCompatActivity {
         ArrayList<NavigationItem> navigationItems = new ArrayList<>();
         navigationItems.add(new NavigationItem(new NavigationAction(), getString(R.string.navigation_capture), R.drawable.ic_hawk_white));
         navigationItems.add(new NavigationItem(new NavigationAction(exportIntent), getString(R.string.navigation_export), 0));
-        navigationItems.add(new NavigationItem(new NavigationAction(settingsIntent), getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
+//        navigationItems.add(new NavigationItem(new NavigationAction(settingsIntent), getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
 
         mNavigation = new Navigation(this, mDrawerLayout, mDrawerList);
         mNavigation.populateNavigation(navigationItems);

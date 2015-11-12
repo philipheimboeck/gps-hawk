@@ -39,6 +39,8 @@ public class GpsHawkApplication extends Application {
         // Start reading Logs
         mLogWorker.initialize();
 
+        Log.i(Constants.PREFERENCES, "Started application");
+
         // Add some custom exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
