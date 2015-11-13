@@ -134,7 +134,8 @@ public class RestClient {
         result.append(URLEncoder.encode(key, "UTF-8"));
         result.append("=");
         Log.d(Constants.PREFERENCES, "Encoding Array to UTF-8");
-        result.append(URLEncoder.encode(content, "UTF-8"));
+//        result.append(URLEncoder.encode(content, "UTF-8"));
+        result.append(content);
         Log.d(Constants.PREFERENCES, "Finished Encoding of Array to UTF-8");
 
         return post(url, result.toString());

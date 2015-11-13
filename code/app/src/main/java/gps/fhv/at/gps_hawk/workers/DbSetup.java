@@ -63,9 +63,10 @@ public class DbSetup extends SQLiteOpenHelper {
         // Delte all tables
         for (BaseTableDef tdbDef : tableDefs) {
             try {
-                String updScript = tdbDef.getUpdateScript();
-                if (updScript != null)
-                    db.execSQL(updScript);
+//                String updScript = tdbDef.getUpdateScript();
+//                if (updScript != null)
+//                    db.execSQL(updScript);
+                db.execSQL(tdbDef.getSqlDeleteEntries());
 
             } catch (Exception e) {
                 Log.e(Constants.PREFERENCES, "Error in DbSetup.onUpgrade()", e);
@@ -73,7 +74,7 @@ public class DbSetup extends SQLiteOpenHelper {
         }
 
         // Then create database new
-//        onCreate(db);
+        onCreate(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
