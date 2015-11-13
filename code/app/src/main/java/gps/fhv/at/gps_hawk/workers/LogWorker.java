@@ -90,7 +90,7 @@ public class LogWorker {
 
             // Create successfull response
             LogMatchResult rs = new LogMatchResult();
-            rs.mCal = parse;
+            rs.mCal = (int) ( parse.getTimeInMillis() / 1000);
             rs.mLine = mRs.group(9);
             rs.setLevel(mRs.group(8));
 
@@ -104,7 +104,7 @@ public class LogWorker {
     }
 
     private class LogMatchResult {
-        public Calendar mCal;
+        public int mCal;
         public String mLine;
         public int mLevel;
 

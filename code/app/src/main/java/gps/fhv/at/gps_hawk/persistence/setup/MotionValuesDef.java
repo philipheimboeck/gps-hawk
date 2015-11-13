@@ -29,4 +29,9 @@ public class MotionValuesDef extends BaseTableDef {
                 COLUMN_NAME_DATETIME_CAPTURED + TYPE_LONG
                 ;
     }
+
+    @Override
+    public String getUpdateScript() {
+        return null;
+    }
 }

@@ -1,14 +1,7 @@
 package gps.fhv.at.gps_hawk.helper;
 
-import android.database.Cursor;
-import android.util.Log;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 
 /**
  * Created by Tobias on 24.10.2015.

@@ -20,12 +20,17 @@ public class Exception2LogDef extends BaseTableDef {
     @Override
     protected String getSqlCreateColumns() {
         return
-                COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
+                COLUMN_NAME_DATETIME + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_STACK_TRACE + TYPE_TEXT + COMMA_SEP +
                         COLUMN_NAME_MSG + TYPE_TEXT + COMMA_SEP +
                         COLUMN_NAME_LEVEL + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_IS_EXPORTED + TYPE_TINYINT
                 ;
 
+    }
+
+    @Override
+    public String getUpdateScript() {
+        return null;
     }
 }

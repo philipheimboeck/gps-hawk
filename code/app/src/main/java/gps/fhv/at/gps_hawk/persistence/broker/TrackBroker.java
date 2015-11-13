@@ -2,12 +2,9 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 
-import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Track;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 
 /**
@@ -22,10 +19,8 @@ public class TrackBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Datetime
-        if (t.getStartDateTime() != null)
-            values.put(TrackDef.COLUMN_NAME_DATETIME_START, DateHelper.toSql(t.getStartDateTime()));
-        if (t.getEndDateTime() != null)
-            values.put(TrackDef.COLUMN_NAME_DATETIME_END, DateHelper.toSql(t.getEndDateTime()));
+        values.put(TrackDef.COLUMN_NAME_DATETIME_START, t.getStartDateTime());
+        values.put(TrackDef.COLUMN_NAME_DATETIME_END, t.getEndDateTime());
 
         return values;
     }
@@ -35,24 +30,8 @@ public class TrackBroker extends BrokerBase {
         Track t = new Track();
 
         // Datetime
-        String toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START));
-        if (toConvert != null) {
-            try {
-                t.setStartDateTime(DateHelper.fromSql(toConvert));
-            } catch (Exception e) {
-                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
-            }
-        }
-
-        toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END));
-        if (toConvert != null) {
-            try {
-                t.setEndDateTime(DateHelper.fromSql(toConvert));
-            } catch (Exception e) {
-                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
-
-            }
-        }
+        t.setStartDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START)));
+        t.setEndDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END)));
 
         return (T) t;
     }

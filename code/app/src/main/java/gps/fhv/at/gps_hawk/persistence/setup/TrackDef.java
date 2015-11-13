@@ -18,8 +18,13 @@ public class TrackDef extends BaseTableDef {
     @Override
     protected String getSqlCreateColumns() {
         return
-                COLUMN_NAME_DATETIME_START + TYPE_DATETIME + COMMA_SEP +
-                COLUMN_NAME_DATETIME_END + TYPE_DATETIME
+                COLUMN_NAME_DATETIME_START + TYPE_INT + COMMA_SEP +
+                COLUMN_NAME_DATETIME_END + TYPE_INT
                 ;
+    }
+
+    @Override
+    public String getUpdateScript() {
+        return null;
     }
 }

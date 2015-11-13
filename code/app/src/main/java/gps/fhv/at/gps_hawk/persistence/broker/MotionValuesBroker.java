@@ -5,9 +5,7 @@ import android.database.Cursor;
 
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
-import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
  * Created by Tobias on 08.11.2015.

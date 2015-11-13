@@ -66,9 +66,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Create Database
-        dbSetup();
-
         // Check for valid token to skip login process
         String token = TokenHelper.getToken(this);
         if (token != null) {
@@ -139,15 +136,6 @@ public class LoginActivity extends AppCompatActivity {
         mLoginPasswordsFormView = findViewById(R.id.user_login_passwords_form);
         mProgressView = findViewById(R.id.login_progress);
         mUserStatusView = (TextView) findViewById(R.id.user_status_text);
-    }
-
-    private void dbSetup() {
-        try {
-            DbSetup db = new DbSetup(this);
-            db.getWritableDatabase();
-        } catch (Exception e) {
-            Log.e(Constants.PREFERENCES, "Could not create Database", e);
-        }
     }
 
     private void checkUser() {

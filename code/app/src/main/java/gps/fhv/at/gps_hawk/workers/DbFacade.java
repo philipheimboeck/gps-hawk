@@ -143,6 +143,8 @@ public class DbFacade {
             // How you want the results sorted in the resulting Cursor
             String sortOrder = BaseTableDef._ID + " ASC";
 
+            Log.v(Constants.PREFERENCES, "Query all entities to export");
+
             c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
@@ -154,6 +156,8 @@ public class DbFacade {
             );
 
             c.moveToFirst();
+
+            Log.v(Constants.PREFERENCES, "Query found "+ c.getCount() +" entities to export - Start mapping to domain");
 
             int i = 0;
             while (i < c.getCount()) {
@@ -264,7 +268,7 @@ public class DbFacade {
                 c.moveToNext();
             }
         } finally {
-            if(c != null) {
+            if (c != null) {
                 c.close();
             }
         }

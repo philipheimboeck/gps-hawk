@@ -57,7 +57,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = mLocationManager.getBestProvider(criteria, false);
 
-            Log.v(Constants.PREFERENCES,"GpsWorker started GPS Tracking");
+            Log.v(Constants.PREFERENCES, "GpsWorker started GPS Tracking");
 
             @SuppressWarnings("ResourceType")
             Location location = mLocationManager.getLastKnownLocation(provider);
@@ -82,8 +82,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
             // In case through UI the track changed, reload it
             DbFacade db = DbFacade.getInstance(mContext);
-            Track t = db.select(mCurrentTrack.getId(),Track.class);
-            t.setEndDateTime(end);
+            Track t = db.select(mCurrentTrack.getId(), Track.class);
+            t.setEndDateTime((int) (end.getTimeInMillis() / 1000));
 
             db.saveEntity(t);
         } catch (SecurityException ex) {
@@ -138,7 +138,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     @Override
     public void onProviderEnabled(String provider) {
         // Todo
-        Log.d(Constants.PREFERENCES,"ProviderEnabled - startGpsTracking?");
+        Log.d(Constants.PREFERENCES, "ProviderEnabled - startGpsTracking?");
 //        startGpsTracking();
     }
 

@@ -1,13 +1,20 @@
 package gps.fhv.at.gps_hawk;
 
 import android.app.Application;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
+import gps.fhv.at.gps_hawk.workers.DbSetup;
 import gps.fhv.at.gps_hawk.workers.LogWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 
@@ -33,8 +40,11 @@ public class GpsHawkApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // Be sure database is initialized
+        dbSetup();
+
         // Be sure to set application context globally (singleton)
-        DbFacade.getInstance(getApplicationContext());
+        DbFacade db = DbFacade.getInstance(getApplicationContext());
 
         // Start reading Logs
         mLogWorker.initialize();
@@ -73,4 +83,16 @@ public class GpsHawkApplication extends Application {
             }
         });
     }
+
+    private void dbSetup() {
+        try {
+            DbSetup db = new DbSetup(this);
+            db.getWritableDatabase();
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, "Could not create Database", e);
+        }
+    }
+
+
+
 }
