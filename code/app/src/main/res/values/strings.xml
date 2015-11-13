@@ -41,4 +41,9 @@
     <string name="update_available_title">Update available</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
+    <string name="content_description_foot">Walking</string>
+    <string name="content_description_bicycle">Bicycle</string>
+    <string name="content_description_bus">Bus</string>
+    <string name="content_description_car">Car</string>
+    <string name="content_description_train">Train</string>
 </resources>

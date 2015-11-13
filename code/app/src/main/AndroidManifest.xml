@@ -25,7 +25,9 @@
         <activity android:name=".activities.FragmentsActivity" >
         </activity>
         <activity android:name=".activities.CaptureActivity"
-                  android:launchMode="singleTask">
+                  android:launchMode="singleTask"
+                  android:exported="true"
+            >
         </activity>
 
         <meta-data
