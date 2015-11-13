@@ -8,7 +8,6 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.lang.reflect.Type;
-import java.security.spec.ECField;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,6 @@ import gps.fhv.at.gps_hawk.persistence.broker.MotionValuesBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
-import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -137,6 +135,7 @@ public class DbFacade {
     public List<IExportable> getAllEntities2Export(Type t) {
 
         List<IExportable> listRet = new ArrayList<>();
+        Cursor c = null;
         try {
 
             BrokerBase broker = mBrokerMap.get(t);
@@ -144,7 +143,7 @@ public class DbFacade {
             // How you want the results sorted in the resulting Cursor
             String sortOrder = BaseTableDef._ID + " ASC";
 
-            Cursor c = getDb().query(
+            c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
                     BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2",                                // The columns for the WHERE clause
@@ -166,6 +165,10 @@ public class DbFacade {
             }
         } catch (Exception e) {
             Log.e(Constants.PREFERENCES, "Error getting exportable data", e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
         return listRet;
     }
@@ -202,12 +205,13 @@ public class DbFacade {
 
         T domain = null;
 
+        Cursor c = null;
         try {
             BrokerBase broker = mBrokerMap.get(cl);
 
             String where = BaseColumns._ID + " = " + id;
 
-            Cursor c = getDb().query(
+            c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,
 //                new String[]{" * "},                               // The columns to return
@@ -223,37 +227,54 @@ public class DbFacade {
             domain = broker.map2domain(c);
         } catch (Exception e) {
             Log.e(Constants.PREFERENCES, e.getMessage(), e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
+
+
         return domain;
     }
 
     public <T extends DomainBase> List<T> selectWhere(String condition, Class<T> cl) {
         BrokerBase broker = mBrokerMap.get(cl);
 
-        Cursor c = getDb().query(
-                broker.getTblName(), // Table to query
-                null,
-                condition,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        c.moveToFirst();
         ArrayList<T> list = new ArrayList<>();
-        for (int i = 0; i < c.getCount(); i++) {
-            T domain = broker.map2domain(c);
-            list.add(domain);
+        Cursor c = null;
+        try {
+            c = getDb().query(
+                    broker.getTblName(), // Table to query
+                    null,
+                    condition,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
 
-            c.moveToNext();
+            c.moveToFirst();
+
+
+            for (int i = 0; i < c.getCount(); i++) {
+                T domain = broker.map2domain(c);
+                list.add(domain);
+
+                c.moveToNext();
+            }
+        } finally {
+            if(c != null) {
+                c.close();
+            }
         }
+
         return list;
     }
 
     public int getCount(String tbl, String where) {
         int ret = -1;
+        Cursor c = null;
         try {
             // Define a projection that specifies which columns from the database
             // you will actually use after this query.
@@ -261,7 +282,7 @@ public class DbFacade {
                     "COUNT(*)"
             };
 
-            Cursor c = getDb().query(
+            c = getDb().query(
                     tbl,  // The table to query
                     projection,                               // The columns to return
                     where,                                // The columns for the WHERE clause
@@ -277,6 +298,10 @@ public class DbFacade {
 
         } catch (Exception e) {
             Log.e(Constants.PREFERENCES, "Error fetching COUNT(*) FROM table" + tbl, e);
+        } finally {
+            if (c != null) {
+                c.close();
+            }
         }
 
         return ret;
