@@ -1,14 +1,14 @@
 package gps.fhv.at.gps_hawk.helper;
 
+import android.database.Cursor;
 import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Properties;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
+import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 
 /**
  * Created by Tobias on 24.10.2015.
@@ -30,18 +30,16 @@ public class DateHelper {
         return new SimpleDateFormat(format).format(date);
     }
 
-    public static Calendar fromSql(String calStr) {
+    public static Calendar fromSql(String calStr) throws Exception {
+
+        if (calStr == null) return null;
+
+        if (calStr.matches(".*[a-z].*")) return null;
+
         Calendar cal = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-            cal.setTime(sdf.parse(calStr));
-        } catch (ParseException e) {
-            Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
-        } catch (Exception e) {
-            Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
-        }
+        cal.setTime(sdf.parse(calStr));
         return cal;
     }
-
 
 }

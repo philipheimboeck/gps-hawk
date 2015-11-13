@@ -45,7 +45,6 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
                 try {
                     DbFacade db = DbFacade.getInstance(mContext);
                     db.saveEntities(mMotionValues, params[0]);
-                    Log.d(Constants.PREFERENCES, "Leave saving MotionValues");
                 } catch (Exception e) {
                     Log.e(Constants.PREFERENCES, "ERROR at inserting MotionValues", e);
                 }
@@ -121,7 +120,12 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
                     if (mCurrentMV >= mMotionValues.length) break;
                     mMotionValues[mCurrentMV++] = mv;
                 }
-                if (mBuffy.size() > 0) Log.i(Constants.PREFERENCES, "Buffy-Size: " + mBuffy.size());
+
+                // Log if buffy contains more than 90% of Array-Capacity
+                if (mBuffy.size() > 0 && ((double) mBuffy.size() / mMotionValues.length) > 0.9)
+                    Log.i(Constants.PREFERENCES, "Buffy-Size: " + mBuffy.size());
+
+                // Always clear whole buffy
                 mBuffy.clear();
 
                 ++mCurrentMV;

@@ -13,7 +13,7 @@ import gps.fhv.at.gps_hawk.helper.DateHelper;
 /**
  * Created by Tobias on 02.11.2015.
  */
-public class Exception2Log extends DomainBase implements IExportable , IJSONable {
+public class Exception2Log extends DomainBase implements IExportable, IJSONable {
 
     private int _id;
     private String _stackTrace;
@@ -57,7 +57,8 @@ public class Exception2Log extends DomainBase implements IExportable , IJSONable
     }
 
     public void setDateTime(Calendar dateTime) {
-        _dateTime = dateTime;
+        if (dateTime != null)
+            _dateTime = dateTime;
     }
 
     public int getIsExported() {
@@ -80,11 +81,13 @@ public class Exception2Log extends DomainBase implements IExportable , IJSONable
     public String toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("id",getId());
-            json.put("level",getLevel());
-            json.put("dateTime", DateHelper.toSql(getDateTime()));
-            json.put("stackTrace",getStackTrace());
-            json.put("msg",getMessage());
+            json.put("id", getId());
+            json.put("level", getLevel());
+            json.put("stackTrace", getStackTrace());
+            json.put("msg", getMessage());
+
+            if (getDateTime() != null)
+                json.put("dateTime", DateHelper.toSql(getDateTime()));
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

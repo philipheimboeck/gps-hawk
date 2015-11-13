@@ -2,7 +2,9 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
@@ -26,7 +28,8 @@ public class WaypointBroker extends BrokerBase {
         values.put(WaypointDef.COLUMN_NAME_VEHICLE_ID, wp.getVehicleId());
 
         // Datetime
-        values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
+        if (wp.getTimestampCaptured() != null)
+            values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
 
         // Float
         values.put(WaypointDef.COLUMN_ACCURACY, wp.getAccuracy());
@@ -69,7 +72,14 @@ public class WaypointBroker extends BrokerBase {
         wp.setBearing(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_BEARING)));
 
         // Datetime
-        wp.setTimestampCaptured(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIME))));
+        String toParse = cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIME));
+        if (toParse != null) {
+            try {
+                wp.setTimestampCaptured(DateHelper.fromSql(toParse));
+            } catch (Exception e) {
+                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
+            }
+        }
 
         return (T) wp;
     }

@@ -49,6 +49,8 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
         if (count > 0) {
 
+            Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " to export");
+
             // Get all Waypoints from DB to export
             mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT()));
 
@@ -71,7 +73,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             } catch (UnExpectedResultException e) {
                 Log.e(Constants.PREFERENCES, "Unexpected result", e);
 
-                // Reset not exported waypoints
+                // Reset not exported entities
                 dbFacade.markExportable(2, 0, mExpContext.getT());
                 return "ERROR";
             }

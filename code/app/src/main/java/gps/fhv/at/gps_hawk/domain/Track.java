@@ -36,7 +36,8 @@ public class Track extends DomainBase implements Serializable, IJSONable {
     }
 
     public void setStartDateTime(Calendar startDateTime) {
-        _startDateTime = startDateTime;
+        if (startDateTime != null)
+            _startDateTime = startDateTime;
     }
 
     public Calendar getEndDateTime() {
@@ -44,16 +45,21 @@ public class Track extends DomainBase implements Serializable, IJSONable {
     }
 
     public void setEndDateTime(Calendar endDateTime) {
-        _endDateTime = endDateTime;
+        if (endDateTime != null)
+            _endDateTime = endDateTime;
     }
 
     @Override
     public String toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("id",getId());
-            json.put("startDateTime", DateHelper.toSql(getStartDateTime()));
-            json.put("endDateTime", DateHelper.toSql(getEndDateTime()));
+            json.put("id", getId());
+
+            if (getStartDateTime() != null)
+                json.put("startDateTime", DateHelper.toSql(getStartDateTime()));
+
+            if (getEndDateTime() != null)
+                json.put("endDateTime", DateHelper.toSql(getEndDateTime()));
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

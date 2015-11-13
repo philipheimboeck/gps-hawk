@@ -39,16 +39,20 @@ public class ExportClient extends RestClient {
             HTTPAnswer answer = post(url, expCtx.getExportList(), expCtx.getCollectionName(), params);
 
             if (answer.responseCode != 200) {
+                Log.e(Constants.PREFERENCES, "Could not export data: " + expCtx.getCollectionName() + ", responseCode was: " + answer.responseCode);
                 throw new RegistrationException("Could not export data!");
             }
 
             // Expects as return-string:
-            // {"waypoints":4}
+            // example {"waypoints":4}
 
             JSONObject response = new JSONObject(answer.content);
             if (!(response.has("amount") && response.getInt("amount") == expCtx.getExportList().size())) {
-                throw new UnExpectedResultException("Amount of saved items does not match amount of transferred items");
+                String msg = "Amount of saved items (" + (response.has("amount") ? response.getInt("amount") : "null") + ")does not match amount of transferred items";
+                Log.e(Constants.PREFERENCES, msg);
+                throw new UnExpectedResultException(msg);
             }
+            Log.d(Constants.PREFERENCES, "Exportet " + response.getInt("amount") + " " + expCtx.getCollectionName());
 
             return true;
 

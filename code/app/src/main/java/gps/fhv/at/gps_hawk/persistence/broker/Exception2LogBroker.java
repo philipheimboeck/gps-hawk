@@ -2,7 +2,11 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
+import java.util.Calendar;
+
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
@@ -21,7 +25,8 @@ public class Exception2LogBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Datetime
-        values.put(Exception2LogDef.COLUMN_NAME_DATETIME, DateHelper.toSql(e.getDateTime()));
+        if (e.getDateTime() != null)
+            values.put(Exception2LogDef.COLUMN_NAME_DATETIME, DateHelper.toSql(e.getDateTime()));
 
         // String
         values.put(Exception2LogDef.COLUMN_NAME_MSG, e.getMessage());
@@ -40,7 +45,13 @@ public class Exception2LogBroker extends BrokerBase {
         Exception2Log e = new Exception2Log();
 
         // Datetime
-        e.setDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_DATETIME))));
+        String toParse = cursor.getString(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_DATETIME));
+        if (toParse != null)
+            try {
+                e.setDateTime(DateHelper.fromSql(toParse));
+            } catch (Exception e1) {
+                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e1);
+            }
 
         // String
         e.setStackTrace(cursor.getString(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_STACK_TRACE)));

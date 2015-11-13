@@ -2,7 +2,9 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.helper.DateHelper;
@@ -20,7 +22,8 @@ public class TrackBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Datetime
-        values.put(TrackDef.COLUMN_NAME_DATETIME_START, DateHelper.toSql(t.getStartDateTime()));
+        if (t.getStartDateTime() != null)
+            values.put(TrackDef.COLUMN_NAME_DATETIME_START, DateHelper.toSql(t.getStartDateTime()));
         if (t.getEndDateTime() != null)
             values.put(TrackDef.COLUMN_NAME_DATETIME_END, DateHelper.toSql(t.getEndDateTime()));
 
@@ -32,11 +35,24 @@ public class TrackBroker extends BrokerBase {
         Track t = new Track();
 
         // Datetime
-        t.setStartDateTime(DateHelper.fromSql(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START))));
+        String toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START));
+        if (toConvert != null) {
+            try {
+                t.setStartDateTime(DateHelper.fromSql(toConvert));
+            } catch (Exception e) {
+                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
+            }
+        }
 
-        String toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END));
-        if (toConvert != null)
-            t.setEndDateTime(DateHelper.fromSql(toConvert));
+        toConvert = cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END));
+        if (toConvert != null) {
+            try {
+                t.setEndDateTime(DateHelper.fromSql(toConvert));
+            } catch (Exception e) {
+                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
+
+            }
+        }
 
         return (T) t;
     }

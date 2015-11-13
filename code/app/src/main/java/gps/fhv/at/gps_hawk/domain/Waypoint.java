@@ -16,7 +16,7 @@ import gps.fhv.at.gps_hawk.helper.DateHelper;
 /**
  * Created by Tobias on 24.10.2015.
  */
-public class Waypoint extends DomainBase implements IJSONable, Serializable , IExportable {
+public class Waypoint extends DomainBase implements IJSONable, Serializable, IExportable {
     private int _id;
     private int _trackId;
     private int _isExported;
@@ -61,7 +61,8 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
     }
 
     public void setTimestampCaptured(Calendar timestampCaptured) {
-        _timestampCaptured = timestampCaptured;
+        if (timestampCaptured != null)
+            _timestampCaptured = timestampCaptured;
     }
 
     public float getAccuracy() {
@@ -116,26 +117,29 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable , IE
     public String toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("accuracy",getAccuracy());
-            json.put("nrOfSattelites",getNrOfSattelites());
-            json.put("timestampCaptured", DateHelper.toSql(getTimestampCaptured()));
-            json.put("speed",getSpeed());
-            json.put("provider",getProvider());
-            json.put("bearing",getBearing());
-            json.put("lng",getLng());
-            json.put("lat",getLat());
-            json.put("altitude",getAltitude());
+            json.put("accuracy", getAccuracy());
+            json.put("nrOfSattelites", getNrOfSattelites());
 
-            if ( getVehicle() != null ) {
-                json.put("vehicle",getVehicle().toJSON());
-            } else  {
-                json.put("vehicleid",getVehicleId());
+            if (getTimestampCaptured() != null)
+                json.put("timestampCaptured", DateHelper.toSql(getTimestampCaptured()));
+
+            json.put("speed", getSpeed());
+            json.put("provider", getProvider());
+            json.put("bearing", getBearing());
+            json.put("lng", getLng());
+            json.put("lat", getLat());
+            json.put("altitude", getAltitude());
+
+            if (getVehicle() != null) {
+                json.put("vehicle", getVehicle().toJSON());
+            } else {
+                json.put("vehicleid", getVehicleId());
             }
 
-            if ( getTrack() != null ) {
-                json.put("track",getTrack().toJSON());
-            } else  {
-                json.put("trackid",getTrackId());
+            if (getTrack() != null) {
+                json.put("track", getTrack().toJSON());
+            } else {
+                json.put("trackid", getTrackId());
             }
 
         } catch (JSONException e) {

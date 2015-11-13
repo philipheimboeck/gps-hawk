@@ -58,6 +58,14 @@ public class ExportFragment extends Fragment {
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.preferences, true);
 
+        // TODO: remove before deployment
+        // And also remove entries in server-db between 08:42 and ... on 13.11.2015 from my deviceid!
+//        DbFacade db = DbFacade.getInstance(getContext());
+//        db.markExportable(1, 0, Waypoint.class);
+//        db.markExportable(1, 0, Exception2Log.class);
+//        db.markExportable(1, 0, MotionValues.class);
+//        db.markExportable(2, 0, MotionValues.class);
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
 
@@ -131,7 +139,7 @@ public class ExportFragment extends Fragment {
         disableRek(mExpWrapper, !show);
 
         // Update text when buttons are enabled again
-        if ( !show ) {
+        if (!show) {
             updText();
         }
 
@@ -158,7 +166,6 @@ public class ExportFragment extends Fragment {
 
         if (prefs.contains(key)) {
             String url = prefs.getString(key, "");
-            Toast.makeText(getActivity(), url, Toast.LENGTH_LONG).show();
 
             ExportContext exportContext = new ExportContext();
             exportContext.setUrl(url);
