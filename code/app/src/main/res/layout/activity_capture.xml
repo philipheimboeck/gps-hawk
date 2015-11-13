@@ -42,6 +42,7 @@
                     android:background="@drawable/inactive_vehicle"
                     style="@style/VehicleButtons"
                     android:layout_toEndOf="@+id/butNowFoot"
+                    android:layout_toRightOf="@+id/butNowFoot"
                     android:contentDescription="@string/content_description_bicycle"/>
                 <ImageButton
                     android:id="@+id/butNowBus"
@@ -49,6 +50,7 @@
                     android:background="@drawable/inactive_vehicle"
                     style="@style/VehicleButtons"
                     android:layout_toEndOf="@+id/butNowBicycle"
+                    android:layout_toRightOf="@id/butNowBicycle"
                     android:contentDescription="@string/content_description_bus"/>
                 <ImageButton
                     android:id="@+id/butNowTrain"
@@ -56,6 +58,7 @@
                     android:background="@drawable/inactive_vehicle"
                     style="@style/VehicleButtons"
                     android:layout_toEndOf="@id/butNowBus"
+                    android:layout_toRightOf="@id/butNowBus"
                     android:contentDescription="@string/content_description_train"/>
                 <ImageButton
                     android:id="@+id/butNowCar"
@@ -63,6 +66,7 @@
                     android:background="@drawable/inactive_vehicle"
                     style="@style/VehicleButtons"
                     android:layout_toEndOf="@id/butNowTrain"
+                    android:layout_toRightOf="@+id/butNowTrain"
                     android:contentDescription="@string/content_description_car"/>
         </RelativeLayout>
 
