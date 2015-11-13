@@ -17,12 +17,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_centerHorizontal="true">
+            android:layout_centerHorizontal="true"
+            android:gravity="center">
 
                 <ImageButton
                     android:id="@+id/butNowFoot"
                     android:src="@drawable/walk"
-                    android:background="@drawable/current_vehicle"
+                    android:background="@drawable/inactive_vehicle"
                     style="@style/VehicleButtons"/>
                 <ImageButton
                     android:id="@+id/butNowBicycle"

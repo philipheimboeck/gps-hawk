@@ -60,7 +60,6 @@ import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
-import gps.fhv.at.gps_hawk.workers.MotionWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 import gps.fhv.at.gps_hawk.workers.WaypointFactory;
 
@@ -68,13 +67,13 @@ import gps.fhv.at.gps_hawk.workers.WaypointFactory;
 public class CaptureActivity extends AppCompatActivity {
 
     public static final int MAP_ZOOM = 15;
-    private static GpsWorker mGpsService;
+    public static final String STATE_WAYPOINT_LISTENER = "waypointListener";
+    private static final String STATE_VEHICLE = "activeVehicle";
 
-    private LocationManager locationManager;
     private boolean mPermissionsGranted = false;
 
     /**
-     * Temporary saves the update path
+     * Temporary save the update path
      */
     private Uri mDownloadUri;
 
@@ -93,12 +92,10 @@ public class CaptureActivity extends AppCompatActivity {
     private Track mCurrentTrack;
     private boolean mZoomed = false;
 
-    private MotionWorker mMotionWorker;
-
     /**
      * State of the waypoint listeners (Registered/Not Registered)
      */
-    private boolean mRegistered;
+    private boolean mWaypointListenerRegistered;
 
     /**
      * Updates the number of waypoints
@@ -141,6 +138,11 @@ public class CaptureActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Saves the current vehicle id
+     */
+    private int mActiveVehicleId;
+
 
     public CaptureActivity() {
         // Required empty public constructor
@@ -172,63 +174,6 @@ public class CaptureActivity extends AppCompatActivity {
         }
 
         checkForUpdate();
-    }
-
-    /**
-     * Checks for an update
-     */
-    private void checkForUpdate() {
-
-        // Start update task
-        final Context context = this;
-        CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, Uri>() {
-            @Override
-            public void onPostExecute(final Uri updateUrl) {
-                if (updateUrl != null) {
-                    // New update
-                    android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
-                    dialogBuilder.setMessage(R.string.update_available)
-                            .setTitle(R.string.update_available_title)
-                            .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    if (checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                                        downloadUpdate(updateUrl);
-                                    } else if (Build.VERSION.SDK_INT >= 23) {
-                                        // Temporary save the download url
-                                        mDownloadUri = updateUrl;
-                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_PERMISSION_STORAGE);
-                                    }
-                                }
-                            })
-                            .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Todo
-                                }
-                            })
-                            .setCancelable(false)
-                            .show();
-                }
-            }
-
-            @Override
-            public void onCancelled() {
-
-            }
-
-            @Override
-            public void onProgressUpdate(Void... progress) {
-
-            }
-
-            @Override
-            public void onPreExecute() {
-
-            }
-        });
-        updateTask.execute();
     }
 
     /**
@@ -321,6 +266,22 @@ public class CaptureActivity extends AppCompatActivity {
             mImgVehicleButtons[i].setBackgroundResource(R.drawable.inactive_vehicle);
         }
         WaypointFactory.getInstance().setVehicle(ourVehicle);
+
+        // Save active vehicle
+        mActiveVehicleId = id;
+    }
+
+    /**
+     * Basically the same as changeVehicle, but doesn't set the vehicle in the WayPointFactory
+     * @param id
+     */
+    private void changeVehicleView(int id) {
+        ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
+        for (int i = 0; i < vList.size(); i++) {
+            if(id == vList.get(i).getUiId()) {
+                mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
+            }
+        }
     }
 
     private View.OnClickListener mVehicleClickListener;
@@ -410,14 +371,14 @@ public class CaptureActivity extends AppCompatActivity {
         // Check if service is running
         if (!ServiceDetectionHelper.isServiceRunning(getApplicationContext(), LocationService.class)) {
 
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            mGpsService = new GpsWorker(locationManager, getApplicationContext());
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            GpsWorker gpsService = new GpsWorker(locationManager, getApplicationContext());
             mCurrentTrack = new Track();
             DbFacade db = DbFacade.getInstance(this);
             int trackID = (int) db.saveEntity(mCurrentTrack);
             mCurrentTrack.setId(trackID);
 
-            if (mGpsService.isGpsAvailable()) {
+            if (gpsService.isGpsAvailable()) {
                 // Start the service
                 Intent intent = new Intent(this, LocationService.class);
                 intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
@@ -458,8 +419,8 @@ public class CaptureActivity extends AppCompatActivity {
      * Add waypoint listeners
      */
     private void addWaypointListener() {
-        if (!mRegistered) {
-            mRegistered = true;
+        if (!mWaypointListenerRegistered) {
+            mWaypointListenerRegistered = true;
 
             LocalBroadcastManager.getInstance(this).registerReceiver(mWaypointCounter, new IntentFilter(Constants.BROADCAST_NEW_WAYPOINT));
             LocalBroadcastManager.getInstance(this).registerReceiver(mWaypointMapUpdater, new IntentFilter(Constants.BROADCAST_NEW_WAYPOINT));
@@ -470,8 +431,8 @@ public class CaptureActivity extends AppCompatActivity {
      * Removes all listeners
      */
     private void removeWaypointListener() {
-        if (mRegistered) {
-            mRegistered = false;
+        if (mWaypointListenerRegistered) {
+            mWaypointListenerRegistered = false;
 
             LocalBroadcastManager.getInstance(this).unregisterReceiver(mWaypointCounter);
             WaypointCounter.resetCounter();
@@ -491,6 +452,64 @@ public class CaptureActivity extends AppCompatActivity {
         if (listener != null) dlgAlert.setPositiveButton(positiveText, listener);
 
         dlgAlert.create().show();
+    }
+
+
+    /**
+     * Checks for an update
+     */
+    private void checkForUpdate() {
+
+        // Start update task
+        final Context context = this;
+        CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, Uri>() {
+            @Override
+            public void onPostExecute(final Uri updateUrl) {
+                if (updateUrl != null) {
+                    // New update
+                    android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
+                    dialogBuilder.setMessage(R.string.update_available)
+                            .setTitle(R.string.update_available_title)
+                            .setPositiveButton(R.string.Yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    if (checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                                        downloadUpdate(updateUrl);
+                                    } else if (Build.VERSION.SDK_INT >= 23) {
+                                        // Temporary save the download url
+                                        mDownloadUri = updateUrl;
+                                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_PERMISSION_STORAGE);
+                                    }
+                                }
+                            })
+                            .setNegativeButton(R.string.No, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Todo
+                                }
+                            })
+                            .setCancelable(false)
+                            .show();
+                }
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
+            }
+        });
+        updateTask.execute();
     }
 
     /**
@@ -590,5 +609,29 @@ public class CaptureActivity extends AppCompatActivity {
         // Handle your other action bar items...
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Store custom data
+        outState.putBoolean(STATE_WAYPOINT_LISTENER, mWaypointListenerRegistered);
+        outState.putInt(STATE_VEHICLE, mActiveVehicleId);
+
+        // Always call this
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore custom data
+        mWaypointListenerRegistered = savedInstanceState.getBoolean(STATE_WAYPOINT_LISTENER);
+
+        mActiveVehicleId = savedInstanceState.getInt(STATE_VEHICLE);
+        if(mActiveVehicleId > 0) {
+            changeVehicleView(mActiveVehicleId);
+        }
     }
 }
