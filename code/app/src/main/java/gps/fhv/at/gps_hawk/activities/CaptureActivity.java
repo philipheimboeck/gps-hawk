@@ -67,8 +67,13 @@ import gps.fhv.at.gps_hawk.workers.WaypointFactory;
 public class CaptureActivity extends AppCompatActivity {
 
     public static final int MAP_ZOOM = 15;
+
+    /*
+     * States
+     */
     public static final String STATE_WAYPOINT_LISTENER = "waypointListener";
     private static final String STATE_VEHICLE = "activeVehicle";
+    private static final String STATE_TRACK = "currentTrack";
 
     private boolean mPermissionsGranted = false;
 
@@ -241,9 +246,6 @@ public class CaptureActivity extends AppCompatActivity {
 
         // Initialize the map
         initializeMapFragment();
-
-        // When already tracking, show some other elements
-        initializeViewInTrackingMode();
     }
 
     /**
@@ -419,6 +421,7 @@ public class CaptureActivity extends AppCompatActivity {
      * Add waypoint listeners
      */
     private void addWaypointListener() {
+        Log.d(Constants.PREFERENCES, "addingWaypoint: " + !mWaypointListenerRegistered);
         if (!mWaypointListenerRegistered) {
             mWaypointListenerRegistered = true;
 
@@ -616,6 +619,7 @@ public class CaptureActivity extends AppCompatActivity {
         // Store custom data
         outState.putBoolean(STATE_WAYPOINT_LISTENER, mWaypointListenerRegistered);
         outState.putInt(STATE_VEHICLE, mActiveVehicleId);
+        outState.putSerializable(STATE_TRACK, mCurrentTrack);
 
         // Always call this
         super.onSaveInstanceState(outState);
@@ -633,5 +637,10 @@ public class CaptureActivity extends AppCompatActivity {
         if(mActiveVehicleId > 0) {
             changeVehicleView(mActiveVehicleId);
         }
+
+        mCurrentTrack = (Track) savedInstanceState.getSerializable(STATE_TRACK);
+
+        // When already tracking, show some other elements
+        initializeViewInTrackingMode();
     }
 }
