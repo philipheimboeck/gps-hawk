@@ -11,6 +11,7 @@ import java.util.List;
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.ExportClient;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
+import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
@@ -47,12 +48,15 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
         // Mark unexported Waypoints as "ExportNow"
         int count = dbFacade.markExportable(0, 2, mExpContext.getT());
 
-        if (count > 0) {
+        while (count > 0) {
 
-            Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " to export");
+            int junkSize = Constants.EXPORT_JUNK;
+            if (mExpContext.getT().equals(MotionValues.class)) junkSize *= 3;
+
+            Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " to export - Start first chunk with limit: " + junkSize);
 
             // Get all Waypoints from DB to export
-            mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT()));
+            mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize));
 
             // Insert Tracks and Vehicles as Objects
             if (mExpContext.getT().equals(Waypoint.class)) {
@@ -78,8 +82,10 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                 return "ERROR";
             }
 
-            // Mark "ExportNow" Waypoints as "Exported"
-            dbFacade.markExportable(2, 1, mExpContext.getT());
+            // Mark "ExportNow" Entities as "Exported"
+            dbFacade.markExportableList(mExpContext.getExportList(), 1, mExpContext.getT());
+
+            count = (count > junkSize) ? count - junkSize : 0;
         }
 
         return "";

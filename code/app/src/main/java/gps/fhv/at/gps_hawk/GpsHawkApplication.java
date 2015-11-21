@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
+import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.DbSetup;
 import gps.fhv.at.gps_hawk.workers.LogWorker;
@@ -45,6 +46,9 @@ public class GpsHawkApplication extends Application {
 
         // Be sure to set application context globally (singleton)
         DbFacade db = DbFacade.getInstance(getApplicationContext());
+
+        // if you need to delete all data in table, use this once
+//        db.emptyTable(Exception2LogDef.TABLE_NAME);
 
         // Start reading Logs
         mLogWorker.initialize();

@@ -51,6 +51,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             float gpsDistance = (float) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_DIST_CHANGE);
 
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, gpsTime, gpsDistance, mLocationListener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, gpsTime, gpsDistance, mLocationListener);
+//            mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, gpsTime, gpsDistance, mLocationListener);
             mLocationManager.addGpsStatusListener(mLocationListener);
 
             Criteria criteria = new Criteria();
@@ -128,6 +130,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
         data.setTrack(mCurrentTrack);
 
         Waypoint waypoint = WaypointFactory.getInstance().createWaypoint(location, data);
+
+        Log.v(Constants.PREFERENCES,"onLocationChange: "+ waypoint.getProvider());
 
         // Send a new message
         Intent intent = new Intent(Constants.BROADCAST_NEW_WAYPOINT);
