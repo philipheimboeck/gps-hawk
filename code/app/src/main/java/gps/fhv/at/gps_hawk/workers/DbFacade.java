@@ -228,7 +228,7 @@ public class DbFacade {
 
         if (list.size() <= 0) return -1;
 
-        if (list.get(0) instanceof IExportable)
+        if (!IExportable.class.isAssignableFrom(list.get(0).getClass()))
             throw new InvalidParameterException("Entity must be of type IExportable");
 
         SQLiteDatabase db = mDbHelper.getReadableDatabase();

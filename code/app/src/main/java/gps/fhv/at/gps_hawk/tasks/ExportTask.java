@@ -10,6 +10,7 @@ import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.ExportClient;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
@@ -51,7 +52,8 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
         while (count > 0) {
 
             int junkSize = Constants.EXPORT_JUNK;
-            if (mExpContext.getT().equals(MotionValues.class)) junkSize *= 3;
+            if (mExpContext.getT().equals(MotionValues.class)) junkSize *= 3; // 3 times more MotionValues than Waypoints
+            if (mExpContext.getT().equals(Exception2Log.class)) junkSize /= 2; // 2 times less Exceptions than Waypoints
 
             Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " to export - Start first chunk with limit: " + junkSize);
 

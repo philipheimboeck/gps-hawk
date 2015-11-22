@@ -88,7 +88,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
         if (isSignificantlyNewer) {
-            Log.v(Constants.PREFERENCES," -> isSignificantlyNewer");
+//            Log.v(Constants.PREFERENCES," -> isSignificantlyNewer");
             return true;
             // If the new location is more than two minutes older, it must be worse
         } else if (isSignificantlyOlder) {
@@ -107,13 +107,13 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
         // Determine location quality using a combination of timeliness and accuracy
         if (isMoreAccurate) {
-            Log.v(Constants.PREFERENCES," -> isMoreAccurate");
+//            Log.v(Constants.PREFERENCES," -> isMoreAccurate");
             return true;
         } else if (isNewer && !isLessAccurate) {
-            Log.v(Constants.PREFERENCES," -> isNewer and !isLessAccurate");
+//            Log.v(Constants.PREFERENCES," -> isNewer and !isLessAccurate");
             return true;
         } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-            Log.v(Constants.PREFERENCES," -> isNewer and !isSignificantlyLessAccurate && isFromSameProvider");
+//            Log.v(Constants.PREFERENCES," -> isNewer and !isSignificantlyLessAccurate && isFromSameProvider");
             return true;
         }
         return false;

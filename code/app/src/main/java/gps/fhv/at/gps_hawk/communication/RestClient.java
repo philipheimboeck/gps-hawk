@@ -138,9 +138,9 @@ public class RestClient {
         // fast hack - only encode exceptions!
         if ("exceptions".equals(key)) {
             result.append(URLEncoder.encode(content, "UTF-8"));
+        } else {
+            result.append(content);
         }
-
-        result.append(content);
         Log.d(Constants.PREFERENCES, "Finished Encoding of Array to UTF-8");
 
         return post(url, result.toString());
