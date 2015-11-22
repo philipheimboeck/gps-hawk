@@ -307,8 +307,8 @@ public class RestClient {
     private HttpURLConnection createConnection(URL url, String method) throws IOException {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(5000);
-        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(15000);
+        connection.setConnectTimeout(30000);
         connection.setRequestMethod(method);
         connection.setDoInput(true);
 
