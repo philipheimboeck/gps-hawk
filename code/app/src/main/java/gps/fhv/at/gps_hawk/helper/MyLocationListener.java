@@ -30,8 +30,8 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
         if (loc == null) return;
 
-        Log.v(Constants.PREFERENCES,loc.getProvider());
-        Log.v(Constants.PREFERENCES,Float.toString(loc.getAccuracy()));
+//        Log.v(Constants.PREFERENCES,loc.getProvider());
+//        Log.v(Constants.PREFERENCES,Float.toString(loc.getAccuracy()));
 
         if (isSufficientLocation(loc)) {
 

@@ -154,8 +154,6 @@ public class DbFacade {
             // How you want the results sorted in the resulting Cursor
             String sortOrder = BaseTableDef._ID + " ASC LIMIT " + limit;
 
-            Log.v(Constants.PREFERENCES, "Query all entities to export");
-
             c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
@@ -250,6 +248,7 @@ public class DbFacade {
             Log.e(Constants.PREFERENCES, "Error in DbSetup.onCreate()", e);
             return -1;
         }
+
 
         return 0;
     }

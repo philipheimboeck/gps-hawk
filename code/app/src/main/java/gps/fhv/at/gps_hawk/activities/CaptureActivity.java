@@ -231,7 +231,6 @@ public class CaptureActivity extends AppCompatActivity {
         mVehicleClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.v(Constants.PREFERENCES, "Hit vehicle-Button: " + v.getId());
                 changeVehicle(v.getId());
             }
         };

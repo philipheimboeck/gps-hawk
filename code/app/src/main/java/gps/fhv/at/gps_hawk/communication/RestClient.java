@@ -209,11 +209,9 @@ public class RestClient {
         JSONArray jsonArray = new JSONArray();
         int nTotal = list.size();
         int nJunk = 0; // to be counted unit 10
-        int junkFactor = 10; // list.size() > 1000 ? 100 : 10;
+        int junkFactor = 4; // list.size() > 1000 ? 100 : 10;
         int junk = nTotal / junkFactor;
         int iJunk = 0;
-
-        Log.d(Constants.PREFERENCES, "Starting creation of JSON-String");
 
         for (IJSONable o : list) {
 
