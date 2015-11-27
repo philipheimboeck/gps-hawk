@@ -22,6 +22,8 @@ import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
+import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
@@ -32,7 +34,7 @@ import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 /**
  * Created by Tobias on 25.10.2015.
  */
-public class ExportFragment extends Fragment {
+public class ExportFragment extends Fragment implements IUpdateableView {
 
     private Button mButStartExport;
     private Button mButStartExportExc;
@@ -47,10 +49,12 @@ public class ExportFragment extends Fragment {
     private View mProgressView;
     private ExportTask mExportTask;
     private LinearLayout mExpWrapper;
+    private ExportStartHelper mExportStartHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mExportStartHelper = new ExportStartHelper(getActivity(), this);
     }
 
     @Override
@@ -123,7 +127,7 @@ public class ExportFragment extends Fragment {
         mTextViewAmountMotion.setText((amount - amountExported) + " from " + amount + " exported");
     }
 
-    private void showLoading(final boolean show) {
+    public void showLoading(final boolean show) {
 
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
@@ -159,66 +163,9 @@ public class ExportFragment extends Fragment {
     }
 
     private void handleButExport(int id) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String key = Constants.PREF_EXPORT_URL;
 
-        Log.v(Constants.PREFERENCES, "Hit Export-Button!");
+        mExportStartHelper.startExport(id);
 
-        if (prefs.contains(key)) {
-            String url = prefs.getString(key, "");
-
-            ExportContext exportContext = new ExportContext();
-            exportContext.setUrl(url);
-            exportContext.setContext(getActivity());
-            exportContext.setAndroidId(Settings.Secure.getString(getActivity().getContentResolver(),
-                    Settings.Secure.ANDROID_ID));
-
-            switch (id) {
-                case R.id.button_do_export:
-                    exportContext.setT(Waypoint.class);
-                    exportContext.setCollectionName("waypoints");
-                    break;
-                case R.id.button_do_exception_export:
-                    exportContext.setT(Exception2Log.class);
-                    exportContext.setCollectionName("exceptions");
-                    break;
-                case R.id.button_do_motion_export:
-                    exportContext.setT(MotionValues.class);
-                    exportContext.setCollectionName("motionValues");
-                    break;
-                default:
-                    throw new RuntimeException("Unallowed button invokd handleButExport");
-            }
-
-            mExportTask = new ExportTask(exportContext, new IAsyncTaskCaller<Void, String>() {
-
-                @Override
-                public void onPostExecute(String success) {
-
-                    if ("ERROR".equals(success)) {
-                        Toast.makeText(getContext(), getString(R.string.error_export_failed), Toast.LENGTH_LONG).show();
-                    }
-
-                    showLoading(false);
-                }
-
-                @Override
-                public void onCancelled() {
-                    showLoading(true);
-                }
-
-                @Override
-                public void onProgressUpdate(Void... progress) {
-
-                }
-
-                @Override
-                public void onPreExecute() {
-                    showLoading(true);
-                }
-            });
-            mExportTask.execute();
-        }
     }
 
 

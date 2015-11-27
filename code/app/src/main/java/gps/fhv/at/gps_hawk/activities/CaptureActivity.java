@@ -55,6 +55,7 @@ import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
+import gps.fhv.at.gps_hawk.services.AppService;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
@@ -593,6 +594,13 @@ public class CaptureActivity extends AppCompatActivity {
         if (mNavigation != null) { // Is maybe null if the permissions are not set
             mNavigation.syncState();
         }
+
+//        // Start AppService
+//        Intent intent = new Intent(this, AppService.class);
+//        this.startService(intent);
+//        ServiceDetectionHelper.isServiceRunning(getApplicationContext(), AppService.class);
+
+
     }
 
     @Override

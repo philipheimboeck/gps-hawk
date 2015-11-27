@@ -46,4 +46,6 @@ public class Constants {
     public static final int SETTING_GPS_MIN_TIME = 1;
     // Minimum time (in millis) to be elapsed between to MotionValues to save
     public static final int SETTING_ACCELERATION_MIN_TIME_GAP = 2;
+
+    public static final int EXPORT_AUTOMATICALLY_GAP = 300; // seconds to be passed to start next export
 }

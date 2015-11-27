@@ -1,6 +1,7 @@
 package gps.fhv.at.gps_hawk;
 
 import android.app.Application;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
 
@@ -13,7 +14,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
+import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
+import gps.fhv.at.gps_hawk.services.AppService;
+import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.DbSetup;
 import gps.fhv.at.gps_hawk.workers.LogWorker;
@@ -52,6 +56,11 @@ public class GpsHawkApplication extends Application {
 
         // Start reading Logs
         mLogWorker.initialize();
+
+        // Start AppService
+        Intent intent = new Intent(this, AppService.class);
+        this.startService(intent);
+        ServiceDetectionHelper.isServiceRunning(getApplicationContext(), AppService.class);
 
         Log.i(Constants.PREFERENCES, "Started application");
 
