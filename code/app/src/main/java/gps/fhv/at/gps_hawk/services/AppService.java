@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import gps.fhv.at.gps_hawk.workers.ExportWorker;
+import gps.fhv.at.gps_hawk.broadcast.ExportNetworkReceiver;
 import gps.fhv.at.gps_hawk.workers.IExportWorker;
 
 /**
@@ -26,7 +26,7 @@ public class AppService extends Service {
 
     @Override
     public void onCreate() {
-        mExportWorker = new ExportWorker(getApplicationContext());
+        mExportWorker = new ExportNetworkReceiver(getApplicationContext());
     }
 
         @Nullable

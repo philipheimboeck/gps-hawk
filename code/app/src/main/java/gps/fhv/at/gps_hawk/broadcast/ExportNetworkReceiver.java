@@ -1,4 +1,4 @@
-package gps.fhv.at.gps_hawk.workers;
+package gps.fhv.at.gps_hawk.broadcast;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,32 +10,38 @@ import android.util.Log;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
+import gps.fhv.at.gps_hawk.workers.IExportWorker;
 
 /**
  * Created by Tobias on 27.11.2015.
+ * The purpose of this class is to detect WiFi-Changes and to export data if connected to network
+ * Also it tries to export on startup, only if has WiFi connection
  */
-public class ExportWorker extends BroadcastReceiver implements IExportWorker {
+public class ExportNetworkReceiver extends BroadcastReceiver implements IExportWorker {
 
     private Context mContext;
     private ExportStartHelper mExportStartHelper;
-    private static boolean isCurrentlyRunning = false;
 
-    public ExportWorker() {
+    public ExportNetworkReceiver() {
 
     }
 
-    public ExportWorker(Context context) {
+    public ExportNetworkReceiver(Context context) {
         mContext = context;
 
         // Try to export on each startup
-        startExport();
+        // Only export if WiFi is connected
+        ConnectivityManager connManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        if (mWifi != null && mWifi.isConnected()) {
+            startExport();
+        }
 
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        WifiManager wifiManager = (WifiManager) context
-                .getSystemService(Context.WIFI_SERVICE);
 
         mContext = context;
 

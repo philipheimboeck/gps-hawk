@@ -75,7 +75,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     }
 
     @Override
-    public void stopGpsTracking() {
+    public void stopGpsTracking(int trackIsValid) {
         try {
             // Stop the tracking
             mLocationManager.removeUpdates(mLocationListener);
@@ -86,6 +86,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             DbFacade db = DbFacade.getInstance(mContext);
             Track t = db.select(mCurrentTrack.getId(), Track.class);
             t.setEndDateTime((int) (end.getTimeInMillis() / 1000));
+            t.setIsValid(trackIsValid);
 
             db.saveEntity(t);
         } catch (SecurityException ex) {
@@ -148,7 +149,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
     @Override
     public void onProviderDisabled(String provider) {
-        stopGpsTracking();
+        // Todo: get some user-insert if Track was valid?
+        stopGpsTracking(0);
     }
 
     @Override

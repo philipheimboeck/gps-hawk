@@ -15,7 +15,10 @@ public interface IGpsWorker {
      */
     void startGpsTracking(Track t);
 
-
-    void stopGpsTracking();
+    /**
+     * Stops GPS-Tracking and saves Track to database
+     * @param trackIsValid - whether the user confirmed that he entered valid training-data
+     */
+    void stopGpsTracking(int trackIsValid);
 }
 

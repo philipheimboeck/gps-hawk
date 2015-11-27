@@ -86,6 +86,10 @@ public class CaptureActivity extends AppCompatActivity {
     private SupportMapFragment mMapFragment;
     private TextView mWaypointCounterView;
     private Button mStartTrackingButton;
+    private Button mTaskValidButtonYes;
+    private Button mTaskValidButtonNo;
+    private View.OnClickListener mButTaskValidClickListener;
+    private TextView mTxtValidTrackQuest;
 
     private Navigation mNavigation;
     private DrawerLayout mDrawerLayout;
@@ -216,6 +220,21 @@ public class CaptureActivity extends AppCompatActivity {
             }
         });
 
+        mButTaskValidClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean isValid = false;
+                if (v.getId() == R.id.but_valid_track_yes) isValid = true;
+
+                handleTaksValidButtons(isValid);
+            }
+        };
+        mTaskValidButtonYes = (Button) findViewById(R.id.but_valid_track_yes);
+        mTaskValidButtonYes.setOnClickListener(mButTaskValidClickListener);
+        mTaskValidButtonNo = (Button) findViewById(R.id.but_valid_track_no);
+        mTaskValidButtonNo.setOnClickListener(mButTaskValidClickListener);
+        mTxtValidTrackQuest = (TextView) findViewById(R.id.txt_valid_track_quest);
+
         mWaypointCounterView = (TextView) findViewById(R.id.text_waypoint_counter);
         mWaypointCounterView.setText(getString(R.string.number_of_waypoints, WaypointCounter.count()));
 
@@ -275,12 +294,13 @@ public class CaptureActivity extends AppCompatActivity {
 
     /**
      * Basically the same as changeVehicle, but doesn't set the vehicle in the WayPointFactory
+     *
      * @param id
      */
     private void changeVehicleView(int id) {
         ArrayList<Vehicle> vList = VolatileInstancePool.getInstance().getAllRegistered(Vehicle.class);
         for (int i = 0; i < vList.size(); i++) {
-            if(id == vList.get(i).getUiId()) {
+            if (id == vList.get(i).getUiId()) {
                 mImgVehicleButtons[i].setBackgroundResource(R.drawable.current_vehicle);
             }
         }
@@ -366,6 +386,37 @@ public class CaptureActivity extends AppCompatActivity {
         }
     }
 
+    private void handleTaksValidButtons(boolean isValid) {
+
+        Log.i(Constants.PREFERENCES, "Is Valid: " + isValid);
+
+        // Visibility of buttons/textView
+        toggleButtons(false);
+
+        // Stop the service
+        Intent intent = new Intent(this, LocationService.class);
+        intent.putExtra("isValid", isValid ? 1 : 0);
+        intent.putExtra("terminate", true);
+        this.startService(intent);
+
+        // Remove the listener
+        removeWaypointListener();
+
+    }
+
+    private void toggleButtons(boolean showValid) {
+
+        // 'valid' meaning for elements checking whether the track is valid
+        int valid = showValid ? View.VISIBLE : View.GONE;
+        int tracking = showValid ? View.GONE : View.VISIBLE;
+
+        mTaskValidButtonNo.setVisibility(valid);
+        mTaskValidButtonYes.setVisibility(valid);
+        mTxtValidTrackQuest.setVisibility(valid);
+        mStartTrackingButton.setVisibility(tracking);
+
+    }
+
     /**
      * Start or stop the tracking
      */
@@ -407,13 +458,11 @@ public class CaptureActivity extends AppCompatActivity {
             }
 
         } else {
-            // Stop the service
-            Intent intent = new Intent(this, LocationService.class);
-            this.stopService(intent);
             mStartTrackingButton.setText(R.string.start_tracking);
 
-            // Remove the listener
-            removeWaypointListener();
+            // Visibility of Buttons/Views
+            toggleButtons(true);
+
         }
     }
 
@@ -641,7 +690,7 @@ public class CaptureActivity extends AppCompatActivity {
         mWaypointListenerRegistered = savedInstanceState.getBoolean(STATE_WAYPOINT_LISTENER);
 
         mActiveVehicleId = savedInstanceState.getInt(STATE_VEHICLE);
-        if(mActiveVehicleId > 0) {
+        if (mActiveVehicleId > 0) {
             changeVehicleView(mActiveVehicleId);
         }
 

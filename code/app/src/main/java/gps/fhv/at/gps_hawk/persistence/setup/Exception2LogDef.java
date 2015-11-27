@@ -30,7 +30,7 @@ public class Exception2LogDef extends BaseTableDef {
     }
 
     @Override
-    public String getUpdateScript() {
+    public String getUpdateScript(int oldVersion) {
         return null;
     }
 }

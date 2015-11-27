@@ -22,7 +22,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class DbSetup extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "GpwHawk.db";
 
     public DbSetup(Context context) {
@@ -63,10 +63,10 @@ public class DbSetup extends SQLiteOpenHelper {
         // Delte all tables
         for (BaseTableDef tdbDef : tableDefs) {
             try {
-//                String updScript = tdbDef.getUpdateScript();
-//                if (updScript != null)
-//                    db.execSQL(updScript);
-                db.execSQL(tdbDef.getSqlDeleteEntries());
+                String updScript = tdbDef.getUpdateScript(oldVersion);
+                if (updScript != null)
+                    db.execSQL(updScript);
+//                db.execSQL(tdbDef.getSqlDeleteEntries());
 
             } catch (Exception e) {
                 Log.e(Constants.PREFERENCES, "Error in DbSetup.onUpgrade()", e);
@@ -74,7 +74,7 @@ public class DbSetup extends SQLiteOpenHelper {
         }
 
         // Then create database new
-        onCreate(db);
+//        onCreate(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

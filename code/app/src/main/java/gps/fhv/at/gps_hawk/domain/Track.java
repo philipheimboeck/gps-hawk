@@ -17,6 +17,7 @@ public class Track extends DomainBase implements Serializable, IJSONable {
     private int _id;
     private int _startDateTime;
     private int _endDateTime;
+    private int _isValid;
 
     public Track() {
         _startDateTime = (int) Calendar.getInstance().getTimeInMillis() / 1000;
@@ -46,6 +47,14 @@ public class Track extends DomainBase implements Serializable, IJSONable {
         _endDateTime = endDateTime;
     }
 
+    public int getIsValid() {
+        return _isValid;
+    }
+
+    public void setIsValid(int isValid) {
+        _isValid = isValid;
+    }
+
     @Override
     public String toJSON() {
         JSONObject json = new JSONObject();
@@ -54,6 +63,7 @@ public class Track extends DomainBase implements Serializable, IJSONable {
 
             json.put("startDateTime", getStartDateTime());
             json.put("endDateTime", getEndDateTime());
+            json.put("isValid", getIsValid());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

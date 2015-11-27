@@ -45,7 +45,20 @@ public class LocationService extends Service {
 
         Log.v(Constants.PREFERENCES, "LocationService - OnStartCommand");
 
-        if(mGpsSvc.isGpsAvailable()) {
+        /**
+         * Using a trick, so that we can pass arguments to "onDestroy"
+         * src: http://stackoverflow.com/questions/14352273/pass-data-to-ondestroy-of-service
+         */
+        final boolean terminate = intent.getBooleanExtra("terminate", false);
+        if (terminate) {
+
+            int trackIsValid = intent.getIntExtra("isValid",0);
+            onCustomDestroy(trackIsValid);
+            return START_NOT_STICKY;
+
+        }
+
+        if (mGpsSvc.isGpsAvailable()) {
             // Show notification
             showNotification();
 
@@ -73,8 +86,12 @@ public class LocationService extends Service {
 
     @Override
     public void onDestroy() {
-
         Log.v(Constants.PREFERENCES, "LocationService - onDestroy");
+    }
+
+    private void onCustomDestroy(int trackIsValid) {
+
+        Log.v(Constants.PREFERENCES, "LocationService - onCustomDestroy");
 
         // Cancel notification
         cancelNotification();
@@ -83,10 +100,11 @@ public class LocationService extends Service {
         removeWaypointListeners();
 
         // Stop GPS tracking
-        mGpsSvc.stopGpsTracking();
+        mGpsSvc.stopGpsTracking(trackIsValid);
 
         // Stop Motion tracking
         mMotionWorker.stop();
+
     }
 
     @Override

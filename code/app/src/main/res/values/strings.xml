@@ -46,4 +46,8 @@
     <string name="content_description_bus">Bus</string>
     <string name="content_description_car">Car</string>
     <string name="content_description_train">Train</string>
+
+    <string name="txt_valid_track_quest">All vehicles \n entered correctly?</string>
+    <string name="txt_valid_track_yes">Yes</string>
+    <string name="txt_valid_track_no">no</string>
 </resources>

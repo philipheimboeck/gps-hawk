@@ -51,6 +51,6 @@ public abstract class BaseTableDef implements BaseColumns {
      * Returns update-Script for the corresponding table
      * @return Updatescript or null, if not provided
      */
-    public abstract String getUpdateScript();
+    public abstract String getUpdateScript(int oldVersion);
 
 }

@@ -6,4 +6,5 @@
     <color name="nav_background">#3F51B5</color>
     <color name="nav_background_pressed">#303F9F</color>
     <color name="nav_item_title">#FFFFFF</color>
+    <color name="warn_red">#FF0000</color>
 </resources>
