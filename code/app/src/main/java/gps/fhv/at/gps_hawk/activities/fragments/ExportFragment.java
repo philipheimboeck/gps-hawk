@@ -64,6 +64,7 @@ public class ExportFragment extends Fragment implements IUpdateableView {
 
         // TODO: remove before deployment
         // And also remove entries in server-db between 08:42 and ... on 13.11.2015 from my deviceid!
+        // And also remove entries in server-db between 08:00 and ... on 28.11.2015 from my deviceid!
         DbFacade db = DbFacade.getInstance(getContext());
         db.markExportable(2, 0, Waypoint.class);
         db.markExportable(2, 0, Exception2Log.class);
