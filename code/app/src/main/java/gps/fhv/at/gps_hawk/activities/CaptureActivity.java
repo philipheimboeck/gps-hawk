@@ -393,14 +393,18 @@ public class CaptureActivity extends AppCompatActivity {
         // Visibility of buttons/textView
         toggleButtons(false);
 
+        // Remove the listener
+        removeWaypointListener();
+
         // Stop the service
         Intent intent = new Intent(this, LocationService.class);
         intent.putExtra("isValid", isValid ? 1 : 0);
         intent.putExtra("terminate", true);
-        this.startService(intent);
+        this.startService(intent); // Trick: with param "terminate", acutally stop the service
 
-        // Remove the listener
-        removeWaypointListener();
+        // And the stop the service
+        intent = new Intent(this, LocationService.class);
+        this.stopService(intent);
 
     }
 
@@ -421,6 +425,7 @@ public class CaptureActivity extends AppCompatActivity {
      * Start or stop the tracking
      */
     private void handleStartButton() {
+        int but = 0; // 1 = yes (running) , -1 = no
         // Check if service is running
         if (!ServiceDetectionHelper.isServiceRunning(getApplicationContext(), LocationService.class)) {
 
@@ -446,6 +451,7 @@ public class CaptureActivity extends AppCompatActivity {
 
                 // Add the listener
                 addWaypointListener();
+                but = 1;
             } else {
                 // Show settings to enable GPS
                 showMessageBox(this, getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
@@ -458,12 +464,17 @@ public class CaptureActivity extends AppCompatActivity {
             }
 
         } else {
-            mStartTrackingButton.setText(R.string.start_tracking);
+            // Else: "Stop" was pressed
 
-            // Visibility of Buttons/Views
-            toggleButtons(true);
+            mStartTrackingButton.setText(R.string.start_tracking);
+            but = -1;
 
         }
+
+        // Visibility of Buttons/Views
+        if (but < 0) toggleButtons(true);
+        else if ( but > 0 ) toggleButtons(false);
+
     }
 
     /**
