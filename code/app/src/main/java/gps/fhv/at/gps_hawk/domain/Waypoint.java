@@ -106,6 +106,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     public String toJSON() {
         JSONObject json = new JSONObject();
         try {
+            json.put("id", getId());
             json.put("accuracy", getAccuracy());
             json.put("nrOfSattelites", getNrOfSattelites());
             json.put("timestampCaptured", getUnixtimestampCaptured());

@@ -18,7 +18,7 @@ public class TokenInvalidReceiver extends BroadcastReceiver {
         // Do only when there is already a token (because when logging in it is not necessary)
         if(TokenHelper.getToken(context) != null) {
             // Remove the token
-            Token5Helper.setToken(context, null);
+            TokenHelper.setToken(context, null);
 
             // Return to login screen
             Intent login = new Intent(context, LoginActivity.class);
