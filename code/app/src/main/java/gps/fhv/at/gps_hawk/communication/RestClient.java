@@ -1,8 +1,10 @@
 package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +24,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.prefs.PreferenceChangeEvent;
 
+import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.broadcast.TokenInvalidReceiver;
 import gps.fhv.at.gps_hawk.domain.IJSONable;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 
@@ -96,6 +101,11 @@ public class RestClient {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+
+        // Token Invalid?
+        if(answer.responseCode == 401) {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.BROADCAST_INVALID_TOKEN));
         }
 
         return answer;
@@ -185,6 +195,11 @@ public class RestClient {
             if (connection != null) {
                 connection.disconnect();
             }
+        }
+
+        // Token Invalid?
+        if(answer.responseCode == 401) {
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.BROADCAST_INVALID_TOKEN));
         }
 
         return answer;

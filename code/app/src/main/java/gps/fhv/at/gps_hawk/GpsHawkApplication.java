@@ -1,11 +1,14 @@
 package gps.fhv.at.gps_hawk;
 
 import android.app.Application;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import gps.fhv.at.gps_hawk.broadcast.TokenInvalidReceiver;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.LogWorker;
@@ -72,5 +75,9 @@ public class GpsHawkApplication extends Application {
                 }
             }
         });
+
+        // Register broadcast receiver
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(new TokenInvalidReceiver(), new IntentFilter(Constants.BROADCAST_INVALID_TOKEN));
     }
 }

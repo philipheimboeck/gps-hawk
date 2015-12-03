@@ -11,6 +11,7 @@ public class Constants {
     public static final int REQUEST_CODE_PERMISSION_STORAGE = 112;
     public static final int NOTIFICATION_TRACKING_ID = 1;
     public static final String BROADCAST_NEW_WAYPOINT = "new-waypoint";
+    public static final String BROADCAST_INVALID_TOKEN = "invalid-token";
     public static final String EXTRA_WAYPOINT = "extra-waypoint";
     public static final String EXTRA_TRACK = "extra-track";
     public static final String EXTRA_FRAGMENT = "extra-fragment";
