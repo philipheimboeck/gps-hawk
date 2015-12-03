@@ -63,7 +63,8 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
 
         try {
             mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+//            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
             mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -89,7 +90,16 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
         values._x = event.values[0];
         values._y = event.values[1];
         values._z = event.values[2];
-        values._motionType = MotionValues.MOTION_TYPE_ACCELEROMETER;
+
+        switch (event.sensor.getName()) {
+            case "MPL Accelerometer":
+                values._motionType = MotionValues.MOTION_TYPE_ACCELEROMETER;
+                break;
+            case "MPL Linear Acceleration":
+            default:
+                values._motionType = MotionValues.MOTION_TYPE_LINEAR_ACCELEROMETER;
+                break;
+        }
 
         // convert to millis
         values._dateTimeCaptured = (new Date()).getTime() + (event.timestamp - System.nanoTime()) / 1000000L;
@@ -106,6 +116,8 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
 
             // Use already converted millis to decide whether to save
             if (!isValidEvent(values)) return;
+
+            Log.v(Constants.PREFERENCES, "x: " + values._x + ", y: " + values._y + ", z: " + values._z);
 
             // Else: use MotionValues and reset
             mLastCapturedAt = values._dateTimeCaptured;

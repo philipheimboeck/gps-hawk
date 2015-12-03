@@ -69,7 +69,7 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         db.markExportable(2, 0, Waypoint.class);
         db.markExportable(2, 0, Exception2Log.class);
         db.markExportable(2, 0, MotionValues.class);
-//        db.markExportable(1, 0, MotionValues.class);
+//        db.markExportable(0, 1, Waypoint.class);
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
