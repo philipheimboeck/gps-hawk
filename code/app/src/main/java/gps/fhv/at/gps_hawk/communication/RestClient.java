@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
@@ -49,7 +50,7 @@ public class RestClient {
     /**
      * GET the URL data
      *
-     * @param url The url to GET
+     * @param url     The url to GET
      * @param headers The headers to add
      * @return The Answer of the server
      * @throws NoConnectionException
@@ -69,7 +70,7 @@ public class RestClient {
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
 
             // Provide the headers
-            if(headers != null) {
+            if (headers != null) {
                 for (String header : headers.keySet()) {
                     connection.setRequestProperty(header, headers.get(header));
                 }
@@ -84,7 +85,7 @@ public class RestClient {
             answer.contentType = connection.getContentType();
 
             // Get the content
-            if(answer.responseCode >= 400) {
+            if (answer.responseCode >= 400) {
                 inputStream = connection.getErrorStream();
             } else {
                 inputStream = connection.getInputStream();
@@ -141,8 +142,15 @@ public class RestClient {
         String content = getJsonArray(list);
         result.append(URLEncoder.encode(key, "UTF-8"));
         result.append("=");
-        result.append(URLEncoder.encode(content, "UTF-8"));
+        Log.d(Constants.PREFERENCES, "Encoding Array to UTF-8");
 
+        // fast hack - only encode exceptions!
+        if ("exceptions".equals(key)) {
+            result.append(URLEncoder.encode(content, "UTF-8"));
+        } else {
+            result.append(content);
+        }
+        Log.d(Constants.PREFERENCES, "Finished Encoding of Array to UTF-8");
 
         return post(url, result.toString());
     }
@@ -179,7 +187,7 @@ public class RestClient {
             answer.contentType = connection.getContentType();
 
             // Get the content
-            if(answer.responseCode >= 400) {
+            if (answer.responseCode >= 400) {
                 inputStream = connection.getErrorStream();
             } else {
                 inputStream = connection.getInputStream();
@@ -213,9 +221,30 @@ public class RestClient {
 
     protected <T extends IJSONable> String getJsonArray(List<T> list) {
         JSONArray jsonArray = new JSONArray();
+        int nTotal = list.size();
+        int nJunk = 0; // to be counted unit 10
+        int junkFactor = 4; // list.size() > 1000 ? 100 : 10;
+        int junk = nTotal / junkFactor;
+        int iJunk = 0;
+
         for (IJSONable o : list) {
+
+            // Reporting only
+            if (iJunk >= junk) {
+                iJunk = 0;
+                ++nJunk;
+                Log.d(Constants.PREFERENCES, "Converted " + nJunk * (100 / junkFactor) + "% of data to JSON");
+            }
+
+            // Do the actual work
             jsonArray.put(o.toJSON());
+
+            ++iJunk;
+
         }
+
+        Log.d(Constants.PREFERENCES, "Ending creation of JSON-String");
+
         return jsonArray.toString();
     }
 
@@ -290,12 +319,12 @@ public class RestClient {
     private HttpURLConnection createConnection(URL url, String method) throws IOException {
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(5000);
-        connection.setConnectTimeout(10000);
+        connection.setReadTimeout(15000);
+        connection.setConnectTimeout(30000);
         connection.setRequestMethod(method);
         connection.setDoInput(true);
 
-        if(method.equals("POST"))
+        if (method.equals("POST"))
             connection.setDoOutput(true);
 
         return connection;

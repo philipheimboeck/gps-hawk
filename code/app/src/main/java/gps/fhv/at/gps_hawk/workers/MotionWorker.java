@@ -144,7 +144,6 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
     private synchronized void insert2Db() {
 
         mIsThreadWorking = true;
-        Log.d(Constants.PREFERENCES, "Enter saving MotionValues");
 
         // start new thread saving all valid MotionValues
         mTaskSave2Db = getTaskSave2Db();

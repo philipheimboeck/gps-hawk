@@ -2,12 +2,9 @@ package gps.fhv.at.gps_hawk.persistence.broker;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 
-import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.domain.DomainBase;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 
 /**
@@ -26,10 +23,7 @@ public class WaypointBroker extends BrokerBase {
         values.put(WaypointDef.COLUMN_NAME_TRACK_ID, wp.getTrackId());
         values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, wp.getIsExported());
         values.put(WaypointDef.COLUMN_NAME_VEHICLE_ID, wp.getVehicleId());
-
-        // Datetime
-        if (wp.getTimestampCaptured() != null)
-            values.put(WaypointDef.COLUMN_NAME_DATETIME, DateHelper.toSql(wp.getTimestampCaptured()));
+        values.put(WaypointDef.COLUMN_NAME_DATETIMESTAMP, wp.getUnixtimestampCaptured());
 
         // Float
         values.put(WaypointDef.COLUMN_ACCURACY, wp.getAccuracy());
@@ -57,6 +51,7 @@ public class WaypointBroker extends BrokerBase {
         wp.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED)));
         wp.setTrackId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID)));
         wp.setVehicleId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_VEHICLE_ID)));
+        wp.setUnixtimestampCaptured(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIMESTAMP)));
 
         // Double
         wp.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_LAT)));
@@ -70,16 +65,6 @@ public class WaypointBroker extends BrokerBase {
         wp.setSpeed(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_SPEED)));
         wp.setAccuracy(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_ACCURACY)));
         wp.setBearing(cursor.getFloat(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_BEARING)));
-
-        // Datetime
-        String toParse = cursor.getString(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIME));
-        if (toParse != null) {
-            try {
-                wp.setTimestampCaptured(DateHelper.fromSql(toParse));
-            } catch (Exception e) {
-                Log.e(Constants.PREFERENCES, "error converting to Calendar form SQL", e);
-            }
-        }
 
         return (T) wp;
     }
@@ -101,7 +86,7 @@ public class WaypointBroker extends BrokerBase {
                 WaypointDef.COLUMN_SPEED,
                 WaypointDef.COLUMN_ACCURACY,
                 WaypointDef.COLUMN_BEARING,
-                WaypointDef.COLUMN_NAME_DATETIME};
+                WaypointDef.COLUMN_NAME_DATETIMESTAMP};
     }
 
 }

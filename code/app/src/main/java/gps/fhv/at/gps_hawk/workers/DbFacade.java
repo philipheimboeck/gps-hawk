@@ -8,6 +8,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.lang.reflect.Type;
+import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,6 +73,16 @@ public class DbFacade {
         return newRowId;
     }
 
+    public void emptyTable(String tableName) {
+        String sql = "DELETE FROM "+ tableName +";";
+        try {
+            getDb().execSQL(sql);
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, "Error in emptyTable(tableName)", e);
+        }
+
+    }
+
     /**
      * Saves array of objects to database using bulk insert
      *
@@ -132,7 +143,7 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<IExportable> getAllEntities2Export(Type t) {
+    public List<IExportable> getAllEntities2Export(Type t, int limit) {
 
         List<IExportable> listRet = new ArrayList<>();
         Cursor c = null;
@@ -141,7 +152,7 @@ public class DbFacade {
             BrokerBase broker = mBrokerMap.get(t);
 
             // How you want the results sorted in the resulting Cursor
-            String sortOrder = BaseTableDef._ID + " ASC";
+            String sortOrder = BaseTableDef._ID + " ASC LIMIT " + limit;
 
             c = getDb().query(
                     broker.getTblName(),  // The table to query
@@ -154,6 +165,8 @@ public class DbFacade {
             );
 
             c.moveToFirst();
+
+            Log.v(Constants.PREFERENCES, "Query found " + c.getCount() + " entities to export - Start mapping to domain");
 
             int i = 0;
             while (i < c.getCount()) {
@@ -199,6 +212,45 @@ public class DbFacade {
 
         return count;
 
+    }
+
+    /**
+     * Updated for all entities in list their `isExported` column to the desired value
+     *
+     * @param list         of IExportable entities
+     * @param updValExport value to set in column `isExported`
+     * @param t            specific type of IExportable
+     * @return -1 in case of error, 0 in case of success
+     */
+    public int markExportableList(List<DomainBase> list, int updValExport, Type t) {
+
+        if (list.size() <= 0) return -1;
+
+        if (!IExportable.class.isAssignableFrom(list.get(0).getClass()))
+            throw new InvalidParameterException("Entity must be of type IExportable");
+
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        BrokerBase broker = mBrokerMap.get(t);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("UPDATE ").append(broker.getTblName()).append(" SET ").append(BaseTableDef.COLUMN_NAME_IS_EXPORTED)
+                .append(" = ").append(updValExport).append(" WHERE ").append(BaseTableDef._ID).append(" IN (");
+        char comma = ' ';
+        for (DomainBase exportable : list) {
+            sql.append(comma).append(exportable.getId());
+            comma = ',';
+        }
+        sql.append(")");
+
+        try {
+            db.execSQL(sql.toString());
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, "Error in DbSetup.onCreate()", e);
+            return -1;
+        }
+
+
+        return 0;
     }
 
     public <T extends DomainBase> T select(int id, Class<T> cl) {
@@ -264,7 +316,7 @@ public class DbFacade {
                 c.moveToNext();
             }
         } finally {
-            if(c != null) {
+            if (c != null) {
                 c.close();
             }
         }

@@ -8,10 +8,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.util.Calendar;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
  * Created by Tobias on 24.10.2015.
@@ -22,7 +20,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     private int _isExported;
     private int _nrOfSattelites;
     private int _vehicleId;
-    private Calendar _timestampCaptured;
+    private int _unixtimestampCaptured;
     private float _accuracy;
     private float _speed;
     private String _provider;
@@ -54,15 +52,6 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
 
     public void setNrOfSattelites(int nrOfSattelites) {
         _nrOfSattelites = nrOfSattelites;
-    }
-
-    public Calendar getTimestampCaptured() {
-        return _timestampCaptured;
-    }
-
-    public void setTimestampCaptured(Calendar timestampCaptured) {
-        if (timestampCaptured != null)
-            _timestampCaptured = timestampCaptured;
     }
 
     public float getAccuracy() {
@@ -119,10 +108,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         try {
             json.put("accuracy", getAccuracy());
             json.put("nrOfSattelites", getNrOfSattelites());
-
-            if (getTimestampCaptured() != null)
-                json.put("timestampCaptured", DateHelper.toSql(getTimestampCaptured()));
-
+            json.put("timestampCaptured", getUnixtimestampCaptured());
             json.put("speed", getSpeed());
             json.put("provider", getProvider());
             json.put("bearing", getBearing());
@@ -199,4 +185,13 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     public void setTrack(Track track) {
         _track = track;
     }
+
+    public int getUnixtimestampCaptured() {
+        return _unixtimestampCaptured;
+    }
+
+    public void setUnixtimestampCaptured(int unixtimestampCaptured) {
+        _unixtimestampCaptured = unixtimestampCaptured;
+    }
+
 }

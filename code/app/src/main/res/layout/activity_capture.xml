@@ -26,44 +26,52 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_centerHorizontal="true"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
-                <ImageButton
-                    android:id="@+id/butNowFoot"
-                    android:src="@drawable/walk"
-                    android:background="@drawable/inactive_vehicle"
-                    style="@style/VehicleButtons"
-                    android:contentDescription="@string/content_description_foot"/>
-                <ImageButton
-                    android:id="@+id/butNowBicycle"
-                    android:src="@drawable/bicycle"
-                    android:background="@drawable/inactive_vehicle"
-                    style="@style/VehicleButtons"
-                    android:layout_toEndOf="@+id/butNowFoot"
-                    android:contentDescription="@string/content_description_bicycle"/>
-                <ImageButton
-                    android:id="@+id/butNowBus"
-                    android:src="@drawable/bus"
-                    android:background="@drawable/inactive_vehicle"
-                    style="@style/VehicleButtons"
-                    android:layout_toEndOf="@+id/butNowBicycle"
-                    android:contentDescription="@string/content_description_bus"/>
-                <ImageButton
-                    android:id="@+id/butNowTrain"
-                    android:src="@drawable/train"
-                    android:background="@drawable/inactive_vehicle"
-                    style="@style/VehicleButtons"
-                    android:layout_toEndOf="@id/butNowBus"
-                    android:contentDescription="@string/content_description_train"/>
-                <ImageButton
-                    android:id="@+id/butNowCar"
-                    android:src="@drawable/car"
-                    android:background="@drawable/inactive_vehicle"
-                    style="@style/VehicleButtons"
-                    android:layout_toEndOf="@id/butNowTrain"
-                    android:contentDescription="@string/content_description_car"/>
+            <ImageButton
+                android:id="@+id/butNowFoot"
+                style="@style/VehicleButtons"
+                android:background="@drawable/inactive_vehicle"
+                android:contentDescription="@string/content_description_foot"
+                android:src="@drawable/walk"/>
+
+            <ImageButton
+                android:id="@+id/butNowBicycle"
+                style="@style/VehicleButtons"
+                android:layout_toEndOf="@+id/butNowFoot"
+                android:layout_toRightOf="@+id/butNowFoot"
+                android:background="@drawable/inactive_vehicle"
+                android:contentDescription="@string/content_description_bicycle"
+                android:src="@drawable/bicycle"/>
+
+            <ImageButton
+                android:id="@+id/butNowBus"
+                style="@style/VehicleButtons"
+                android:layout_toEndOf="@+id/butNowBicycle"
+                android:layout_toRightOf="@id/butNowBicycle"
+                android:background="@drawable/inactive_vehicle"
+                android:contentDescription="@string/content_description_bus"
+                android:src="@drawable/bus"/>
+
+            <ImageButton
+                android:id="@+id/butNowTrain"
+                style="@style/VehicleButtons"
+                android:layout_toEndOf="@id/butNowBus"
+                android:layout_toRightOf="@id/butNowBus"
+                android:background="@drawable/inactive_vehicle"
+                android:contentDescription="@string/content_description_train"
+                android:src="@drawable/train"/>
+
+            <ImageButton
+                android:id="@+id/butNowCar"
+                style="@style/VehicleButtons"
+                android:layout_toEndOf="@id/butNowTrain"
+                android:layout_toRightOf="@+id/butNowTrain"
+                android:background="@drawable/inactive_vehicle"
+                android:contentDescription="@string/content_description_car"
+                android:src="@drawable/car"/>
         </RelativeLayout>
 
         <TextView
@@ -73,14 +81,44 @@
             android:layout_below="@+id/map"
             android:text="@string/number_of_waypoints"/>
 
-        <Button
-            android:id="@+id/button_tracking"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:enabled="false"
-            android:text="@string/start_tracking"/>
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/text_waypoint_counter"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_valid_track_quest"
+                android:id="@+id/txt_valid_track_quest"
+                android:textColor="@color/warn_red"
+                android:visibility="gone" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_valid_track_yes"
+                android:id="@+id/but_valid_track_yes"
+                android:visibility="gone" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_valid_track_no"
+                android:id="@+id/but_valid_track_no"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/button_tracking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="@string/start_tracking"/>
+        </LinearLayout>
 
     </RelativeLayout>
 

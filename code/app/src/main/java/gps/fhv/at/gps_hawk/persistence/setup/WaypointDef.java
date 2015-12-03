@@ -16,7 +16,8 @@ public class WaypointDef extends BaseTableDef {
     public static final String COLUMN_NAME_VEHICLE_ID = "vehicleId";
 
     // Datetime types
-    public static final String COLUMN_NAME_DATETIME = "date_gps";
+//    public static final String COLUMN_NAME_DATETIME = "date_gps";
+    public static final String COLUMN_NAME_DATETIMESTAMP = "timestamp_gps";
 
     // Text types
     public static final String COLUMN_PROVIDER = "provider";
@@ -39,9 +40,10 @@ public class WaypointDef extends BaseTableDef {
                         COLUMN_NAME_TRACK_ID + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_IS_EXPORTED + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_VEHICLE_ID + TYPE_INT + COMMA_SEP +
+                        COLUMN_NAME_DATETIMESTAMP + TYPE_INT + COMMA_SEP +
 
                         // Datetime types
-                        COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
+//                        COLUMN_NAME_DATETIME + TYPE_DATETIME + COMMA_SEP +
 
                         // Float types
                         COLUMN_ACCURACY + TYPE_FLOAT + COMMA_SEP +
@@ -55,6 +57,13 @@ public class WaypointDef extends BaseTableDef {
                         COLUMN_NAME_LAT + TYPE_DOUBLE + COMMA_SEP +
                         COLUMN_NAME_LNG + TYPE_DOUBLE + COMMA_SEP +
                         COLUMN_NAME_ALTITUDE + TYPE_DOUBLE;
+    }
+
+    @Override
+    public String getUpdateScript(int oldVersion) {
+        return null;
+//        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_DATETIMESTAMP + " " + TYPE_INT + ";"
+//                + "UPDATE " + TABLE_NAME + " SET " + COLUMN_NAME_DATETIMESTAMP + " = strftime('%s'," + COLUMN_NAME_DATETIME + ");";
     }
 
     @Override

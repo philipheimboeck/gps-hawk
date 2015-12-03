@@ -47,4 +47,10 @@ public abstract class BaseTableDef implements BaseColumns {
         return "DROP TABLE IF EXISTS " + getTableName();
     }
 
+    /**
+     * Returns update-Script for the corresponding table
+     * @return Updatescript or null, if not provided
+     */
+    public abstract String getUpdateScript(int oldVersion);
+
 }

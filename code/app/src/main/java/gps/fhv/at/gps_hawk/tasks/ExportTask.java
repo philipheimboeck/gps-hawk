@@ -9,12 +9,16 @@ import java.util.HashSet;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.communication.ExportClient;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
+import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.exceptions.UnExpectedResultException;
+import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
 
@@ -25,6 +29,9 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
     private ExportContext mExpContext;
     private IAsyncTaskCaller<Void, String> mCaller;
+    public static int isCurrentlyRunning = 0;
+    private static int[] mExpIds = {R.id.button_do_export, R.id.button_do_motion_export, R.id.button_do_exception_export};
+
 
     public ExportTask(ExportContext expContext, final IAsyncTaskCaller<Void, String> caller) {
         mExpContext = expContext;
@@ -37,50 +44,83 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
     protected void onPostExecute(final String result) {
         mCaller.onPostExecute(result);
+
     }
 
     @Override
     protected String doInBackground(Void... params) {
 
-        DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
+        if (isCurrentlyRunning == 1) {
+            Log.i(Constants.PREFERENCES, "ExportTask currently running - return");
+            return "";
+        }
 
-        // Mark unexported Waypoints as "ExportNow"
-        int count = dbFacade.markExportable(0, 2, mExpContext.getT());
+        ++isCurrentlyRunning;
 
-        if (count > 0) {
+        try {
 
-            Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " to export");
+            // Set default values if no specific data to export was set - but also then export ALL data!
+            // If all data exported - return
+            while (trySetDefaultExport()) {
 
-            // Get all Waypoints from DB to export
-            mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT()));
+                DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
 
-            // Insert Tracks and Vehicles as Objects
-            if (mExpContext.getT().equals(Waypoint.class)) {
-                setDomainObjects(dbFacade, mExpContext);
-            }
+                // Mark unexported Waypoints as "ExportNow"
+                int count = dbFacade.markExportable(0, 2, mExpContext.getT());
 
-            // Send via Web
-            ExportClient client = new ExportClient(mExpContext.getContext());
-            try {
+                while (count > 0) {
 
-                boolean result = client.exportCollectedWaypoints(mExpContext);
+                    int junkSize = Constants.EXPORT_JUNK;
+                    if (mExpContext.getT().equals(MotionValues.class))
+                        junkSize *= 3; // 3 times more MotionValues than Waypoints
+                    if (mExpContext.getT().equals(Exception2Log.class))
+                        junkSize /= 2; // 2 times less Exceptions than Waypoints
 
-                // If no successful - be sure to reset flags
-                if (!result) {
-                    throw new UnExpectedResultException("An unexpected result occured while exporting data");
+                    Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " 2 export - Start chunk with limit: " + junkSize);
+
+                    // Get all Waypoints from DB to export
+                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize));
+
+                    // Insert Tracks and Vehicles as Objects
+                    if (mExpContext.getT().equals(Waypoint.class)) {
+                        setDomainObjects(dbFacade, mExpContext);
+                    }
+
+                    // Send via Web
+                    ExportClient client = new ExportClient(mExpContext.getContext());
+                    try {
+
+                        boolean result = client.exportCollectedWaypoints(mExpContext);
+
+                        // If no successful - be sure to reset flags
+                        if (!result) {
+                            throw new UnExpectedResultException("An unexpected result occured while exporting data");
+                        }
+
+                    } catch (UnExpectedResultException e) {
+                        Log.e(Constants.PREFERENCES, "Unexpected result", e);
+
+                        // Reset not exported entities
+                        dbFacade.markExportable(2, 0, mExpContext.getT());
+                        return "ERROR";
+                    }
+
+                    // Mark "ExportNow" Entities as "Exported"
+                    dbFacade.markExportableList(mExpContext.getExportList(), 1, mExpContext.getT());
+
+                    count = (count > junkSize) ? count - junkSize : 0;
                 }
 
-            } catch (UnExpectedResultException e) {
-                Log.e(Constants.PREFERENCES, "Unexpected result", e);
-
-                // Reset not exported entities
-                dbFacade.markExportable(2, 0, mExpContext.getT());
-                return "ERROR";
+                // if was a default export - delete it again to continue exporting
+                if (i >= 0) mExpContext.setCollectionName(null);
             }
-
-            // Mark "ExportNow" Waypoints as "Exported"
-            dbFacade.markExportable(2, 1, mExpContext.getT());
+        } catch (Exception e) {
+            Log.e(Constants.PREFERENCES, "Problem in exporting - rethrow", e);
+        } finally {
+            --isCurrentlyRunning;
+            i = -1;
         }
+
 
         return "";
     }
@@ -113,4 +153,42 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
         }
 
     }
+
+    private static int i = -1;
+    private static boolean hasDoneFirstExport = false;
+
+    /**
+     * if is a "all-data-Export", set Type and collectionName in order of their priority to export
+     * Returns, if there should be done an export according to the number of just done exports
+     *
+     * @return
+     */
+    private boolean trySetDefaultExport() {
+
+        // If no collectionName defined --> use default
+        if (mExpContext.getCollectionName() == null) {
+
+            // start with first index
+            if (i < 0) i = 0;
+
+            // Stop exporting, all data exported!
+            if (i >= mExpIds.length) return false;
+
+            ExportStartHelper.setContextSpecificFromButId(mExpIds[i], mExpContext);
+            ++i;
+
+            return true;
+
+        }
+
+        // -1, if is first button-export, 0 if is not -> reset and return
+        if (hasDoneFirstExport) {
+            hasDoneFirstExport = false;
+            return false;
+        }
+        hasDoneFirstExport = true;
+        return true;
+
+    }
+
 }

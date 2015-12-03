@@ -9,18 +9,18 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
  * Created by Tobias on 30.10.2015.
  */
 public class Track extends DomainBase implements Serializable, IJSONable {
     private int _id;
-    private Calendar _startDateTime;
-    private Calendar _endDateTime;
+    private int _startDateTime;
+    private int _endDateTime;
+    private int _isValid;
 
     public Track() {
-        _startDateTime = Calendar.getInstance();
+        _startDateTime = (int) Calendar.getInstance().getTimeInMillis() / 1000;
     }
 
     public int getId() {
@@ -31,22 +31,28 @@ public class Track extends DomainBase implements Serializable, IJSONable {
         _id = id;
     }
 
-    public Calendar getStartDateTime() {
+    public int getStartDateTime() {
         return _startDateTime;
     }
 
-    public void setStartDateTime(Calendar startDateTime) {
-        if (startDateTime != null)
-            _startDateTime = startDateTime;
+    public void setStartDateTime(int startDateTime) {
+        _startDateTime = startDateTime;
     }
 
-    public Calendar getEndDateTime() {
+    public int getEndDateTime() {
         return _endDateTime;
     }
 
-    public void setEndDateTime(Calendar endDateTime) {
-        if (endDateTime != null)
-            _endDateTime = endDateTime;
+    public void setEndDateTime(int endDateTime) {
+        _endDateTime = endDateTime;
+    }
+
+    public int getIsValid() {
+        return _isValid;
+    }
+
+    public void setIsValid(int isValid) {
+        _isValid = isValid;
     }
 
     @Override
@@ -55,11 +61,9 @@ public class Track extends DomainBase implements Serializable, IJSONable {
         try {
             json.put("id", getId());
 
-            if (getStartDateTime() != null)
-                json.put("startDateTime", DateHelper.toSql(getStartDateTime()));
-
-            if (getEndDateTime() != null)
-                json.put("endDateTime", DateHelper.toSql(getEndDateTime()));
+            json.put("startDateTime", getStartDateTime());
+            json.put("endDateTime", getEndDateTime());
+            json.put("isValid", getIsValid());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

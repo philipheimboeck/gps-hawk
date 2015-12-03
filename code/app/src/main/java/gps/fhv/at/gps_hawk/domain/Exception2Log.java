@@ -5,10 +5,7 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Calendar;
-
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.helper.DateHelper;
 
 /**
  * Created by Tobias on 02.11.2015.
@@ -18,7 +15,7 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
     private int _id;
     private String _stackTrace;
     private String _message;
-    private Calendar _dateTime;
+    private int _dateTime;
     private int _isExported;
     private int _level;
 
@@ -52,13 +49,12 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
         _message = message;
     }
 
-    public Calendar getDateTime() {
+    public int getDateTime() {
         return _dateTime;
     }
 
-    public void setDateTime(Calendar dateTime) {
-        if (dateTime != null)
-            _dateTime = dateTime;
+    public void setDateTime(int dateTime) {
+        _dateTime = dateTime;
     }
 
     public int getIsExported() {
@@ -85,9 +81,7 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
             json.put("level", getLevel());
             json.put("stackTrace", getStackTrace());
             json.put("msg", getMessage());
-
-            if (getDateTime() != null)
-                json.put("dateTime", DateHelper.toSql(getDateTime()));
+            json.put("dateTime", getDateTime());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

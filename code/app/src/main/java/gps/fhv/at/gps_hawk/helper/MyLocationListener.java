@@ -30,10 +30,14 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
         if (loc == null) return;
 
-        mLastLocation = loc;
-        mLastLocationMillis = SystemClock.elapsedRealtime();
-        Log.i(Constants.PREFERENCES,"onLocationChanged");
+//        Log.v(Constants.PREFERENCES,loc.getProvider());
+//        Log.v(Constants.PREFERENCES,Float.toString(loc.getAccuracy()));
+
         if (isSufficientLocation(loc)) {
+
+            mLastLocation = loc;
+            mLastLocationMillis = SystemClock.elapsedRealtime();
+
             NewLocationEventData data = new NewLocationEventData();
             data.setNrOfSattelites(mNrOfSattelites);
             caller.onLocationChange(loc, data);
@@ -56,17 +60,74 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        Log.i(Constants.PREFERENCES, "onStatusChanged");
+//        Log.i(Constants.PREFERENCES, "onStatusChanged");
     }
+
+    private static final int SIGNIFICANT_TIME_CHANGE_GAP = Constants.GPS_MIN_TIME * 20;
 
     /**
      * determines whether location can be used or not
+     * soure: http://developer.android.com/guide/topics/location/strategies.html
      *
      * @param location
      * @return
      */
     protected boolean isSufficientLocation(Location location) {
-        return true;
+
+        if (mLastLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Check whether the new location fix is newer or older
+        long timeDelta = location.getTime() - mLastLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > SIGNIFICANT_TIME_CHANGE_GAP;
+        boolean isSignificantlyOlder = timeDelta < -SIGNIFICANT_TIME_CHANGE_GAP;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location
+        // because the user has likely moved
+        if (isSignificantlyNewer) {
+//            Log.v(Constants.PREFERENCES," -> isSignificantlyNewer");
+            return true;
+            // If the new location is more than two minutes older, it must be worse
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - mLastLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 50;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                mLastLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+//            Log.v(Constants.PREFERENCES," -> isMoreAccurate");
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+//            Log.v(Constants.PREFERENCES," -> isNewer and !isLessAccurate");
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+//            Log.v(Constants.PREFERENCES," -> isNewer and !isSignificantlyLessAccurate && isFromSameProvider");
+            return true;
+        }
+        return false;
+
+    }
+
+    /**
+     * Checks whether two providers are the same
+     */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
     }
 
     /**
@@ -77,6 +138,7 @@ public class MyLocationListener implements LocationListener, GpsStatus.Listener 
     @Override
     public void onGpsStatusChanged(int event) {
         boolean isGPSFix = false;
+
 
         switch (event) {
             case GpsStatus.GPS_EVENT_SATELLITE_STATUS:

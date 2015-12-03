@@ -51,13 +51,15 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             float gpsDistance = (float) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_DIST_CHANGE);
 
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, gpsTime, gpsDistance, mLocationListener);
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, gpsTime, gpsDistance, mLocationListener);
+//            mLocationManager.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, gpsTime, gpsDistance, mLocationListener);
             mLocationManager.addGpsStatusListener(mLocationListener);
 
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             String provider = mLocationManager.getBestProvider(criteria, false);
 
-            Log.v(Constants.PREFERENCES,"GpsWorker started GPS Tracking");
+            Log.v(Constants.PREFERENCES, "GpsWorker started GPS Tracking");
 
             @SuppressWarnings("ResourceType")
             Location location = mLocationManager.getLastKnownLocation(provider);
@@ -73,7 +75,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     }
 
     @Override
-    public void stopGpsTracking() {
+    public void stopGpsTracking(int trackIsValid) {
         try {
             // Stop the tracking
             mLocationManager.removeUpdates(mLocationListener);
@@ -82,8 +84,9 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
             // In case through UI the track changed, reload it
             DbFacade db = DbFacade.getInstance(mContext);
-            Track t = db.select(mCurrentTrack.getId(),Track.class);
-            t.setEndDateTime(end);
+            Track t = db.select(mCurrentTrack.getId(), Track.class);
+            t.setEndDateTime((int) (end.getTimeInMillis() / 1000));
+            t.setIsValid(trackIsValid);
 
             db.saveEntity(t);
         } catch (SecurityException ex) {
@@ -129,6 +132,8 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
         Waypoint waypoint = WaypointFactory.getInstance().createWaypoint(location, data);
 
+        Log.v(Constants.PREFERENCES,"onLocationChange: "+ waypoint.getProvider());
+
         // Send a new message
         Intent intent = new Intent(Constants.BROADCAST_NEW_WAYPOINT);
         intent.putExtra(Constants.EXTRA_WAYPOINT, waypoint);
@@ -138,13 +143,14 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
     @Override
     public void onProviderEnabled(String provider) {
         // Todo
-        Log.d(Constants.PREFERENCES,"ProviderEnabled - startGpsTracking?");
+        Log.d(Constants.PREFERENCES, "ProviderEnabled - startGpsTracking?");
 //        startGpsTracking();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        stopGpsTracking();
+        // Todo: get some user-insert if Track was valid?
+        stopGpsTracking(0);
     }
 
     @Override
