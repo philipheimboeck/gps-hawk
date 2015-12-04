@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -187,7 +188,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         // Default vehicle
         changeVehicle(R.id.butNowFoot);
-        
+
     }
 
     /**
@@ -269,6 +270,19 @@ public class CaptureActivity extends AppCompatActivity {
 
         // Initialize the map
         initializeMapFragment();
+
+        // Display version in UI
+        PackageManager manager = getApplicationContext().getPackageManager();
+        PackageInfo info = null;
+        try {
+            info = manager.getPackageInfo(getApplicationContext().getPackageName(), 0);
+            String version = info.versionName;
+            TextView txtVersion = (TextView) findViewById(R.id.txt_version_number);
+            txtVersion.setText(getString(R.string.app_name) +", V"+ version);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(Constants.PREFERENCES,"Cannot read current version",e);
+        }
+
     }
 
     /**
@@ -481,7 +495,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         // Visibility of Buttons/Views
         if (but < 0) toggleButtons(true);
-        else if ( but > 0 ) toggleButtons(false);
+        else if (but > 0) toggleButtons(false);
 
     }
 
