@@ -86,6 +86,7 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
     }
 
     private static MotionValues createMV(SensorEvent event) {
+
         MotionValues values = new MotionValues();
         values._x = event.values[0];
         values._y = event.values[1];
@@ -109,6 +110,9 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
+        if (event == null || event.values == null) return;
+
         if (event.values.length >= 3) {
 
             // Create Motion-Value

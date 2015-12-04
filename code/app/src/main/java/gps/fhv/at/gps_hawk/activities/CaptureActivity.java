@@ -184,6 +184,10 @@ public class CaptureActivity extends AppCompatActivity {
         }
 
         checkForUpdate();
+
+        // Default vehicle
+        changeVehicle(R.id.butNowFoot);
+        
     }
 
     /**
@@ -400,7 +404,7 @@ public class CaptureActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LocationService.class);
         intent.putExtra("isValid", isValid ? 1 : 0);
         intent.putExtra("terminate", true);
-        this.startService(intent); // Trick: with param "terminate", acutally stop the service
+        this.startService(intent); // Trick: with param "terminate", actually stop the service
 
         // And the stop the service
         intent = new Intent(this, LocationService.class);
@@ -437,6 +441,10 @@ public class CaptureActivity extends AppCompatActivity {
             mCurrentTrack.setId(trackID);
 
             if (gpsService.isGpsAvailable()) {
+
+                // Default vehicle
+                changeVehicle(R.id.butNowFoot);
+
                 // Start the service
                 Intent intent = new Intent(this, LocationService.class);
                 intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
