@@ -42,6 +42,7 @@ public class AppClient extends RestClient implements IAppClient {
 
             JSONObject jsonObject = new JSONObject(answer.content);
             String newVersion = jsonObject.getString("current-version");
+            Log.v(Constants.PREFERENCES,"Checked version: old: "+ currentVersion +", new: "+ newVersion);
 
             // If no update is available just return null
             if (currentVersion.equals(newVersion)) {
@@ -51,7 +52,7 @@ public class AppClient extends RestClient implements IAppClient {
             JSONArray versions = jsonObject.getJSONArray("versions");
 
             // Find the URL and return it
-            for (int i = 0; i < newVersion.length(); i++) {
+            for (int i = 0; i < versions.length(); i++) {
                 JSONObject v = versions.getJSONObject(i);
                 if (v.getString("version").equals(newVersion)) {
                     return REST_SERVER + v.getString("url");
