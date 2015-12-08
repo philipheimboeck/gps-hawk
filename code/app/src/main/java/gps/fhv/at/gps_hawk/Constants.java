@@ -31,7 +31,7 @@ public class Constants {
     public static int ACCELERATION_MIN_TIME_GAP = 100; // in millis
 
     /**
-     * Pferences-Keys
+     * Preferences-Keys
      */
     public static String PREF_EXPORT_URL = "export_url";
 

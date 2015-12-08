@@ -38,8 +38,8 @@ import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
  */
 public class RestClient {
 
-    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
-    //protected static final String REST_SERVER = "http://192.168.0.3:8080/webservice/fhvgis/";
+//    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
+    protected static final String REST_SERVER = "http://172.22.26.33:8080/webservice/fhvgis/";
 
     private Context mContext;
 

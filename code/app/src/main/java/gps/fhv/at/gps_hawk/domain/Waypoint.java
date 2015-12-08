@@ -18,7 +18,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     private int _id;
     private int _trackId;
     private int _isExported;
-    private int _nrOfSattelites;
+    private int _nrOfSatellites;
     private int _vehicleId;
     private int _unixtimestampCaptured;
     private float _accuracy;
@@ -46,12 +46,12 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         _id = id;
     }
 
-    public int getNrOfSattelites() {
-        return _nrOfSattelites;
+    public int getNrOfSatellites() {
+        return _nrOfSatellites;
     }
 
-    public void setNrOfSattelites(int nrOfSattelites) {
-        _nrOfSattelites = nrOfSattelites;
+    public void setNrOfSatellites(int nrOfSatellites) {
+        _nrOfSatellites = nrOfSatellites;
     }
 
     public float getAccuracy() {
@@ -108,7 +108,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         try {
             json.put("id", getId());
             json.put("accuracy", getAccuracy());
-            json.put("nrOfSattelites", getNrOfSattelites());
+            json.put("nrOfSatellites", getNrOfSatellites());
             json.put("timestampCaptured", getUnixtimestampCaptured());
             json.put("speed", getSpeed());
             json.put("provider", getProvider());

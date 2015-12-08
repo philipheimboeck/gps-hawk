@@ -328,7 +328,10 @@ public class CaptureActivity extends AppCompatActivity {
             mMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    googleMap.setMyLocationEnabled(true);
+
+                    if(mPermissionsGranted) {
+                        googleMap.setMyLocationEnabled(true);
+                    }
 
                     // Set polyline
                     PolylineOptions polylineOptions = new PolylineOptions();

@@ -1,6 +1,7 @@
 package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -10,10 +11,12 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.exceptions.RestException;
+import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Author: Philip Heimböck
@@ -23,9 +26,11 @@ public class AppClient extends RestClient implements IAppClient {
 
     public static final String REST_APP = "app/";
     private static final String REST_VERSION = REST_SERVER + REST_APP + "version";
+    private final Context _context;
 
     public AppClient(Context context) {
         super(context);
+        _context = context;
     }
 
     @Override
@@ -33,7 +38,11 @@ public class AppClient extends RestClient implements IAppClient {
         try {
             String urlString = REST_VERSION;
             URL url = new URL(urlString);
-            HTTPAnswer answer = get(url);
+
+            HashMap<String, String> headers = new HashMap<>();
+            headers.put("Authorization", TokenHelper.getToken(_context));
+
+            HTTPAnswer answer = get(url, headers);
 
             if (answer.responseCode != 200) {
                 Log.w(Constants.PREFERENCES, "Rest exception: " + answer.content);

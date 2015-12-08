@@ -19,7 +19,7 @@ public class WaypointBroker extends BrokerBase {
         ContentValues values = new ContentValues();
 
         // Int
-        values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSattelites());
+        values.put(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES, wp.getNrOfSatellites());
         values.put(WaypointDef.COLUMN_NAME_TRACK_ID, wp.getTrackId());
         values.put(WaypointDef.COLUMN_NAME_IS_EXPORTED, wp.getIsExported());
         values.put(WaypointDef.COLUMN_NAME_VEHICLE_ID, wp.getVehicleId());
@@ -47,7 +47,7 @@ public class WaypointBroker extends BrokerBase {
         Waypoint wp = new Waypoint();
 
         // Int
-        wp.setNrOfSattelites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
+        wp.setNrOfSatellites(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_NR_OF_SATTELITES)));
         wp.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED)));
         wp.setTrackId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID)));
         wp.setVehicleId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_VEHICLE_ID)));
