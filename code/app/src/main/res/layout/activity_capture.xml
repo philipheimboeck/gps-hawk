@@ -19,8 +19,11 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_centerVertical="true"
-            />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/text_waypoint_counter"
+            android:layout_below="@+id/relativeLayout"
+            android:layout_marginTop="5px"/>
 
 
         <RelativeLayout
@@ -28,7 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/relativeLayout">
 
             <ImageButton
                 android:id="@+id/butNowFoot"
@@ -78,25 +82,28 @@
             android:id="@+id/text_waypoint_counter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/map"
-            android:text="@string/number_of_waypoints"/>
+            android:text="@string/number_of_waypoints"
+            android:layout_above="@+id/layout_buttons_capture"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_name"
+            android:id="@+id/txt_version_number"
             android:layout_below="@+id/map"
             android:layout_alignParentRight="true"
-            android:id="@+id/txt_version_number"/>
+            android:layout_alignParentEnd="true"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentRight="true"
-            android:layout_below="@+id/text_waypoint_counter"
             android:orientation="horizontal"
-            android:id="@+id/layout_buttons_capture">
+            android:id="@+id/layout_buttons_capture"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
 
 
             <TextView
@@ -126,7 +133,9 @@
                 android:layout_height="wrap_content"
                 android:enabled="false"
                 android:text="@string/start_tracking"/>
+
         </LinearLayout>
+
 
 
     </RelativeLayout>
