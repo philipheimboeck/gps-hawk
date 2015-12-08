@@ -27,11 +27,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.FragmentsActivity" >
+        <activity android:name=".activities.FragmentsActivity"
+                  android:configChanges="orientation|screenSize"
+            >
         </activity>
         <activity android:name=".activities.CaptureActivity"
                   android:launchMode="singleTask"
                   android:exported="true"
+                  android:configChanges="orientation|screenSize"
+                  android:screenOrientation="portrait"
             >
         </activity>
 

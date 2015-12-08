@@ -13,12 +13,15 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -38,6 +41,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -56,7 +60,6 @@ import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
-import gps.fhv.at.gps_hawk.services.AppService;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
@@ -134,11 +137,11 @@ public class CaptureActivity extends AppCompatActivity {
                 if (mMapFragment != null && mMapFragment.getMap() != null) {
                     addMapPoint(point);
 
-                    // Show position
-                    mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
-
-                    // Zoom in the Google Map
                     if (!mZoomed) {
+                        // Show position
+                        mMapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(point));
+
+                        // Zoom in the Google Map
                         mMapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(MAP_ZOOM));
                         mZoomed = true;
                     }
@@ -168,10 +171,6 @@ public class CaptureActivity extends AppCompatActivity {
         // Check for permissions
         mPermissionsGranted =
                 PermissionChecker.checkCallingOrSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-
-        // TODO: Testing motion sensors
-//        mMotionWorker = new MotionWorker(getApplicationContext());
-//        mMotionWorker.initialize();
 
         initializeView();
 
@@ -278,9 +277,9 @@ public class CaptureActivity extends AppCompatActivity {
             info = manager.getPackageInfo(getApplicationContext().getPackageName(), 0);
             String version = info.versionName;
             TextView txtVersion = (TextView) findViewById(R.id.txt_version_number);
-            txtVersion.setText(getString(R.string.app_name) +", V"+ version);
+            txtVersion.setText(getString(R.string.app_name) + ", V" + version);
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(Constants.PREFERENCES,"Cannot read current version",e);
+            Log.e(Constants.PREFERENCES, "Cannot read current version", e);
         }
 
     }
@@ -346,7 +345,32 @@ public class CaptureActivity extends AppCompatActivity {
             mMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
-                    googleMap.setMyLocationEnabled(true);
+                    // Show current position
+                    try {
+                        if(mPermissionsGranted) {
+                            googleMap.setMyLocationEnabled(true);
+
+                            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                            Criteria criteria = new Criteria();
+                            Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+                            if (location != null)
+                            {
+                                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(location.getLatitude(), location.getLongitude()), 13));
+
+                                CameraPosition cameraPosition = new CameraPosition.Builder()
+                                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                                        .zoom(17)                   // Sets the zoom
+                                        .bearing(90)                // Sets the orientation of the camera to east
+                                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                                        .build();                   // Creates a CameraPosition from the builder
+                                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+                            }
+                        }
+                    } catch (SecurityException ex) {
+                        // ignore
+                    }
 
                     // Set polyline
                     PolylineOptions polylineOptions = new PolylineOptions();
