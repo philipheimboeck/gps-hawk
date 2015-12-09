@@ -480,9 +480,6 @@ public class CaptureActivity extends AppCompatActivity {
 
             if (gpsService.isGpsAvailable()) {
 
-                // Default vehicle
-                changeVehicle(R.id.butNowFoot);
-
                 // Start the service
                 Intent intent = new Intent(this, LocationService.class);
                 intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
