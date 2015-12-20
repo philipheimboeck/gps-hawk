@@ -2,33 +2,20 @@ package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.domain.Exception2Log;
-import gps.fhv.at.gps_hawk.domain.ExportContext;
-import gps.fhv.at.gps_hawk.domain.MotionValues;
-import gps.fhv.at.gps_hawk.domain.Track;
-import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
-import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
-import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
-import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
-import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
+import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
@@ -54,6 +41,7 @@ public class ExportFragment extends Fragment implements IUpdateableView {
     private ExportTask mExportTask;
     private LinearLayout mExpWrapper;
     private ExportStartHelper mExportStartHelper;
+    private ExportMetadataLoaderTask mExpDataLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,16 +53,6 @@ public class ExportFragment extends Fragment implements IUpdateableView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         PreferenceManager.setDefaultValues(getContext(), R.xml.preferences, true);
-
-        // TODO: remove before deployment
-        // And also remove entries in server-db between 08:42 and ... on 13.11.2015 from my deviceid!
-        // And also remove entries in server-db between 08:00 and ... on 28.11.2015 from my deviceid!
-        DbFacade db = DbFacade.getInstance(getContext());
-        db.markExportable(2, 0, Waypoint.class);
-        db.markExportable(2, 0, Exception2Log.class);
-        db.markExportable(2, 0, MotionValues.class);
-        db.markExportable(2, 0, Track.class);
-//        db.markExportable(0, 1, Waypoint.class);
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_export, container, false);
@@ -104,42 +82,65 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mTextViewAmountMotion = (TextView) view.findViewById(R.id.tbx_amount_of_motions);
         mTextViewAmountTracks = (TextView) view.findViewById(R.id.tbx_amount_of_tracks);
 
-        updText();
+        doDataLoadingAsnc();
 
         return view;
+    }
+
+    public void doDataLoadingAsnc() {
+
+        // Do loading in in background
+        createDataLoadingTask();
+        mExpDataLoader.execute();
+    }
+
+    private void createDataLoadingTask() {
+        mExpDataLoader = new ExportMetadataLoaderTask(this, new IAsyncTaskCaller<Void, int[]>() {
+
+            @Override
+            public void onPostExecute(int[] success) {
+                updText(success);
+                showLoading(false);
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+                showLoading(true);
+            }
+
+        });
     }
 
     /**
      * Setting all text-values
      * quite dirty, but should work for us!
      */
-    private void updText() {
+    public void updText(int[] amounts) {
 
         DbFacade db = DbFacade.getInstance(getActivity());
+        int i = -1;
 
         // Waypoints
-        int amount = db.getCount(WaypointDef.TABLE_NAME, null);
-        int amountExported = db.getCount(WaypointDef.TABLE_NAME, WaypointDef.COLUMN_NAME_IS_EXPORTED + " = 0");
-
-        mTextViewAmount.setText("" + (amount - amountExported) + " from " + amount + " exported");
+        mTextViewAmount.setText("" + (amounts[++i] - amounts[i + 1]) + " from " + amounts[i++] + " exported");
 
         // Exceptions
-        amount = db.getCount(Exception2LogDef.TABLE_NAME, null);
-        amountExported = db.getCount(Exception2LogDef.TABLE_NAME, Exception2LogDef.COLUMN_NAME_IS_EXPORTED + " = 0");
-
-        mTextViewAmountExc.setText((amount - amountExported) + " from " + amount + " exported");
+        mTextViewAmountExc.setText((amounts[++i] - amounts[i + 1]) + " from " + amounts[i++] + " exported");
 
         // Motions
-        amount = db.getCount(MotionValuesDef.TABLE_NAME, null);
-        amountExported = db.getCount(MotionValuesDef.TABLE_NAME, MotionValuesDef.COLUMN_NAME_IS_EXPORTED + " = 0");
-
-        mTextViewAmountMotion.setText((amount - amountExported) + " from " + amount + " exported");
+        mTextViewAmountMotion.setText((amounts[++i] - amounts[i + 1]) + " from " + amounts[i++] + " exported");
 
         // Tracks
-        amount = db.getCount(TrackDef.TABLE_NAME, null);
-        amountExported = db.getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_IS_EXPORTED + " = 0");
-
-        mTextViewAmountTracks.setText((amount - amountExported) + " from " + amount + " exported");
+        mTextViewAmountTracks.setText((amounts[++i] - amounts[i + 1]) + " from " + amounts[i++] + " exported");
     }
 
     public void showLoading(final boolean show) {
@@ -156,11 +157,6 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         });
 
         disableRek(mExpWrapper, !show);
-
-        // Update text when buttons are enabled again
-        if (!show) {
-            updText();
-        }
 
     }
 
@@ -182,6 +178,5 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mExportStartHelper.startExport(id);
 
     }
-
 
 }

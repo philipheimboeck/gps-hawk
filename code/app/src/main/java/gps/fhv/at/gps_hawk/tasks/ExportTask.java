@@ -30,7 +30,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
     private ExportContext mExpContext;
     private IAsyncTaskCaller<Void, String> mCaller;
     public static int isCurrentlyRunning = 0;
-    private static int[] mExpIds = {R.id.button_do_export, R.id.button_do_motion_export, R.id.button_do_exception_export};
+    private static int[] mExpIds = {R.id.button_do_export, R.id.button_do_motion_export, R.id.button_do_exception_export, R.id.button_do_track_export};
 
 
     public ExportTask(ExportContext expContext, final IAsyncTaskCaller<Void, String> caller) {
@@ -44,7 +44,6 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
     protected void onPostExecute(final String result) {
         mCaller.onPostExecute(result);
-
     }
 
     @Override

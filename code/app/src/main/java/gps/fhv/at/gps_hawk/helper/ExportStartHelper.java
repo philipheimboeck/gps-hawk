@@ -69,11 +69,8 @@ public class ExportStartHelper {
                 @Override
                 public void onPostExecute(String success) {
 
-                    if ("ERROR".equals(success)) {
-                        Toast.makeText(mContext, mContext.getString(R.string.error_export_failed), Toast.LENGTH_LONG).show();
-                    }
-
-                    if (mView != null) mView.showLoading(false);
+                    mView.doDataLoadingAsnc();
+//                    if (mView != null) mView.showLoading(false);
                 }
 
                 @Override
