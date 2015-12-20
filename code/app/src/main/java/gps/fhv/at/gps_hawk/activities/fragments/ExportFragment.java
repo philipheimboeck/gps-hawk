@@ -21,11 +21,13 @@ import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
+import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
@@ -39,12 +41,14 @@ public class ExportFragment extends Fragment implements IUpdateableView {
     private Button mButStartExport;
     private Button mButStartExportExc;
     private Button mButStartExportMotions;
+    private Button mButStartExportTracks;
 
     private View.OnClickListener mButExportListener;
 
     private TextView mTextViewAmount;
     private TextView mTextViewAmountExc;
     private TextView mTextViewAmountMotion;
+    private TextView mTextViewAmountTracks;
 
     private View mProgressView;
     private ExportTask mExportTask;
@@ -69,6 +73,8 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         db.markExportable(2, 0, Waypoint.class);
         db.markExportable(2, 0, Exception2Log.class);
         db.markExportable(2, 0, MotionValues.class);
+        db.markExportable(2, 0, Track.class);
+        db.markExportable(1, 0, Track.class); // TODO- remove
 //        db.markExportable(0, 1, Waypoint.class);
 
         // Inflate the layout for this fragment
@@ -81,6 +87,7 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExport = (Button) view.findViewById(R.id.button_do_export);
         mButStartExportExc = (Button) view.findViewById(R.id.button_do_exception_export);
         mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
+        mButStartExportTracks = (Button) view.findViewById(R.id.button_do_track_export);
 
         mButExportListener = new View.OnClickListener() {
             @Override
@@ -91,10 +98,12 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExport.setOnClickListener(mButExportListener);
         mButStartExportExc.setOnClickListener(mButExportListener);
         mButStartExportMotions.setOnClickListener(mButExportListener);
+        mButStartExportTracks.setOnClickListener(mButExportListener);
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
         mTextViewAmountMotion = (TextView) view.findViewById(R.id.tbx_amount_of_motions);
+        mTextViewAmountTracks = (TextView) view.findViewById(R.id.tbx_amount_of_tracks);
 
         updText();
 
@@ -126,6 +135,12 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         amountExported = db.getCount(MotionValuesDef.TABLE_NAME, MotionValuesDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
         mTextViewAmountMotion.setText((amount - amountExported) + " from " + amount + " exported");
+
+        // Tracks
+        amount = db.getCount(TrackDef.TABLE_NAME, null);
+        amountExported = db.getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_IS_EXPORTED + " = 0");
+
+        mTextViewAmountTracks.setText((amount - amountExported) + " from " + amount + " exported");
     }
 
     public void showLoading(final boolean show) {

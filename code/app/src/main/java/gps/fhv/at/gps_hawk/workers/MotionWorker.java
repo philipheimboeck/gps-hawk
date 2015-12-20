@@ -128,8 +128,6 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
             // Use already converted millis to decide whether to save
             if (!isValidEvent(values)) return;
 
-            Log.v(Constants.PREFERENCES, "x: " + values._x + ", y: " + values._y + ", z: " + values._z);
-
             // Else: use MotionValues and reset
             mLastCapturedAt[values._motionType] = values._dateTimeCaptured;
 

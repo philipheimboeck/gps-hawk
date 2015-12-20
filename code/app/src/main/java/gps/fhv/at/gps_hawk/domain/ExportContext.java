@@ -16,6 +16,7 @@ public class ExportContext<T extends IExportable> {
     private String androidId;
     private Type t;
     private String collectionName;
+    private String customWhere;
 
     public List<T> getExportList() {
         return _exportList;
@@ -63,5 +64,13 @@ public class ExportContext<T extends IExportable> {
 
     public void setCollectionName(String collectionName) {
         this.collectionName = collectionName;
+    }
+
+    public String getCustomWhere() {
+        return customWhere;
+    }
+
+    public void setCustomWhere(String customWhere) {
+        this.customWhere = customWhere;
     }
 }

@@ -108,6 +108,33 @@
                     android:text="@string/start_export"/>
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/exp_lyt_3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"
+                    android:text="@string/amount_of_tracks"/>
+
+                <TextView
+                    android:id="@+id/tbx_amount_of_tracks"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/activity_horizontal_margin"/>
+
+                <Button
+                    android:id="@+id/button_do_track_export"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/start_export"/>
+
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
     <!--<RelativeLayout-->

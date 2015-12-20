@@ -219,7 +219,7 @@ public class RestClient {
             if (iJunk >= junk) {
                 iJunk = 0;
                 ++nJunk;
-                Log.d(Constants.PREFERENCES, "Converted " + nJunk * (100 / junkFactor) + "% of data to JSON");
+//                Log.d(Constants.PREFERENCES, "Converted " + nJunk * (100 / junkFactor) + "% of data to JSON");
             }
 
             // Do the actual work
@@ -229,7 +229,7 @@ public class RestClient {
 
         }
 
-        Log.d(Constants.PREFERENCES, "Ending creation of JSON-String");
+//        Log.d(Constants.PREFERENCES, "Ending creation of JSON-String");
 
         return jsonArray.toString();
     }

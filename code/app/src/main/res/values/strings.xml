@@ -50,4 +50,5 @@
     <string name="txt_valid_track_quest">All vehicles \n entered correctly?</string>
     <string name="txt_valid_track_yes">Yes</string>
     <string name="txt_valid_track_no">no</string>
+    <string name="amount_of_tracks">Amount of tracks</string>
 </resources>

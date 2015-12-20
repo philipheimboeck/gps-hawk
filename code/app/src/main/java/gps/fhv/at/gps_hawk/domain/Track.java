@@ -13,11 +13,12 @@ import gps.fhv.at.gps_hawk.Constants;
 /**
  * Created by Tobias on 30.10.2015.
  */
-public class Track extends DomainBase implements Serializable, IJSONable {
+public class Track extends DomainBase implements Serializable, IJSONable, IExportable {
     private int _id;
     private int _startDateTime;
     private int _endDateTime;
     private int _isValid;
+    private int _isExported;
 
     public Track() {
         _startDateTime = (int) Calendar.getInstance().getTimeInMillis() / 1000;
@@ -70,5 +71,13 @@ public class Track extends DomainBase implements Serializable, IJSONable {
         }
         return json.toString();
 
+    }
+
+    public int getIsExported() {
+        return _isExported;
+    }
+
+    public void setIsExported(int isExported) {
+        _isExported = isExported;
     }
 }

@@ -65,7 +65,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
                 DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
 
-                // Mark unexported Waypoints as "ExportNow"
+                // Mark unexported entities as "ExportNow" (=flag 2)
                 int count = dbFacade.markExportable(0, 2, mExpContext.getT());
 
                 while (count > 0) {
@@ -79,7 +79,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " 2 export - Start chunk with limit: " + junkSize);
 
                     // Get all Waypoints from DB to export
-                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize));
+                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
 
                     // Insert Tracks and Vehicles as Objects
                     if (mExpContext.getT().equals(Waypoint.class)) {
@@ -120,7 +120,6 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             --isCurrentlyRunning;
             i = -1;
         }
-
 
         return "";
     }
