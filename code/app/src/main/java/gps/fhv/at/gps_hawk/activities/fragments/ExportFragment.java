@@ -74,7 +74,6 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         db.markExportable(2, 0, Exception2Log.class);
         db.markExportable(2, 0, MotionValues.class);
         db.markExportable(2, 0, Track.class);
-        db.markExportable(1, 0, Track.class); // TODO- remove
 //        db.markExportable(0, 1, Waypoint.class);
 
         // Inflate the layout for this fragment

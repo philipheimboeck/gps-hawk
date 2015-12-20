@@ -21,7 +21,7 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
     private int _isExported;
 
     public Track() {
-        _startDateTime = (int) Calendar.getInstance().getTimeInMillis() / 1000;
+        _startDateTime = (int) (Calendar.getInstance().getTimeInMillis() / 1000);
     }
 
     public int getId() {
