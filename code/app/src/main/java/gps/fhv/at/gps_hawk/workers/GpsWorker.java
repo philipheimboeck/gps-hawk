@@ -132,8 +132,6 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
 
         Waypoint waypoint = WaypointFactory.getInstance().createWaypoint(location, data);
 
-        Log.v(Constants.PREFERENCES,"onLocationChange: "+ waypoint.getProvider());
-
         // Send a new message
         Intent intent = new Intent(Constants.BROADCAST_NEW_WAYPOINT);
         intent.putExtra(Constants.EXTRA_WAYPOINT, waypoint);

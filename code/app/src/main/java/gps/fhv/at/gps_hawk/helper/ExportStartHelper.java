@@ -69,7 +69,7 @@ public class ExportStartHelper {
                 @Override
                 public void onPostExecute(String success) {
 
-                    mView.doDataLoadingAsnc();
+                    if (mView != null) mView.doDataLoadingAsnc();
 //                    if (mView != null) mView.showLoading(false);
                 }
 
