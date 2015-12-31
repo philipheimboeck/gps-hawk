@@ -27,6 +27,7 @@ import gps.fhv.at.gps_hawk.persistence.broker.MotionValuesBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
+import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -153,9 +154,9 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<IExportable> getAllEntities2Export(Type t, int limit, String where) {
+    public <T extends DomainBase & IExportable> List<T> getAllEntities2Export(Class<T> t, int limit, String where) {
 
-        List<IExportable> listRet = new ArrayList<>();
+        List<T> listRet = new ArrayList<>();
         Cursor c = null;
         try {
 
@@ -180,8 +181,8 @@ public class DbFacade {
 
             int i = 0;
             while (i < c.getCount()) {
-
-                listRet.add((IExportable) broker.map2domain(c));
+                T entity = broker.map2domain(c);
+                listRet.add(entity);
                 c.moveToNext();
                 ++i;
 
@@ -237,7 +238,7 @@ public class DbFacade {
      * @param t            specific type of IExportable
      * @return -1 in case of error, 0 in case of success
      */
-    public int markExportableList(List<DomainBase> list, int updValExport, Type t) {
+    public <T extends DomainBase> int markExportableList(List<T> list, int updValExport, Type t) {
 
         if (list.size() <= 0) return -1;
 
@@ -339,6 +340,35 @@ public class DbFacade {
         return list;
     }
 
+    public <T extends DomainBase> T selectOneWhere(String condition, Class<T> cl) {
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        T domain;
+        Cursor c = null;
+        try {
+            c = getDb().query(
+                    broker.getTblName(), // Table to query
+                    null,
+                    condition,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            c.moveToFirst();
+            domain = broker.map2domain(c);
+
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return domain;
+    }
+
     public int getCount(String tbl, String where) {
         int ret = -1;
         Cursor c = null;
@@ -399,6 +429,14 @@ public class DbFacade {
                 selectionArgs);
 
         return count;
+    }
+
+    public Track findReservedTrack() {
+        return DbFacade.getInstance().selectOneWhere(TrackDef.COLUMN_NAME_EXTERNAL_ID + "IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " IS NULL", Track.class);
+    }
+
+    public int countReservedTracks() {
+        return DbFacade.getInstance().getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_EXTERNAL_ID + "IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " IS NULL");
     }
 
 }

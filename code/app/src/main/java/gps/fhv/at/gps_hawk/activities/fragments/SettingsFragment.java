@@ -12,8 +12,6 @@ import gps.fhv.at.gps_hawk.R;
  */
 public class SettingsFragment extends PreferenceFragmentCompat {
 
-    private Button mButStartExport;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

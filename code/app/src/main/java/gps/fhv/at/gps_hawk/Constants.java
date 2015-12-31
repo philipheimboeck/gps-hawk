@@ -34,6 +34,7 @@ public class Constants {
      * Preferences-Keys
      */
     public static String PREF_EXPORT_URL = "export_url";
+    public static final String PREF_ALLOW_TRACKING_WITHOUT_WLAN = "allow_tracking";
 
     /**
      * Motion capturing

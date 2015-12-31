@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -16,12 +17,14 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -58,11 +61,13 @@ import gps.fhv.at.gps_hawk.broadcast.WaypointCounter;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.exceptions.NoTrackException;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
+import gps.fhv.at.gps_hawk.tasks.ReserveTracksTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
@@ -183,7 +188,11 @@ public class CaptureActivity extends AppCompatActivity {
 
         }
 
+        // Is there a new version?
         checkForUpdate();
+
+        // Check if new tracks must be generated
+        checkForTracks();
 
         // Default vehicle
         changeVehicle(R.id.butNowFoot);
@@ -208,7 +217,7 @@ public class CaptureActivity extends AppCompatActivity {
         ArrayList<NavigationItem> navigationItems = new ArrayList<>();
         navigationItems.add(new NavigationItem(new NavigationAction(), getString(R.string.navigation_capture), R.drawable.ic_hawk_white));
         navigationItems.add(new NavigationItem(new NavigationAction(exportIntent), getString(R.string.navigation_export), 0));
-//        navigationItems.add(new NavigationItem(new NavigationAction(settingsIntent), getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
+        navigationItems.add(new NavigationItem(new NavigationAction(settingsIntent), getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
 
         mNavigation = new Navigation(this, mDrawerLayout, mDrawerList);
         mNavigation.populateNavigation(navigationItems);
@@ -347,14 +356,13 @@ public class CaptureActivity extends AppCompatActivity {
                 public void onMapReady(GoogleMap googleMap) {
                     // Show current position
                     try {
-                        if(mPermissionsGranted) {
+                        if (mPermissionsGranted) {
                             googleMap.setMyLocationEnabled(true);
 
                             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                             Criteria criteria = new Criteria();
                             Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-                            if (location != null)
-                            {
+                            if (location != null) {
                                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                                         new LatLng(location.getLatitude(), location.getLongitude()), 13));
 
@@ -467,57 +475,100 @@ public class CaptureActivity extends AppCompatActivity {
      * Start or stop the tracking
      */
     private void handleStartButton() {
-        int but = 0; // 1 = yes (running) , -1 = no
+
         // Check if service is running
         if (!ServiceDetectionHelper.isServiceRunning(getApplicationContext(), LocationService.class)) {
+            // Start was pressed
 
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            GpsWorker gpsService = new GpsWorker(locationManager, getApplicationContext());
-            mCurrentTrack = new Track();
-            DbFacade db = DbFacade.getInstance(this);
-            int trackID = (int) db.saveEntity(mCurrentTrack);
-            mCurrentTrack.setId(trackID);
+            // Find a reserved track
+            Track track;
+            try {
+                track = findReservedTrack();
 
-            if (gpsService.isGpsAvailable()) {
+                if(track != null) {
+                    // Null means that the track will be started later after it could successfully create a new track
+                    startTracking(track);
+                }
 
-                // Start the service
-                Intent intent = new Intent(this, LocationService.class);
-                intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
-                this.startService(intent);
-                mStartTrackingButton.setText(R.string.stop_tracking);
-
-                // Remove old waypoint
-                clearWaypoints();
-
-                // Reset zoom
-                mZoomed = false;
-
-                // Add the listener
-                addWaypointListener();
-                but = 1;
-            } else {
-                // Show settings to enable GPS
-                showMessageBox(this, getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(i);
-                    }
-                });
+            } catch (NoTrackException e) {
+                // Cannot start because there are no tracks left
+                Toast.makeText(CaptureActivity.this, R.string.error_no_tracks, Toast.LENGTH_LONG).show();
             }
 
         } else {
             // Else: "Stop" was pressed
-
             mStartTrackingButton.setText(R.string.start_tracking);
-            but = -1;
+
+            toggleButtons(true);
 
         }
+    }
 
-        // Visibility of Buttons/Views
-        if (but < 0) toggleButtons(true);
-        else if (but > 0) toggleButtons(false);
+    /**
+     * Actually start tracking
+     */
+    private void startTracking(Track track) {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        GpsWorker gpsService = new GpsWorker(locationManager, getApplicationContext());
 
+        if (gpsService.isGpsAvailable()) {
+
+            mCurrentTrack = track;
+
+            // Start the service
+            Intent intent = new Intent(this, LocationService.class);
+            intent.putExtra(Constants.EXTRA_TRACK, mCurrentTrack);
+            this.startService(intent);
+            mStartTrackingButton.setText(R.string.stop_tracking);
+
+            // Remove old waypoint
+            clearWaypoints();
+
+            // Reset zoom
+            mZoomed = false;
+
+            // Add the listener
+            addWaypointListener();
+
+            toggleButtons(false);
+        } else {
+            // Show settings to enable GPS
+            showMessageBox(this, getResources().getString(R.string.enable_gps_button), getResources().getString(R.string.enable_gps_button_positive), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
+        }
+    }
+
+    /**
+     * Returns a reserved track object
+     * @return
+     */
+    private Track findReservedTrack() throws NoTrackException {
+        Track track;
+
+        // Is there a reserved track left?
+        track = DbFacade.getInstance().findReservedTrack();
+        if(track != null) {
+            return track;
+        }
+
+        // Is it possible to create a track instance now?
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean allowed = preferences.getBoolean(Constants.PREF_ALLOW_TRACKING_WITHOUT_WLAN, false);
+
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
+
+        if(allowed && activeInfo != null && activeInfo.isConnected()) {
+            // Start a new track now
+            // Todo
+        }
+
+        throw new NoTrackException("No track left");
     }
 
     /**
@@ -665,6 +716,24 @@ public class CaptureActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Checks if there are any tracks left and reserves new ones if possible
+     */
+    private void checkForTracks() {
+        int nrTracks = DbFacade.getInstance().countReservedTracks();
+
+        if(nrTracks < 10) {
+            // Reserve new tracks if possible now
+            // Do only over wifi
+            ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
+
+            if(activeInfo != null && activeInfo.isConnected() && activeInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                new ReserveTracksTask(this).execute();
+            }
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -697,13 +766,6 @@ public class CaptureActivity extends AppCompatActivity {
         if (mNavigation != null) { // Is maybe null if the permissions are not set
             mNavigation.syncState();
         }
-
-//        // Start AppService
-//        Intent intent = new Intent(this, AppService.class);
-//        this.startService(intent);
-//        ServiceDetectionHelper.isServiceRunning(getApplicationContext(), AppService.class);
-
-
     }
 
     @Override

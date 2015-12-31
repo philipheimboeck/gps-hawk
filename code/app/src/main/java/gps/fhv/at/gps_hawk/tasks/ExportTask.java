@@ -93,7 +93,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
                         // If no successful - be sure to reset flags
                         //if (!result) {
-                            throw new UnExpectedResultException("An unexpected result occured while exporting data");
+                            throw new UnExpectedResultException("An unexpected result occurred while exporting data");
                         //}
 
                     } catch (UnExpectedResultException e) {

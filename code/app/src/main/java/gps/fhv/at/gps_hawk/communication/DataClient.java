@@ -173,7 +173,7 @@ public class DataClient extends RestClient implements IDataClient {
     }
 
     @Override
-    public void exportWaypoints(ArrayList<Waypoint> waypoints) throws CommunicationException {
+    public void exportWaypoints(List<Waypoint> waypoints) throws CommunicationException {
         try {
             URL url = new URL(REST_EXPORT_WAYPOINTS);
             HashMap<String, String> headers = getAuthorizationHeaders();
@@ -196,7 +196,7 @@ public class DataClient extends RestClient implements IDataClient {
     }
 
     @Override
-    public void exportMotionValues(ArrayList<MotionValues> values) throws CommunicationException {
+    public void exportMotionValues(List<MotionValues> values) throws CommunicationException {
         try {
             URL url = new URL(REST_EXPORT_MOTIONVALUES);
             HashMap<String, String> headers = getAuthorizationHeaders();

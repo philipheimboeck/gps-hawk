@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
+import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
@@ -30,15 +32,12 @@ public class ExportFragment extends Fragment implements IUpdateableView {
     private Button mButStartExportMotions;
     private Button mButStartExportTracks;
 
-    private View.OnClickListener mButExportListener;
-
     private TextView mTextViewAmount;
     private TextView mTextViewAmountExc;
     private TextView mTextViewAmountMotion;
     private TextView mTextViewAmountTracks;
 
     private View mProgressView;
-    private ExportTask mExportTask;
     private LinearLayout mExpWrapper;
     private ExportStartHelper mExportStartHelper;
     private ExportMetadataLoaderTask mExpDataLoader;
@@ -66,16 +65,18 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
         mButStartExportTracks = (Button) view.findViewById(R.id.button_do_track_export);
 
-        mButExportListener = new View.OnClickListener() {
+        mButStartExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                handleButExport(v.getId());
+                new UploadWaypointsTask(getContext()).execute();
             }
-        };
-        mButStartExport.setOnClickListener(mButExportListener);
-        mButStartExportExc.setOnClickListener(mButExportListener);
-        mButStartExportMotions.setOnClickListener(mButExportListener);
-        mButStartExportTracks.setOnClickListener(mButExportListener);
+        });
+//        mButStartExportExc.setOnClickListener(mButExportListener);
+//        mButStartExportMotions.setOnClickListener(mButExportListener);
+//        mButStartExportTracks.setOnClickListener(mButExportListener);
+        mButStartExportExc.setEnabled(false);
+        mButStartExportMotions.setEnabled(false);
+        mButStartExportTracks.setEnabled(false);
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
@@ -171,12 +172,6 @@ public class ExportFragment extends Fragment implements IUpdateableView {
             }
             ++i;
         }
-    }
-
-    private void handleButExport(int id) {
-
-        mExportStartHelper.startExport(id);
-
     }
 
 }

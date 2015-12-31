@@ -24,6 +24,10 @@ public class ReserveTracksTask extends AsyncTask<Void, Void, List<Track>> {
     private Context mContext;
     private IAsyncTaskCaller<Void, List<Track>> mCaller;
 
+    public ReserveTracksTask(Context context) {
+        this(null, context);
+    }
+
     public ReserveTracksTask(IAsyncTaskCaller<Void, List<Track>> caller, Context context) {
         mCaller = caller;
         mContext = context;
@@ -49,7 +53,9 @@ public class ReserveTracksTask extends AsyncTask<Void, Void, List<Track>> {
             facade.saveEntities(tracks.toArray(new Track[tracks.size()]), tracks.size());
 
             // Return the tracks
-            mCaller.onPostExecute(tracks);
+            if(mCaller != null) {
+                mCaller.onPostExecute(tracks);
+            }
 
         } catch (SQLException e) {
             Log.e(Constants.PREFERENCES, "Failed to persist the entities!", e);
