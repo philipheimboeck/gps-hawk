@@ -9,6 +9,7 @@ public class TrackDef extends BaseTableDef {
 
     public static final String COLUMN_NAME_DATETIME_START = "dateTimeStart";
     public static final String COLUMN_NAME_DATETIME_END = "dateTimeEnd";
+    public static final String COLUMN_NAME_EXTERNAL_ID = "externalId";
     public static final String COLUMN_NAME_IS_VALID = "isValid";
 
     @Override
@@ -22,7 +23,8 @@ public class TrackDef extends BaseTableDef {
                 COLUMN_NAME_DATETIME_START + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_DATETIME_END + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_IS_VALID + TYPE_INT + COMMA_SEP +
-                        COLUMN_NAME_IS_EXPORTED + TYPE_INT
+                        COLUMN_NAME_IS_EXPORTED + TYPE_INT +
+                        COLUMN_NAME_EXTERNAL_ID + TYPE_TEXT
                 ;
     }
 
@@ -36,6 +38,10 @@ public class TrackDef extends BaseTableDef {
 
         if (oldVersion <= 14) {
             sb.append("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_IS_EXPORTED + " INT AFTER " + COLUMN_NAME_IS_VALID + ";");
+        }
+
+        if (oldVersion <= 15) {
+            sb.append("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_EXTERNAL_ID + " TEXT AFTER " + COLUMN_NAME_IS_EXPORTED + ";");
         }
 
         return sb.toString();

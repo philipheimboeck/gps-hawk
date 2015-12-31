@@ -13,5 +13,4 @@ public interface IAsyncTaskCaller<Progress, Result> {
     void onProgressUpdate(Progress... progress);
 
     void onPreExecute();
-
 }

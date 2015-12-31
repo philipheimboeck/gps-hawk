@@ -23,6 +23,7 @@ public class TrackBroker extends BrokerBase {
         values.put(TrackDef.COLUMN_NAME_DATETIME_END, t.getEndDateTime());
         values.put(TrackDef.COLUMN_NAME_IS_VALID, t.getIsValid());
         values.put(TrackDef.COLUMN_NAME_IS_EXPORTED, t.getIsExported());
+        values.put(TrackDef.COLUMN_NAME_EXTERNAL_ID, t.getExternalId());
 
         return values;
     }
@@ -36,6 +37,7 @@ public class TrackBroker extends BrokerBase {
         t.setEndDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END)));
         t.setIsValid(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_VALID)));
         t.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_EXPORTED)));
+        t.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_EXTERNAL_ID)));
 
         return (T) t;
     }

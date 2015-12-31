@@ -78,7 +78,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " 2 export - Start chunk with limit: " + junkSize);
 
                     // Get all Waypoints from DB to export
-                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
+                    //mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
 
                     // Insert Tracks and Vehicles as Objects
                     if (mExpContext.getT().equals(Waypoint.class)) {
@@ -89,12 +89,12 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     DataClient client = new DataClient(mExpContext.getContext());
                     try {
 
-                        boolean result = client.exportWaypoints(mExpContext);
+                        //boolean result = client.exportWaypoints();
 
                         // If no successful - be sure to reset flags
-                        if (!result) {
+                        //if (!result) {
                             throw new UnExpectedResultException("An unexpected result occured while exporting data");
-                        }
+                        //}
 
                     } catch (UnExpectedResultException e) {
                         Log.e(Constants.PREFERENCES, "Unexpected result", e);
@@ -105,9 +105,9 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     }
 
                     // Mark "ExportNow" Entities as "Exported"
-                    dbFacade.markExportableList(mExpContext.getExportList(), 1, mExpContext.getT());
+                    //dbFacade.markExportableList(mExpContext.getExportList(), 1, mExpContext.getT());
 
-                    count = (count > junkSize) ? count - junkSize : 0;
+                    //count = (count > junkSize) ? count - junkSize : 0;
                 }
 
                 // if was a default export - delete it again to continue exporting
