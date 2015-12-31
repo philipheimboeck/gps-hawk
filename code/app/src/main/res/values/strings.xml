@@ -29,7 +29,6 @@
     <string name="amount_of_captured_waypoints">Amount of captured waypoints</string>
     <string name="error_permission_location_required">Location permission is required for this application to work</string>
     <string name="txt_export_url">Export-URL:</string>
-    <string name="txt_export_url_default">http://intern.ts-maeder.at/application/debug/gps</string>
     <string name="navigation_settings">Settings</string>
     <string name="notification_tracking_title">GPS Hawk Tracking</string>
     <string name="notification_tracking_text">GPS Hawk is tracking your location</string>

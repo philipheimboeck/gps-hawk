@@ -15,8 +15,9 @@ import gps.fhv.at.gps_hawk.Constants;
  */
 public class Track extends DomainBase implements Serializable, IJSONable, IExportable {
     private int _id;
-    private int _startDateTime;
-    private int _endDateTime;
+    private String _externalId;
+    private long _startDateTime;
+    private long _endDateTime;
     private int _isValid;
     private int _isExported;
 
@@ -32,19 +33,27 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
         _id = id;
     }
 
-    public int getStartDateTime() {
+    public String getExternalId() {
+        return _externalId;
+    }
+
+    public void setExternalId(String _externalId) {
+        this._externalId = _externalId;
+    }
+
+    public long getStartDateTime() {
         return _startDateTime;
     }
 
-    public void setStartDateTime(int startDateTime) {
+    public void setStartDateTime(long startDateTime) {
         _startDateTime = startDateTime;
     }
 
-    public int getEndDateTime() {
+    public long getEndDateTime() {
         return _endDateTime;
     }
 
-    public void setEndDateTime(int endDateTime) {
+    public void setEndDateTime(long endDateTime) {
         _endDateTime = endDateTime;
     }
 

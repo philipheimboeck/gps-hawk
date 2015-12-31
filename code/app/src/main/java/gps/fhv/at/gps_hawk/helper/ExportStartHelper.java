@@ -54,10 +54,7 @@ public class ExportStartHelper {
         if (id < 0) mLastExportStarted = Calendar.getInstance();
 
         try {
-            String url = mContext.getString(R.string.txt_export_url_default);
-
             ExportContext exportContext = new ExportContext();
-            exportContext.setUrl(url);
             exportContext.setContext(mContext);
             exportContext.setAndroidId(Settings.Secure.getString(mContext.getContentResolver(),
                     Settings.Secure.ANDROID_ID));

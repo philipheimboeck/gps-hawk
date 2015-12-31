@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
+import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -24,13 +22,11 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.prefs.PreferenceChangeEvent;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.broadcast.TokenInvalidReceiver;
 import gps.fhv.at.gps_hawk.domain.IJSONable;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
+import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Author: Philip Heimböck
@@ -38,10 +34,10 @@ import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
  */
 public class RestClient {
 
-//    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
-    protected static final String REST_SERVER = "http://172.22.26.33:8080/webservice/fhvgis/";
+    //    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
+    protected static final String REST_SERVER = "http://192.168.0.3:8080/webservice/fhvgis/";
 
-    private Context mContext;
+    protected Context mContext;
 
     public RestClient(Context context) {
         this.mContext = context;
@@ -105,7 +101,7 @@ public class RestClient {
         }
 
         // Token Invalid?
-        if(answer.responseCode == 401) {
+        if (answer.responseCode == 401) {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.BROADCAST_INVALID_TOKEN));
         }
 
@@ -124,39 +120,7 @@ public class RestClient {
         return get(url, null);
     }
 
-    public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key) throws IOException, NoConnectionException {
-        return post(url, list, key, null);
-    }
-
-    public <T extends IJSONable> HTTPAnswer post(URL url, List<T> list, String key, Map<String, String> otherParams) throws IOException, NoConnectionException {
-
-        StringBuilder result = new StringBuilder();
-
-        if (otherParams != null && !otherParams.isEmpty()) {
-            String otherContent = getPostDataString(otherParams);
-            result.append(otherContent);
-        }
-
-        if (list.size() > 0 && result.length() > 0) result.append("&");
-
-        String content = getJsonArray(list);
-        result.append(URLEncoder.encode(key, "UTF-8"));
-        result.append("=");
-        Log.d(Constants.PREFERENCES, "Encoding Array to UTF-8");
-
-        // fast hack - only encode exceptions!
-        if ("exceptions".equals(key)) {
-            result.append(URLEncoder.encode(content, "UTF-8"));
-        } else {
-            result.append(content);
-        }
-        Log.d(Constants.PREFERENCES, "Finished Encoding of Array to UTF-8");
-
-        return post(url, result.toString());
-    }
-
-
-    private HTTPAnswer post(URL url, String content) throws IOException, NoConnectionException {
+    private HTTPAnswer post(URL url, String content, Map<String, String> headers) throws IOException, NoConnectionException {
         if (!checkConnection()) {
             throw new NoConnectionException();
         }
@@ -168,6 +132,13 @@ public class RestClient {
         try {
             connection = createConnection(url, "POST");
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+
+            // Provide the headers
+            if (headers != null) {
+                for (String header : headers.keySet()) {
+                    connection.setRequestProperty(header, headers.get(header));
+                }
+            }
 
             // Start the query
             connection.connect();
@@ -206,7 +177,7 @@ public class RestClient {
         }
 
         // Token Invalid?
-        if(answer.responseCode == 401) {
+        if (answer.responseCode == 401) {
             LocalBroadcastManager.getInstance(mContext).sendBroadcast(new Intent(Constants.BROADCAST_INVALID_TOKEN));
         }
 
@@ -215,35 +186,27 @@ public class RestClient {
     }
 
     public HTTPAnswer post(URL url, HashMap<String, String> params) throws IOException, NoConnectionException {
-        String content = getPostDataString(params);
-        return post(url, content);
+        return post(url, params, null);
     }
 
-    protected <T extends IJSONable> String getJsonArray(List<T> list) {
+    public HTTPAnswer post(URL url, HashMap<String, String> params, Map<String, String> headers) throws IOException, NoConnectionException {
+        String content = getPostDataString(params);
+        return post(url, content, headers);
+    }
+
+    /**
+     * Returns a json string of the entities
+     *
+     * @param list
+     * @param <T>
+     * @return
+     */
+    public <T extends IJSONable> String getJsonArray(List<T> list) {
         JSONArray jsonArray = new JSONArray();
-        int nTotal = list.size();
-        int nJunk = 0; // to be counted unit 10
-        int junkFactor = 4; // list.size() > 1000 ? 100 : 10;
-        int junk = nTotal / junkFactor;
-        int iJunk = 0;
 
         for (IJSONable o : list) {
-
-            // Reporting only
-            if (iJunk >= junk) {
-                iJunk = 0;
-                ++nJunk;
-//                Log.d(Constants.PREFERENCES, "Converted " + nJunk * (100 / junkFactor) + "% of data to JSON");
-            }
-
-            // Do the actual work
             jsonArray.put(o.toJSON());
-
-            ++iJunk;
-
         }
-
-//        Log.d(Constants.PREFERENCES, "Ending creation of JSON-String");
 
         return jsonArray.toString();
     }
@@ -328,5 +291,14 @@ public class RestClient {
             connection.setDoOutput(true);
 
         return connection;
+    }
+
+    @NonNull
+    protected HashMap<String, String> getAuthorizationHeaders() {
+        String authorizationToken = TokenHelper.getToken(mContext);
+
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Authorization", authorizationToken);
+        return headers;
     }
 }

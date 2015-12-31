@@ -10,7 +10,7 @@ import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.communication.ExportClient;
+import gps.fhv.at.gps_hawk.communication.DataClient;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
@@ -86,10 +86,10 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     }
 
                     // Send via Web
-                    ExportClient client = new ExportClient(mExpContext.getContext());
+                    DataClient client = new DataClient(mExpContext.getContext());
                     try {
 
-                        boolean result = client.exportCollectedWaypoints(mExpContext);
+                        boolean result = client.exportWaypoints(mExpContext);
 
                         // If no successful - be sure to reset flags
                         if (!result) {
