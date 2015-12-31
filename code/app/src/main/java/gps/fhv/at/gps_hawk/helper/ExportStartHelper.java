@@ -1,8 +1,6 @@
 package gps.fhv.at.gps_hawk.helper;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,7 +13,9 @@ import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.IExportable;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
+import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
+import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 
@@ -45,7 +45,7 @@ public class ExportStartHelper {
 
             // If last export was within timegap, don't do it again
             if (now.before(mLastExportStarted)) {
-                Log.i(Constants.PREFERENCES,"Don't start automatical export, has just done it before!");
+                Log.i(Constants.PREFERENCES, "Don't start automatical export, has just done it before!");
                 return;
             }
         }
@@ -69,11 +69,8 @@ public class ExportStartHelper {
                 @Override
                 public void onPostExecute(String success) {
 
-                    if ("ERROR".equals(success)) {
-                        Toast.makeText(mContext, mContext.getString(R.string.error_export_failed), Toast.LENGTH_LONG).show();
-                    }
-
-                    if (mView != null) mView.showLoading(false);
+                    if (mView != null) mView.doDataLoadingAsnc();
+//                    if (mView != null) mView.showLoading(false);
                 }
 
                 @Override
@@ -112,6 +109,11 @@ public class ExportStartHelper {
             case R.id.button_do_motion_export:
                 exportContext.setT(MotionValues.class);
                 exportContext.setCollectionName("motionValues");
+                break;
+            case R.id.button_do_track_export:
+                exportContext.setT(Track.class);
+                exportContext.setCollectionName("tracks");
+//                exportContext.setCustomWhere(TrackDef.COLUMN_NAME_DATETIME_END + " > 0");
                 break;
             default:
                 // export all data - is handled by ExportTask itself

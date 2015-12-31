@@ -49,13 +49,16 @@ public class LocationService extends Service {
          * Using a trick, so that we can pass arguments to "onDestroy"
          * src: http://stackoverflow.com/questions/14352273/pass-data-to-ondestroy-of-service
          */
-        final boolean terminate = intent.getBooleanExtra("terminate", false);
-        if (terminate) {
+        if ( intent != null ) {
+            final boolean terminate = intent.getBooleanExtra("terminate", false);
+            if (terminate) {
 
-            int trackIsValid = intent.getIntExtra("isValid",0);
-            onCustomDestroy(trackIsValid);
-            return START_NOT_STICKY;
+                Log.v(Constants.PREFERENCES, "Terminate service - received intent `terminate`");
+                int trackIsValid = intent.getIntExtra("isValid", 0);
+                onCustomDestroy(trackIsValid);
+                return START_NOT_STICKY;
 
+            }
         }
 
         if (mGpsSvc.isGpsAvailable()) {

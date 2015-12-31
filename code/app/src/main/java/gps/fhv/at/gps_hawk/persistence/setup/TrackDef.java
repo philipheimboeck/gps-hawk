@@ -21,17 +21,23 @@ public class TrackDef extends BaseTableDef {
         return
                 COLUMN_NAME_DATETIME_START + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_DATETIME_END + TYPE_INT + COMMA_SEP +
-                        COLUMN_NAME_IS_VALID + TYPE_INT
+                        COLUMN_NAME_IS_VALID + TYPE_INT + COMMA_SEP +
+                        COLUMN_NAME_IS_EXPORTED + TYPE_INT
                 ;
     }
 
     @Override
     public String getUpdateScript(int oldVersion) {
-        switch (oldVersion) {
-            case 13:
-                return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_IS_VALID + " INT AFTER dateTimeEnd";
-            default:
-                return null;
+        StringBuilder sb = new StringBuilder();
+
+        if (oldVersion <= 13) {
+            sb.append("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_IS_VALID + " INT AFTER dateTimeEnd;");
         }
+
+        if (oldVersion <= 14) {
+            sb.append("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_IS_EXPORTED + " INT AFTER " + COLUMN_NAME_IS_VALID + ";");
+        }
+
+        return sb.toString();
     }
 }

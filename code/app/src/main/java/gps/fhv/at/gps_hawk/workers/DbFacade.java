@@ -69,12 +69,22 @@ public class DbFacade {
     public <T extends DomainBase> long saveEntity(T entity) {
         BrokerBase broker = mBrokerMap.get(entity.getClass());
         ContentValues insertValues = broker.map2db(entity);
-        long newRowId = getDb().insert(broker.getTblName(), null, insertValues);
+
+        long newRowId;
+
+        // If has id --> update
+        if (entity.getId() > 0) {
+            String[] selectionArgs = {String.valueOf(entity.getId())};
+            newRowId = getDb().update(broker.getTblName(), insertValues, BaseTableDef._ID + " = ?", selectionArgs);
+        } else {
+            // else --> insert
+            newRowId = getDb().insert(broker.getTblName(), null, insertValues);
+        }
         return newRowId;
     }
 
     public void emptyTable(String tableName) {
-        String sql = "DELETE FROM "+ tableName +";";
+        String sql = "DELETE FROM " + tableName + ";";
         try {
             getDb().execSQL(sql);
         } catch (Exception e) {
@@ -143,7 +153,7 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<IExportable> getAllEntities2Export(Type t, int limit) {
+    public List<IExportable> getAllEntities2Export(Type t, int limit, String where) {
 
         List<IExportable> listRet = new ArrayList<>();
         Cursor c = null;
@@ -157,7 +167,7 @@ public class DbFacade {
             c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
-                    BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2",                                // The columns for the WHERE clause
+                    BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2" + (where != null ? " AND " + where : ""),                                // The columns for the WHERE clause
                     null,                              // The values for the WHERE clause
                     null,                                     // don't group the rows
                     null,                                     // don't filter by row groups
@@ -202,6 +212,11 @@ public class DbFacade {
 
         // Which row to update, based on the ID
         String selection = BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
+
+        // If unexported are desired, include those that are NULL
+        if (whereIsExport == 0)
+            selection += " OR " + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " IS NULL ";
+
         String[] selectionArgs = {String.valueOf(whereIsExport)};
 
         int count = db.update(

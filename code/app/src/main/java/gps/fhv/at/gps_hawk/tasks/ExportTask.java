@@ -30,7 +30,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
     private ExportContext mExpContext;
     private IAsyncTaskCaller<Void, String> mCaller;
     public static int isCurrentlyRunning = 0;
-    private static int[] mExpIds = {R.id.button_do_export, R.id.button_do_motion_export, R.id.button_do_exception_export};
+    private static int[] mExpIds = {R.id.button_do_export, R.id.button_do_motion_export, R.id.button_do_exception_export, R.id.button_do_track_export};
 
 
     public ExportTask(ExportContext expContext, final IAsyncTaskCaller<Void, String> caller) {
@@ -44,7 +44,6 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
     protected void onPostExecute(final String result) {
         mCaller.onPostExecute(result);
-
     }
 
     @Override
@@ -65,7 +64,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
 
                 DbFacade dbFacade = DbFacade.getInstance(mExpContext.getContext());
 
-                // Mark unexported Waypoints as "ExportNow"
+                // Mark unexported entities as "ExportNow" (=flag 2)
                 int count = dbFacade.markExportable(0, 2, mExpContext.getT());
 
                 while (count > 0) {
@@ -79,7 +78,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " 2 export - Start chunk with limit: " + junkSize);
 
                     // Get all Waypoints from DB to export
-                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize));
+                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
 
                     // Insert Tracks and Vehicles as Objects
                     if (mExpContext.getT().equals(Waypoint.class)) {
@@ -120,7 +119,6 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
             --isCurrentlyRunning;
             i = -1;
         }
-
 
         return "";
     }

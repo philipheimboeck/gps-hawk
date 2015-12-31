@@ -13,6 +13,7 @@ import gps.fhv.at.gps_hawk.Constants;
 public class MotionValues extends DomainBase implements IExportable, IJSONable {
 
     public static final int MOTION_TYPE_ACCELEROMETER = 0;
+    public static final int MOTION_TYPE_LINEAR_ACCELEROMETER = 1;
 
     private int _id;
 
