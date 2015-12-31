@@ -47,18 +47,21 @@ public class ReserveTracksTask extends AsyncTask<Void, Void, List<Track>> {
 
     @Override
     protected void onPostExecute(List<Track> tracks) {
-        // Persist the entities
-        DbFacade facade = DbFacade.getInstance();
-        try {
-            facade.saveEntities(tracks.toArray(new Track[tracks.size()]), tracks.size());
+        if(tracks != null) {
 
-            // Return the tracks
-            if(mCaller != null) {
-                mCaller.onPostExecute(tracks);
+            // Persist the entities
+            DbFacade facade = DbFacade.getInstance();
+            try {
+                facade.saveEntities(tracks.toArray(new Track[tracks.size()]), tracks.size());
+
+                // Return the tracks
+                if(mCaller != null) {
+                    mCaller.onPostExecute(tracks);
+                }
+
+            } catch (SQLException e) {
+                Log.e(Constants.PREFERENCES, "Failed to persist the entities!", e);
             }
-
-        } catch (SQLException e) {
-            Log.e(Constants.PREFERENCES, "Failed to persist the entities!", e);
         }
     }
 }

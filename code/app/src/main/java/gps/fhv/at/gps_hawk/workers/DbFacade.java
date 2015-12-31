@@ -163,7 +163,7 @@ public class DbFacade {
             BrokerBase broker = mBrokerMap.get(t);
 
             // How you want the results sorted in the resulting Cursor
-            String sortOrder = BaseTableDef._ID + " ASC LIMIT " + limit;
+            String sortOrder = BaseTableDef._ID + " ASC" + (limit > 0 ? " LIMIT " + limit : "");
 
             c = getDb().query(
                     broker.getTblName(),  // The table to query
@@ -358,7 +358,12 @@ public class DbFacade {
             );
 
             c.moveToFirst();
-            domain = broker.map2domain(c);
+
+            if(c.getCount() > 0) {
+                domain = broker.map2domain(c);
+            } else {
+                domain = null;
+            }
 
         } finally {
             if (c != null) {
@@ -432,11 +437,15 @@ public class DbFacade {
     }
 
     public Track findReservedTrack() {
-        return DbFacade.getInstance().selectOneWhere(TrackDef.COLUMN_NAME_EXTERNAL_ID + "IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " IS NULL", Track.class);
+        return DbFacade.getInstance().selectOneWhere(TrackDef.COLUMN_NAME_EXTERNAL_ID + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " = 0", Track.class);
     }
 
     public int countReservedTracks() {
-        return DbFacade.getInstance().getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_EXTERNAL_ID + "IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " IS NULL");
+        int count = DbFacade.getInstance().getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_EXTERNAL_ID + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " = 0");
+        if (count < 0) {
+            return 0;
+        }
+        return count;
     }
 
 }

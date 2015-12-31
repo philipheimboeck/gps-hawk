@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
@@ -68,15 +69,13 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
                 new UploadWaypointsTask(getContext()).execute();
             }
         });
 //        mButStartExportExc.setOnClickListener(mButExportListener);
 //        mButStartExportMotions.setOnClickListener(mButExportListener);
 //        mButStartExportTracks.setOnClickListener(mButExportListener);
-        mButStartExportExc.setEnabled(false);
-        mButStartExportMotions.setEnabled(false);
-        mButStartExportTracks.setEnabled(false);
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);

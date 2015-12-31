@@ -49,6 +49,6 @@ public class TrackBroker extends BrokerBase {
 
     @Override
     public String[] getColumns() {
-        return new String[]{TrackDef.COLUMN_NAME_DATETIME_END, TrackDef.COLUMN_NAME_DATETIME_START};
+        return new String[]{TrackDef.COLUMN_NAME_DATETIME_END, TrackDef.COLUMN_NAME_DATETIME_START, TrackDef.COLUMN_NAME_EXTERNAL_ID};
     }
 }

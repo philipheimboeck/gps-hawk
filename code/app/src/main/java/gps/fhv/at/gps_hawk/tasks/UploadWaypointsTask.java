@@ -37,13 +37,15 @@ public class UploadWaypointsTask extends AsyncTask<Void, Void, List<Waypoint>> {
         DataClient client = new DataClient(mContext);
         try {
             DbFacade facade = DbFacade.getInstance();
-            List<Waypoint> waypoints = facade.getAllEntities2Export(Waypoint.class, 30, null);
+            List<Waypoint> waypoints = facade.getAllEntities2Export(Waypoint.class, 0, null);
 
-            // Export all waypoints
-            client.exportWaypoints(waypoints);
+            if(!waypoints.isEmpty()) {
+                // Export all waypoints
+                client.exportWaypoints(waypoints);
 
-            // When successful mark them as exported
-            facade.markExportableList(waypoints, 1, Waypoint.class);
+                // When successful mark them as exported
+                facade.markExportableList(waypoints, 1, Waypoint.class);
+            }
 
             return waypoints;
 

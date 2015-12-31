@@ -738,6 +738,10 @@ public class CaptureActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        if(grantResults.length <= 0) {
+            return;
+        }
+
         switch (requestCode) {
             case Constants.REQUEST_CODE_PERMISSION_GPS:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
