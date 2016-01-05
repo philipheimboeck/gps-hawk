@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Created by Tobias on 30.10.2015.
@@ -70,8 +71,8 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
         try {
             json.put("id", getId());
 
-            json.put("startDateTime", getStartDateTime());
-            json.put("endDateTime", getEndDateTime());
+            json.put("startDate", getStartDateTime());
+            json.put("endDate", getEndDateTime());
             json.put("isValid", getIsValid());
 
         } catch (JSONException e) {

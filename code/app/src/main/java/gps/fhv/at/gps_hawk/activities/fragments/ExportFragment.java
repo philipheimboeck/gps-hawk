@@ -18,6 +18,7 @@ import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
+import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
 import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
@@ -75,7 +76,13 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         });
 //        mButStartExportExc.setOnClickListener(mButExportListener);
 //        mButStartExportMotions.setOnClickListener(mButExportListener);
-//        mButStartExportTracks.setOnClickListener(mButExportListener);
+        mButStartExportTracks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadTracksTask(getContext()).execute();
+            }
+        });
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);

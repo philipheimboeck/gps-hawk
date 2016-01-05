@@ -10,6 +10,7 @@ import android.util.Log;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
+import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
 import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.IExportWorker;
 
@@ -74,8 +75,8 @@ public class ExportNetworkReceiver extends BroadcastReceiver implements IExportW
     private synchronized void startExport() {
         //mExportStartHelper = new ExportStartHelper(mContext, null);
         //mExportStartHelper.startExport(-1);
-        UploadWaypointsTask task = new UploadWaypointsTask(mContext);
-        task.execute();
+        new UploadTracksTask(mContext).execute();
+        new UploadWaypointsTask(mContext).execute();
     }
 
 }

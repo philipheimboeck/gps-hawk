@@ -22,6 +22,8 @@ public interface IDataClient {
 
     Track finishTrack(Calendar calendar, Track track) throws CommunicationException;
 
+    void exportTracks(List<Track> tracks) throws CommunicationException;
+
     void exportWaypoints(List<Waypoint> waypoints) throws CommunicationException;
 
     void exportMotionValues(List<MotionValues> values) throws CommunicationException;

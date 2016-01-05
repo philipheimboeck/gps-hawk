@@ -33,6 +33,7 @@ public class DataClient extends RestClient implements IDataClient {
     private static final String REST_START_NEW_TRACK = REST_DATA + "starttrack/$TIME";
     private static final String REST_START_TRACK = REST_START_NEW_TRACK + "?track=$TRACK";
     private static final String REST_FINISH_TRACK = REST_DATA + "finishtrack/$TIME/$TRACK";
+    private static final String REST_EXPORT_TRACKS = REST_DATA + "updatetracks";
     private static final String REST_EXPORT_WAYPOINTS = REST_DATA + "waypoints";
     private static final String REST_EXPORT_MOTIONVALUES = REST_DATA + "motionValues";
 
@@ -167,6 +168,29 @@ public class DataClient extends RestClient implements IDataClient {
             throw new RuntimeException("Invalid URL!");
 
         } catch (NoConnectionException | IOException | JSONException e) {
+            Log.e(Constants.PREFERENCES, "Finish track failed: ", e);
+            throw new CommunicationException("Finish track failed", e);
+        }
+    }
+
+    @Override
+    public void exportTracks(List<Track> tracks) throws CommunicationException {
+        try {
+            URL url = new URL(REST_EXPORT_TRACKS);
+            HashMap<String, String> headers = getAuthorizationHeaders();
+            HashMap<String, String> content = new HashMap<>();
+            content.put("tracks", getJsonArray(tracks));
+
+            // Get the tracks
+            HTTPAnswer answer = post(url, content, headers);
+            if (answer.responseCode != 200) {
+                throw new CommunicationException("Error occurred while finishing track!");
+            }
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid URL!");
+
+        } catch (NoConnectionException | IOException e) {
             Log.e(Constants.PREFERENCES, "Finish track failed: ", e);
             throw new CommunicationException("Finish track failed", e);
         }

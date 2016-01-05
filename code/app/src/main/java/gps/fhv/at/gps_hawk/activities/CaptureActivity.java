@@ -565,7 +565,7 @@ public class CaptureActivity extends AppCompatActivity {
 
         if(allowed && activeInfo != null && activeInfo.isConnected()) {
             // Start a new track now
-            // Todo
+            // Todo Retrieve a new track from the server
         }
 
         throw new NoTrackException("No track left");

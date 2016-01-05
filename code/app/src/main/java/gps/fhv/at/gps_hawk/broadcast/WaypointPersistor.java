@@ -52,8 +52,7 @@ public class WaypointPersistor extends BroadcastReceiver {
 
         if(allowed && activeInfo != null && activeInfo.isConnected()) {
             // Start the upload activity
-            UploadWaypointsTask task = new UploadWaypointsTask(context);
-            task.execute();
+            new UploadWaypointsTask(context).execute();
         }
     }
 }
