@@ -42,4 +42,8 @@ public abstract class BrokerBase {
 
     public abstract String[] getColumns();
 
+    public String getExportableWhere() {
+        return null;
+    }
+
 }

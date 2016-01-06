@@ -37,7 +37,7 @@ public class TrackBroker extends BrokerBase {
         t.setEndDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END)));
         t.setIsValid(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_VALID)));
         t.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_EXPORTED)));
-        t.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_EXTERNAL_ID)));
+        t.setExternalId(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_EXTERNAL_ID)));
 
         return (T) t;
     }
@@ -50,5 +50,10 @@ public class TrackBroker extends BrokerBase {
     @Override
     public String[] getColumns() {
         return new String[]{TrackDef.COLUMN_NAME_DATETIME_END, TrackDef.COLUMN_NAME_DATETIME_START, TrackDef.COLUMN_NAME_EXTERNAL_ID};
+    }
+
+    @Override
+    public String getExportableWhere() {
+        return TrackDef.COLUMN_NAME_EXTERNAL_ID + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " > 0 AND " + TrackDef.COLUMN_NAME_DATETIME_END + " > 0";
     }
 }

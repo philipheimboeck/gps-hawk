@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -201,14 +203,14 @@ public class RestClient {
      * @param <T>
      * @return
      */
-    public <T extends IJSONable> String getJsonArray(List<T> list) {
+    public <T extends IJSONable> JSONArray getJsonArray(List<T> list) throws JSONException {
         JSONArray jsonArray = new JSONArray();
 
         for (IJSONable o : list) {
             jsonArray.put(o.toJSON());
         }
 
-        return jsonArray.toString();
+        return jsonArray;
     }
 
     /**

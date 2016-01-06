@@ -179,20 +179,21 @@ public class DataClient extends RestClient implements IDataClient {
             URL url = new URL(REST_EXPORT_TRACKS);
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
-            content.put("tracks", getJsonArray(tracks));
+
+            content.put("tracks", new JSONObject().put("tracks", getJsonArray(tracks)).toString());
 
             // Get the tracks
             HTTPAnswer answer = post(url, content, headers);
             if (answer.responseCode != 200) {
-                throw new CommunicationException("Error occurred while finishing track!");
+                throw new CommunicationException("Error occurred while exporting tracks!");
             }
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");
 
-        } catch (NoConnectionException | IOException e) {
-            Log.e(Constants.PREFERENCES, "Finish track failed: ", e);
-            throw new CommunicationException("Finish track failed", e);
+        } catch (NoConnectionException | IOException | JSONException e) {
+            Log.e(Constants.PREFERENCES, "Exporting tracks failed: ", e);
+            throw new CommunicationException("Exporting tracks failed", e);
         }
     }
 
@@ -202,20 +203,21 @@ public class DataClient extends RestClient implements IDataClient {
             URL url = new URL(REST_EXPORT_WAYPOINTS);
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
-            content.put("waypoints", getJsonArray(waypoints));
+
+            content.put("waypoints", new JSONObject().put("waypoints", getJsonArray(waypoints)).toString());
 
             // Get the tracks
             HTTPAnswer answer = post(url, content, headers);
             if (answer.responseCode != 200) {
-                throw new CommunicationException("Error occurred while finishing track!");
+                throw new CommunicationException("Error occurred while exporting waypoints!");
             }
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");
 
-        } catch (NoConnectionException | IOException e) {
-            Log.e(Constants.PREFERENCES, "Finish track failed: ", e);
-            throw new CommunicationException("Finish track failed", e);
+        } catch (NoConnectionException | IOException | JSONException e) {
+            Log.e(Constants.PREFERENCES, "Exporting waypoints failed: ", e);
+            throw new CommunicationException("Exporting waypoints failed", e);
         }
     }
 
@@ -225,20 +227,20 @@ public class DataClient extends RestClient implements IDataClient {
             URL url = new URL(REST_EXPORT_MOTIONVALUES);
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
-            content.put("motionValues", getJsonArray(values));
+            content.put("motionValues", new JSONObject().put("motionValues", getJsonArray(values)).toString());
 
             // Get the tracks
             HTTPAnswer answer = post(url, content, headers);
             if (answer.responseCode != 200) {
-                throw new CommunicationException("Error occurred while finishing track!");
+                throw new CommunicationException("Error occurred while exporting motion values!");
             }
 
         } catch (MalformedURLException e) {
             throw new RuntimeException("Invalid URL!");
 
-        } catch (NoConnectionException | IOException e) {
-            Log.e(Constants.PREFERENCES, "Finish track failed: ", e);
-            throw new CommunicationException("Finish track failed", e);
+        } catch (NoConnectionException | IOException | JSONException e) {
+            Log.e(Constants.PREFERENCES, "Exporting motion values failed: ", e);
+            throw new CommunicationException("Exporting motion values failed", e);
         }
     }
 }

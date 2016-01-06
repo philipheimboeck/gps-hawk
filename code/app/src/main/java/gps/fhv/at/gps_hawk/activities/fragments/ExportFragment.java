@@ -2,7 +2,6 @@ package gps.fhv.at.gps_hawk.activities.fragments;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -15,14 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
+import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
+import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
 import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
 import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
-import gps.fhv.at.gps_hawk.tasks.ExportTask;
-import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -41,13 +39,11 @@ public class ExportFragment extends Fragment implements IUpdateableView {
 
     private View mProgressView;
     private LinearLayout mExpWrapper;
-    private ExportStartHelper mExportStartHelper;
     private ExportMetadataLoaderTask mExpDataLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mExportStartHelper = new ExportStartHelper(getActivity(), this);
     }
 
     @Override
@@ -75,7 +71,13 @@ public class ExportFragment extends Fragment implements IUpdateableView {
             }
         });
 //        mButStartExportExc.setOnClickListener(mButExportListener);
-//        mButStartExportMotions.setOnClickListener(mButExportListener);
+        mButStartExportMotions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadMotionValuesTask(getContext()).execute();
+            }
+        });
         mButStartExportTracks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

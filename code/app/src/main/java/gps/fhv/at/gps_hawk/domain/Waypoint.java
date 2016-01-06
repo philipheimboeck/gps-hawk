@@ -103,7 +103,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     }
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
             json.put("id", getId());
@@ -120,19 +120,16 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
             if (getVehicle() != null) {
                 json.put("vehicle", getVehicle().toJSON());
             } else {
-                json.put("vehicleid", getVehicleId());
+                json.put("vehicleId", getVehicleId());
             }
 
-            if (getTrack() != null) {
-                json.put("track", getTrack().toJSON());
-            } else {
-                json.put("trackid", getTrackId());
-            }
+            // Ensure the domain object is set! Otherwise we won't get the external ID of it
+            json.put("track", getTrack().toJSON());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
     }
 
     public double getLng() {

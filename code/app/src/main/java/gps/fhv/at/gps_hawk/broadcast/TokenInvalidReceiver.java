@@ -19,7 +19,7 @@ public class TokenInvalidReceiver extends BroadcastReceiver {
 
         // Do only when there is already a token (because when logging in it is not necessary)
         if (TokenHelper.getToken(context) != null) {
-            Log.e(Constants.PREFERENCES, "Removing token");
+            Log.i(Constants.PREFERENCES, "Removing token because it is invalid");
 
             // Remove the token
             TokenHelper.setToken(context, null);

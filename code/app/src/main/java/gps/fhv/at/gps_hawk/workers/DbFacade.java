@@ -165,10 +165,18 @@ public class DbFacade {
             // How you want the results sorted in the resulting Cursor
             String sortOrder = BaseTableDef._ID + " ASC" + (limit > 0 ? " LIMIT " + limit : "");
 
+            String selection = "(" + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2" + (where != null ? " AND " + where : "") + ")";
+
+            // Add type specific where
+            String customWhere = broker.getExportableWhere();
+            if(customWhere != null) {
+                selection += " AND ( " + customWhere + " )";
+            }
+
             c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
-                    BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2" + (where != null ? " AND " + where : ""),                                // The columns for the WHERE clause
+                    selection,                                // The columns for the WHERE clause
                     null,                              // The values for the WHERE clause
                     null,                                     // don't group the rows
                     null,                                     // don't filter by row groups
@@ -198,7 +206,7 @@ public class DbFacade {
     }
 
     /**
-     * Masks Waypoints, that hasn't yet been exported, with `isExportet=updValIsExport`
+     * Masks Data, that hasn't yet been exported, with `isExportet=updValIsExport`
      *
      * @return
      */
@@ -212,11 +220,19 @@ public class DbFacade {
         values.put(BaseTableDef.COLUMN_NAME_IS_EXPORTED, updValIsExport);
 
         // Which row to update, based on the ID
-        String selection = BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
+        String selection = "(" + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
 
         // If unexported are desired, include those that are NULL
         if (whereIsExport == 0)
             selection += " OR " + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " IS NULL ";
+
+        selection += ")";
+
+        // Add type-specific where
+        String customWhere = broker.getExportableWhere();
+        if(customWhere != null) {
+            selection += " AND ( " + customWhere + " )";
+        }
 
         String[] selectionArgs = {String.valueOf(whereIsExport)};
 
@@ -303,6 +319,52 @@ public class DbFacade {
 
 
         return domain;
+    }
+
+    public <T extends DomainBase> List<T> select(ArrayList<Integer> ids, Class<T> cl) {
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        String where = BaseTableDef._ID + " IN (%ids)";
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < ids.size(); i++) {
+            builder.append(String.valueOf(ids.get(i)));
+
+            if (i < ids.size() - 1) {
+                builder.append(",");
+            }
+        }
+        where = where.replace("%ids", builder.toString());
+
+        ArrayList<T> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = getDb().query(
+                    broker.getTblName(), // Table to query
+                    null,
+                    where,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            c.moveToFirst();
+
+
+            for (int i = 0; i < c.getCount(); i++) {
+                T domain = broker.map2domain(c);
+                list.add(domain);
+
+                c.moveToNext();
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return list;
     }
 
     public <T extends DomainBase> List<T> selectWhere(String condition, Class<T> cl) {

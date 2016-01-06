@@ -8,20 +8,20 @@ import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.DataClient;
-import gps.fhv.at.gps_hawk.domain.Track;
+import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.exceptions.CommunicationException;
 import gps.fhv.at.gps_hawk.exceptions.TaskException;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 
 /**
  * Author: Philip Heimböck
- * Date: 05.01.16
+ * Date: 06.01.16
  */
-public class UploadTracksTask extends AsyncTask<Void, Void, Void> {
+public class UploadMotionValuesTask extends AsyncTask<Void, Void, Void> {
 
     private Context mContext;
 
-    public UploadTracksTask(Context context) {
+    public UploadMotionValuesTask(Context context) {
         mContext = context;
     }
 
@@ -31,35 +31,34 @@ public class UploadTracksTask extends AsyncTask<Void, Void, Void> {
         DbFacade facade = DbFacade.getInstance();
 
         try {
-            int junkSize = Constants.EXPORT_JUNK;
+            int junkSize = Constants.EXPORT_JUNK * 3;
 
             // Mark unexported entities as "ExportNow" (= flag 2)
-            int count = facade.markExportable(0, 2, Track.class);
+            int count = facade.markExportable(0, 2, MotionValues.class);
             while (count > 0) {
-                // Retrieve the tracks
-                List<Track> tracks = DbFacade.getInstance().getAllEntities2Export(Track.class, junkSize, null);
+                // Retrieve the motion values
+                List<MotionValues> motionValues = facade.getAllEntities2Export(MotionValues.class, junkSize, null);
 
-                if (tracks.isEmpty()) {
+                if (motionValues.isEmpty()) {
                     // No result set found
                     throw new TaskException("Failed to retrieve exportable entities!");
                 }
 
                 // Send them to the server
-                client.exportTracks(tracks);
+                client.exportMotionValues(motionValues);
 
-                // Mark tracks as exported
-                facade.markExportableList(tracks, 1, Track.class);
+                // Mark motion values as exported
+                facade.markExportableList(motionValues, 1, MotionValues.class);
 
                 // Calculate whats left
-                count -= tracks.size();
+                count -= motionValues.size();
             }
 
-
         } catch (CommunicationException | TaskException e) {
-            Log.e(Constants.PREFERENCES, "Failed to export tracks!", e);
+            Log.e(Constants.PREFERENCES, "Failed to export motion values!", e);
 
             // Reset not exported entities
-            facade.markExportable(2, 0, Track.class);
+            facade.markExportable(2, 0, MotionValues.class);
         }
 
         return null;

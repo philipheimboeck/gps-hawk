@@ -66,10 +66,10 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
     }
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("id", getId());
+            json.put("id", getExternalId());
 
             json.put("startDate", getStartDateTime());
             json.put("endDate", getEndDateTime());
@@ -78,7 +78,7 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
 
     }
 

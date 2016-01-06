@@ -39,14 +39,14 @@ public class Vehicle extends DomainBase implements IJSONable {
     }
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
             json.put("id",getId());
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
 
     }
 }
