@@ -47,7 +47,12 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             mCurrentTrack = t;
 
             // Start the track now
-            mCurrentTrack.setStartDateTime(Calendar.getInstance().getTimeInMillis());
+
+            // In case through UI the track changed, reload it
+            DbFacade db = DbFacade.getInstance(mContext);
+            Track track = db.select(mCurrentTrack.getId(), Track.class);
+            track.setStartDateTime(Calendar.getInstance().getTimeInMillis());
+            db.saveEntity(track);
 
             //noinspection ResourceType
             int gpsTime = (int) SettingsWorker.getInstance().getSetting(Constants.SETTING_GPS_MIN_TIME);
@@ -88,7 +93,7 @@ public class GpsWorker implements IGpsWorker, MyLocationListener.MyLocationListe
             // In case through UI the track changed, reload it
             DbFacade db = DbFacade.getInstance(mContext);
             Track t = db.select(mCurrentTrack.getId(), Track.class);
-            t.setEndDateTime((int) (end.getTimeInMillis()));
+            t.setEndDateTime(end.getTimeInMillis());
             t.setIsValid(trackIsValid);
 
             db.saveEntity(t);

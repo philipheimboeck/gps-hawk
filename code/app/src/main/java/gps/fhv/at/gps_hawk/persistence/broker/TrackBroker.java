@@ -33,8 +33,8 @@ public class TrackBroker extends BrokerBase {
         Track t = new Track();
 
         // Datetime
-        t.setStartDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START)));
-        t.setEndDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END)));
+        t.setStartDateTime(cursor.getLong(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_START)));
+        t.setEndDateTime(cursor.getLong(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_DATETIME_END)));
         t.setIsValid(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_VALID)));
         t.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_IS_EXPORTED)));
         t.setExternalId(cursor.getString(cursor.getColumnIndexOrThrow(TrackDef.COLUMN_NAME_EXTERNAL_ID)));

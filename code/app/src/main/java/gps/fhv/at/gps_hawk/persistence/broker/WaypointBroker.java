@@ -51,7 +51,7 @@ public class WaypointBroker extends BrokerBase {
         wp.setIsExported(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_IS_EXPORTED)));
         wp.setTrackId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_TRACK_ID)));
         wp.setVehicleId(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_VEHICLE_ID)));
-        wp.setUnixtimestampCaptured(cursor.getInt(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIMESTAMP)));
+        wp.setUnixtimestampCaptured(cursor.getLong(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_DATETIMESTAMP)));
 
         // Double
         wp.setLat(cursor.getDouble(cursor.getColumnIndexOrThrow(WaypointDef.COLUMN_NAME_LAT)));

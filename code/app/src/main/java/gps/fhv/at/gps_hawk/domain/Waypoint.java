@@ -20,7 +20,7 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     private int _isExported;
     private int _nrOfSatellites;
     private int _vehicleId;
-    private int _unixtimestampCaptured;
+    private long _unixtimestampCaptured;
     private float _accuracy;
     private float _speed;
     private String _provider;
@@ -184,11 +184,11 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         _track = track;
     }
 
-    public int getUnixtimestampCaptured() {
+    public long getUnixtimestampCaptured() {
         return _unixtimestampCaptured;
     }
 
-    public void setUnixtimestampCaptured(int unixtimestampCaptured) {
+    public void setUnixtimestampCaptured(long unixtimestampCaptured) {
         _unixtimestampCaptured = unixtimestampCaptured;
     }
 
