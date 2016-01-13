@@ -9,6 +9,7 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
 import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
 import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
 import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
@@ -71,6 +72,7 @@ public class ExportNetworkReceiver extends BroadcastReceiver implements IExportW
         new UploadTracksTask(mContext).execute();
         new UploadWaypointsTask(mContext).execute();
         new UploadMotionValuesTask(mContext).execute();
+        new UploadLogTask(mContext).execute();
     }
 
 }

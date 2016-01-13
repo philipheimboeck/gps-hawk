@@ -20,9 +20,15 @@ import gps.fhv.at.gps_hawk.workers.DbFacade;
 public class UploadMotionValuesTask extends AsyncTask<Void, Void, Void> {
 
     private Context mContext;
+    private IAsyncTaskCaller<Void, Void> mCaller;
 
     public UploadMotionValuesTask(Context context) {
         mContext = context;
+    }
+
+    public UploadMotionValuesTask(IAsyncTaskCaller<Void, Void> caller, Context context) {
+        mContext = context;
+        mCaller = caller;
     }
 
     @Override
@@ -62,5 +68,13 @@ public class UploadMotionValuesTask extends AsyncTask<Void, Void, Void> {
         }
 
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void success) {
+        // Return the tracks
+        if (mCaller != null) {
+            mCaller.onPostExecute(success);
+        }
     }
 }

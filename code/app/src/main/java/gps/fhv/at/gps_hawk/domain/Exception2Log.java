@@ -15,7 +15,7 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
     private int _id;
     private String _stackTrace;
     private String _message;
-    private int _dateTime;
+    private long _dateTime;
     private int _isExported;
     private int _level;
 
@@ -49,11 +49,11 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
         _message = message;
     }
 
-    public int getDateTime() {
+    public long getDateTime() {
         return _dateTime;
     }
 
-    public void setDateTime(int dateTime) {
+    public void setDateTime(long dateTime) {
         _dateTime = dateTime;
     }
 
@@ -78,10 +78,11 @@ public class Exception2Log extends DomainBase implements IExportable, IJSONable 
         JSONObject json = new JSONObject();
         try {
             json.put("id", getId());
-            json.put("level", getLevel());
-            json.put("stackTrace", getStackTrace());
-            json.put("msg", getMessage());
-            json.put("dateTime", getDateTime());
+            json.put("level", String.valueOf(getLevel()));
+            json.put("stacktrace", getStackTrace());
+            json.put("message", getMessage());
+            json.put("timestamp", getDateTime());
+            json.put("tag", "GPS Hawk");
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);

@@ -69,8 +69,8 @@ public class ExportMetadataLoaderTask extends AsyncTask<Void, Void, int[]> {
             amounts[++i] = db.getCount(MotionValuesDef.TABLE_NAME, MotionValuesDef.COLUMN_NAME_IS_EXPORTED + " = 0");
 
             // Tracks
-            amounts[++i] = db.getCount(TrackDef.TABLE_NAME, null);
-            amounts[++i] = db.getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_IS_EXPORTED + " = 0");
+            amounts[++i] = db.getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_DATETIME_END + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_END + " > 0");
+            amounts[++i] = db.getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_IS_EXPORTED + " = 0 AND " + TrackDef.COLUMN_NAME_DATETIME_END + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_END + " > 0");
 
         } catch (Exception e) {
             Log.e(Constants.PREFERENCES, "Cannot determine all amounts of data", e);

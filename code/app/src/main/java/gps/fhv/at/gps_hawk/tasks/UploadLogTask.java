@@ -8,27 +8,29 @@ import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.communication.DataClient;
-import gps.fhv.at.gps_hawk.domain.Track;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.exceptions.CommunicationException;
 import gps.fhv.at.gps_hawk.exceptions.TaskException;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 
 /**
  * Author: Philip Heimböck
- * Date: 05.01.16
+ * Date: 31.12.15
+ * <p/>
+ * The purpose of this task is to retrieve tracks from the server, which then can be used to save waypoints on the server
  */
-public class UploadTracksTask extends AsyncTask<Void, Void, Void> {
+public class UploadLogTask extends AsyncTask<Void, Void, Void> {
 
     private Context mContext;
     private IAsyncTaskCaller<Void, Void> mCaller;
 
-    public UploadTracksTask(Context context) {
-        mContext = context;
+    public UploadLogTask(Context context) {
+        this(null, context);
     }
 
-    public UploadTracksTask(IAsyncTaskCaller<Void, Void> caller, Context context) {
-        mContext = context;
+    public UploadLogTask(IAsyncTaskCaller<Void, Void> caller, Context context) {
         mCaller = caller;
+        mContext = context;
     }
 
     @Override
@@ -40,34 +42,34 @@ public class UploadTracksTask extends AsyncTask<Void, Void, Void> {
             int junkSize = Constants.EXPORT_JUNK;
 
             // Mark unexported entities as "ExportNow" (= flag 2)
-            int count = facade.markExportable(0, 2, Track.class);
+            int count = facade.markExportable(0, 2, Exception2Log.class);
             while (count > 0) {
-                // Retrieve the tracks
-                List<Track> tracks = DbFacade.getInstance().getAllEntities2Export(Track.class, junkSize, null);
 
-                if (tracks.isEmpty()) {
+                // Retrieve all logs
+                List<Exception2Log> logs = facade.getAllEntities2Export(Exception2Log.class, junkSize, null);
+
+                if (logs.isEmpty()) {
                     // No result set found
                     throw new TaskException("Failed to retrieve exportable entities!");
                 }
 
-                // Send them to the server
-                client.exportTracks(tracks);
+                // Export all logs
+                client.exportLogs(logs);
 
-                // Mark tracks as exported
-                facade.markExportableList(tracks, 1, Track.class);
+                // When successful mark them as exported
+                // Do this also for the filtered logs!
+                facade.markExportableList(logs, 1, Exception2Log.class);
 
                 // Calculate whats left
-                count -= tracks.size();
+                count -= logs.size();
             }
 
-
         } catch (CommunicationException | TaskException e) {
-            Log.e(Constants.PREFERENCES, "Failed to export tracks!", e);
+            Log.e(Constants.PREFERENCES, "Failed to upload logs", e);
 
             // Reset not exported entities
-            facade.markExportable(2, 0, Track.class);
+            facade.markExportable(2, 0, Exception2Log.class);
         }
-
         return null;
     }
 

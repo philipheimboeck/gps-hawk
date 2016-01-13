@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
@@ -36,6 +37,7 @@ public class DataClient extends RestClient implements IDataClient {
     private static final String REST_EXPORT_TRACKS = REST_DATA + "updatetracks";
     private static final String REST_EXPORT_WAYPOINTS = REST_DATA + "waypoints";
     private static final String REST_EXPORT_MOTIONVALUES = REST_DATA + "motionValues";
+    private static final String REST_EXPORT_LOGS = REST_SERVER + "app/log";
 
 
     public DataClient(Context context) {
@@ -243,4 +245,29 @@ public class DataClient extends RestClient implements IDataClient {
             throw new CommunicationException("Exporting motion values failed", e);
         }
     }
+
+    @Override
+    public void exportLogs(List<Exception2Log> logs) throws CommunicationException {
+        try {
+            URL url = new URL(REST_EXPORT_LOGS);
+            HashMap<String, String> headers = getAuthorizationHeaders();
+            HashMap<String, String> content = new HashMap<>();
+            content.put("logs", new JSONObject().put("logs", getJsonArray(logs)).toString());
+
+            // Get the tracks
+            HTTPAnswer answer = post(url, content, headers);
+            if (answer.responseCode != 200) {
+                throw new CommunicationException("Error occurred while exporting logs!");
+            }
+
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Invalid URL!");
+
+        } catch (NoConnectionException | IOException | JSONException e) {
+            Log.e(Constants.PREFERENCES, "Exporting logs failed: ", e);
+            throw new CommunicationException("Exporting logs failed", e);
+        }
+    }
+
+
 }

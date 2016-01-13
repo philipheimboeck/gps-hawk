@@ -17,6 +17,7 @@ import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
+import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
 import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
 import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
 import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
@@ -63,26 +64,54 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
         mButStartExportTracks = (Button) view.findViewById(R.id.button_do_track_export);
 
+        final IAsyncTaskCaller<Void, Void> caller = new IAsyncTaskCaller<Void, Void>() {
+            @Override
+            public void onPostExecute(Void success) {
+                doDataLoadingAsnc();
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
+            }
+        };
+
         mButStartExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
-                new UploadWaypointsTask(getContext()).execute();
+                new UploadWaypointsTask(caller, getContext()).execute();
             }
         });
-//        mButStartExportExc.setOnClickListener(mButExportListener);
+        mButStartExportExc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadLogTask(caller, getContext()).execute();
+            }
+        });
         mButStartExportMotions.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
-                new UploadMotionValuesTask(getContext()).execute();
+                new UploadMotionValuesTask(caller, getContext()).execute();
             }
         });
         mButStartExportTracks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
-                new UploadTracksTask(getContext()).execute();
+                new UploadTracksTask(caller, getContext()).execute();
             }
         });
 

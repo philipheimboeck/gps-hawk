@@ -3,6 +3,7 @@ package gps.fhv.at.gps_hawk.communication;
 import java.util.Calendar;
 import java.util.List;
 
+import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
@@ -27,4 +28,6 @@ public interface IDataClient {
     void exportWaypoints(List<Waypoint> waypoints) throws CommunicationException;
 
     void exportMotionValues(List<MotionValues> values) throws CommunicationException;
+
+    void exportLogs(List<Exception2Log> logs) throws CommunicationException;
 }
