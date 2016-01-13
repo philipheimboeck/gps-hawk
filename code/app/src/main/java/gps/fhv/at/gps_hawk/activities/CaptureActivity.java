@@ -68,6 +68,10 @@ import gps.fhv.at.gps_hawk.services.LocationService;
 import gps.fhv.at.gps_hawk.tasks.CheckUpdateTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.ReserveTracksTask;
+import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
+import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
+import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
+import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.DbFacade;
 import gps.fhv.at.gps_hawk.workers.GpsWorker;
 import gps.fhv.at.gps_hawk.workers.VolatileInstancePool;
@@ -240,6 +244,11 @@ public class CaptureActivity extends AppCompatActivity {
                 if (v.getId() == R.id.but_valid_track_yes) isValid = true;
 
                 handleTaksValidButtons(isValid);
+
+                // If online mode, start the upload
+                if(onlineMode()) {
+                    startUpload();
+                }
             }
         };
         mTaskValidButtonYes = (Button) findViewById(R.id.but_valid_track_yes);
@@ -500,8 +509,18 @@ public class CaptureActivity extends AppCompatActivity {
             mStartTrackingButton.setText(R.string.start_tracking);
 
             toggleButtons(true);
-
         }
+    }
+
+    /**
+     * Starts the upload tasks
+     */
+    private void startUpload() {
+        // Start the upload tasks
+        new UploadTracksTask(this).execute();
+        new UploadWaypointsTask(this).execute();
+        new UploadMotionValuesTask(this).execute();
+        new UploadLogTask(this).execute();
     }
 
     /**
@@ -557,18 +576,51 @@ public class CaptureActivity extends AppCompatActivity {
         }
 
         // Is it possible to create a track instance now?
+        if(onlineMode()) {
+            // Start a new track now
+            Log.i(Constants.PREFERENCES, "Get new tracks from server using the mobile network!");
+            new ReserveTracksTask(new IAsyncTaskCaller<Void, List<Track>>() {
+                @Override
+                public void onPostExecute(List<Track> success) {
+                    if(success != null && !success.isEmpty()) {
+                        // Start with the first track
+                        startTracking(success.get(0));
+                    }
+                }
+
+                @Override
+                public void onCancelled() {
+
+                }
+
+                @Override
+                public void onProgressUpdate(Void... progress) {
+
+                }
+
+                @Override
+                public void onPreExecute() {
+
+                }
+            }, this);
+            return null;
+        }
+
+        throw new NoTrackException("No track left");
+    }
+
+    /**
+     * Checks if online mode is allowed and if there is a mobile connection
+     * @return
+     */
+    private boolean onlineMode() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean allowed = preferences.getBoolean(Constants.PREF_ALLOW_TRACKING_WITHOUT_WLAN, false);
 
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeInfo = connManager.getActiveNetworkInfo();
 
-        if(allowed && activeInfo != null && activeInfo.isConnected()) {
-            // Start a new track now
-            // Todo Retrieve a new track from the server
-        }
-
-        throw new NoTrackException("No track left");
+        return (allowed && activeInfo != null && activeInfo.isConnected());
     }
 
     /**
