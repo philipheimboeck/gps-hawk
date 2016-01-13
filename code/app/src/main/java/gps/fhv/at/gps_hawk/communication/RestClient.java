@@ -9,7 +9,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -36,8 +35,8 @@ import gps.fhv.at.gps_hawk.helper.TokenHelper;
  */
 public class RestClient {
 
-    //    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
-    protected static final String REST_SERVER = "http://192.168.0.3:8080/webservice/fhvgis/";
+    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
+//    protected static final String REST_SERVER = "http://192.168.0.3:8080/webservice/fhvgis/";
 
     protected Context mContext;
 
