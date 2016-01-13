@@ -585,6 +585,9 @@ public class CaptureActivity extends AppCompatActivity {
                     if(success != null && !success.isEmpty()) {
                         // Start with the first track
                         startTracking(success.get(0));
+                    } else {
+                        // Cannot start because there are no tracks left
+                        Toast.makeText(CaptureActivity.this, R.string.error_no_tracks, Toast.LENGTH_LONG).show();
                     }
                 }
 
