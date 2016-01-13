@@ -44,6 +44,10 @@ public class TrackDef extends BaseTableDef {
             sb.append("ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_EXTERNAL_ID + " TEXT AFTER " + COLUMN_NAME_IS_EXPORTED + ";");
         }
 
+        if (oldVersion <= 17) {
+            sb.append("DELETE FROM " + TABLE_NAME + ";");
+        }
+
         return sb.toString();
     }
 }

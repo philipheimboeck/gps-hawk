@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
@@ -22,7 +23,7 @@ import gps.fhv.at.gps_hawk.persistence.setup.WaypointDef;
 public class DbSetup extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 17;
+    public static final int DATABASE_VERSION = 18;
     public static final String DATABASE_NAME = "GpwHawk.db";
 
     public DbSetup(Context context) {
@@ -60,21 +61,17 @@ public class DbSetup extends SQLiteOpenHelper {
 
         List<BaseTableDef> tableDefs = getTableDefs();
 
-        // Delte all tables
+        // Upgrade all tables
         for (BaseTableDef tdbDef : tableDefs) {
             try {
                 String updScript = tdbDef.getUpdateScript(oldVersion);
-                if (updScript != null && updScript != "")
+                if (updScript != null && !updScript.isEmpty())
                     db.execSQL(updScript);
-//                db.execSQL(tdbDef.getSqlDeleteEntries());
 
             } catch (Exception e) {
                 Log.e(Constants.PREFERENCES, "Error in DbSetup.onUpgrade()", e);
             }
         }
-
-        // Then create database new
-//        onCreate(db);
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {

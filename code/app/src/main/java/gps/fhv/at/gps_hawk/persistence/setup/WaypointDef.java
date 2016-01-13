@@ -61,9 +61,13 @@ public class WaypointDef extends BaseTableDef {
 
     @Override
     public String getUpdateScript(int oldVersion) {
-        return null;
-//        return "ALTER TABLE " + TABLE_NAME + " ADD COLUMN " + COLUMN_NAME_DATETIMESTAMP + " " + TYPE_INT + ";"
-//                + "UPDATE " + TABLE_NAME + " SET " + COLUMN_NAME_DATETIMESTAMP + " = strftime('%s'," + COLUMN_NAME_DATETIME + ");";
+        StringBuilder sb = new StringBuilder();
+
+        if (oldVersion <= 17) {
+            sb.append("DELETE FROM " + TABLE_NAME + ";");
+        }
+
+        return sb.toString();
     }
 
     @Override
