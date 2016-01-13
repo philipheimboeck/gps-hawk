@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
@@ -98,18 +99,18 @@ public class UploadWaypointsTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void setDomainObjects(DbFacade facade, List<Waypoint> waypoints) {
-        ArrayList<Integer> neededTracks = new ArrayList<>();
+        HashSet<Integer> trackIds = new HashSet<>();
 
         // Find tracks that must be get from the database
         for(Waypoint waypoint : waypoints) {
-            if(!mTracks.containsKey(waypoint.getTrackId())) {
+            if(!trackIds.contains(waypoint.getTrackId())) {
                 // Add track to map
-                neededTracks.add(waypoint.getTrackId());
+                trackIds.add(waypoint.getTrackId());
             }
         }
 
         // Select all tracks
-        List<Track> tracks = facade.select(neededTracks, Track.class);
+        List<Track> tracks = facade.select(new ArrayList<Integer>(trackIds), Track.class);
         for(Track track : tracks) {
             mTracks.put(track.getId(), track);
         }

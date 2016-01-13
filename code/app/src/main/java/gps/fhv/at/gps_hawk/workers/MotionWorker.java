@@ -43,6 +43,7 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
             @Override
             protected String doInBackground(Integer... params) {
                 try {
+
                     DbFacade db = DbFacade.getInstance(mContext);
                     db.saveEntities(mMotionValues, params[0]);
                 } catch (Exception e) {
@@ -85,7 +86,7 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
 
         // Save currently unsaved MotionValues
         // ignore the few values in buffy
-        if (!mIsThreadWorking) {
+        if (!mIsThreadWorking && mCurrentMV > 0) {
             insert2Db();
         }
     }
@@ -167,8 +168,10 @@ public class MotionWorker implements IMotionWorker, SensorEventListener {
         mIsThreadWorking = true;
 
         // start new thread saving all valid MotionValues
-        mTaskSave2Db = getTaskSave2Db();
-        mTaskSave2Db.execute(mCurrentMV);
+        if ( mCurrentMV  > 0) {
+            mTaskSave2Db = getTaskSave2Db();
+            mTaskSave2Db.execute(mCurrentMV);
+        }
 
     }
 

@@ -38,6 +38,9 @@ public class ExportNetworkReceiver extends BroadcastReceiver implements IExportW
 
     }
 
+    public ExportNetworkReceiver() {
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
