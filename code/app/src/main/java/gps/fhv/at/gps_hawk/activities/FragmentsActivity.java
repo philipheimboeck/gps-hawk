@@ -2,6 +2,7 @@ package gps.fhv.at.gps_hawk.activities;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.activities.fragments.SettingsFragment;
@@ -38,8 +40,13 @@ public class FragmentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Show first fragment
+        Fragment fragment = mExportFragment;
+        if(getIntent().getStringExtra(Constants.EXTRA_FRAGMENT).equals(Constants.FRAGMENT_SETTINGS)) {
+            fragment = mSettingsFragment;
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, mExportFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, fragment).commit();
 
         // Find Views
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
