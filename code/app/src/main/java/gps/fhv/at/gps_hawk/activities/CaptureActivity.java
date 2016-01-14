@@ -584,7 +584,13 @@ public class CaptureActivity extends AppCompatActivity {
                 public void onPostExecute(List<Track> success) {
                     if(success != null && !success.isEmpty()) {
                         // Start with the first track
-                        startTracking(success.get(0));
+                        Track t = DbFacade.getInstance().findReservedTrack();
+                        if(t != null) {
+                            startTracking(t);
+                        } else {
+                            // Cannot start because there are no tracks left
+                            Toast.makeText(CaptureActivity.this, R.string.error_no_tracks, Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         // Cannot start because there are no tracks left
                         Toast.makeText(CaptureActivity.this, R.string.error_no_tracks, Toast.LENGTH_LONG).show();
@@ -605,7 +611,7 @@ public class CaptureActivity extends AppCompatActivity {
                 public void onPreExecute() {
 
                 }
-            }, this);
+            }, this).execute();
             return null;
         }
 
