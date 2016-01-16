@@ -23,7 +23,7 @@ public class TrackDef extends BaseTableDef {
                 COLUMN_NAME_DATETIME_START + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_DATETIME_END + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_IS_VALID + TYPE_INT + COMMA_SEP +
-                        COLUMN_NAME_IS_EXPORTED + TYPE_INT +
+                        COLUMN_NAME_IS_EXPORTED + TYPE_INT + COMMA_SEP +
                         COLUMN_NAME_EXTERNAL_ID + TYPE_TEXT
                 ;
     }
