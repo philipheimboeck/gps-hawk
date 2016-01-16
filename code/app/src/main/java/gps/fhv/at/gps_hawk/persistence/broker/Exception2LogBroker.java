@@ -39,7 +39,7 @@ public class Exception2LogBroker extends BrokerBase {
         Exception2Log e = new Exception2Log();
 
         // Datetime
-        e.setDateTime(cursor.getInt(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_DATETIME)));
+        e.setDateTime(cursor.getLong(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_DATETIME)));
 
         // String
         e.setStackTrace(cursor.getString(cursor.getColumnIndexOrThrow(Exception2LogDef.COLUMN_NAME_STACK_TRACE)));

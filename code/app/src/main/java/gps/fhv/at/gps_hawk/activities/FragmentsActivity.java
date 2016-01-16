@@ -1,6 +1,5 @@
 package gps.fhv.at.gps_hawk.activities;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,17 +7,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.activities.fragments.ExportFragment;
 import gps.fhv.at.gps_hawk.activities.fragments.SettingsFragment;
-import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
 import gps.fhv.at.gps_hawk.activities.navigation.Navigation;
+import gps.fhv.at.gps_hawk.activities.navigation.NavigationAction;
 import gps.fhv.at.gps_hawk.activities.navigation.NavigationItem;
 
 public class FragmentsActivity extends AppCompatActivity {
@@ -28,12 +26,12 @@ public class FragmentsActivity extends AppCompatActivity {
 
     // Fragments
     private ExportFragment mExportFragment;
-//    private SettingsFragment mSettingsFragment;
+    private SettingsFragment mSettingsFragment;
     private Navigation mNavigation;
 
     public FragmentsActivity() {
         mExportFragment = new ExportFragment();
-//        mSettingsFragment = new SettingsFragment();
+        mSettingsFragment = new SettingsFragment();
     }
 
     @Override
@@ -42,8 +40,13 @@ public class FragmentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Show first fragment
+        Fragment fragment = mExportFragment;
+        if(getIntent().getStringExtra(Constants.EXTRA_FRAGMENT).equals(Constants.FRAGMENT_SETTINGS)) {
+            fragment = mSettingsFragment;
+        }
+
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, mExportFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragment_placeholder, fragment).commit();
 
         // Find Views
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -55,8 +58,8 @@ public class FragmentsActivity extends AppCompatActivity {
                 getString(R.string.navigation_capture), R.drawable.ic_hawk_white));
         navigationItems.add(new NavigationItem(new NavigationAction(mExportFragment),
                 getString(R.string.navigation_export), 0));
-//        navigationItems.add(new NavigationItem(new NavigationAction(mSettingsFragment),
-//                getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
+        navigationItems.add(new NavigationItem(new NavigationAction(mSettingsFragment),
+                getString(R.string.navigation_settings), R.drawable.ic_setting_dark));
 
         mNavigation = new Navigation(this, mDrawerLayout, mDrawerList);
         mNavigation.populateNavigation(navigationItems);

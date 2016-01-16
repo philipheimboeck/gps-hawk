@@ -3,7 +3,6 @@ package gps.fhv.at.gps_hawk.helper;
 import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -15,7 +14,6 @@ import gps.fhv.at.gps_hawk.domain.IExportable;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
 import gps.fhv.at.gps_hawk.domain.Track;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
-import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 
@@ -54,10 +52,7 @@ public class ExportStartHelper {
         if (id < 0) mLastExportStarted = Calendar.getInstance();
 
         try {
-            String url = mContext.getString(R.string.txt_export_url_default);
-
             ExportContext exportContext = new ExportContext();
-            exportContext.setUrl(url);
             exportContext.setContext(mContext);
             exportContext.setAndroidId(Settings.Secure.getString(mContext.getContentResolver(),
                     Settings.Secure.ANDROID_ID));

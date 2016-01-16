@@ -2,8 +2,6 @@ package gps.fhv.at.gps_hawk.workers;
 
 import android.location.Location;
 
-import java.util.Calendar;
-
 import gps.fhv.at.gps_hawk.domain.POI;
 import gps.fhv.at.gps_hawk.domain.Vehicle;
 import gps.fhv.at.gps_hawk.domain.Waypoint;
@@ -61,9 +59,9 @@ public class WaypointFactory {
         // Text
         waypoint.setProvider(location.getProvider());
         // Int
-        waypoint.setNrOfSattelites(data.getNrOfSattelites());
+        waypoint.setNrOfSatellites(data.getNrOfSattelites());
         waypoint.setTrackId(data.getTrack().getId());
-        waypoint.setUnixtimestampCaptured((int) (location.getTime() / 1000));
+        waypoint.setUnixtimestampCaptured(location.getTime());
 
         return waypoint;
     }

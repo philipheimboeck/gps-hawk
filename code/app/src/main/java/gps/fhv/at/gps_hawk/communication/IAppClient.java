@@ -1,6 +1,6 @@
 package gps.fhv.at.gps_hawk.communication;
 
-import gps.fhv.at.gps_hawk.exceptions.RestException;
+import gps.fhv.at.gps_hawk.exceptions.CommunicationException;
 
 /**
  * Author: Philip Heimböck
@@ -15,5 +15,5 @@ public interface IAppClient {
      * @param currentVersion The current version
      * @return the URL of the newer version or null if none
      */
-    String getUpdateLink(String currentVersion) throws RestException;
+    String getUpdateLink(String currentVersion) throws CommunicationException;
 }

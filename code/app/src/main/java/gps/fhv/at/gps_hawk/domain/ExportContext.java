@@ -11,7 +11,6 @@ import java.util.List;
 public class ExportContext<T extends IExportable> {
 
     private List<T> _exportList;
-    private String _url;
     private Context _context;
     private String androidId;
     private Type t;
@@ -24,14 +23,6 @@ public class ExportContext<T extends IExportable> {
 
     public void setExportList(List<T> waypointList) {
         _exportList = waypointList;
-    }
-
-    public String getUrl() {
-        return _url;
-    }
-
-    public void setUrl(String url) {
-        _url = url;
     }
 
     public Context getContext() {

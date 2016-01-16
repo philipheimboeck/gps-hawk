@@ -11,14 +11,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
-import gps.fhv.at.gps_hawk.workers.DbFacade;
-import gps.fhv.at.gps_hawk.tasks.ExportTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
+import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
+import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
+import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
+import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
+import gps.fhv.at.gps_hawk.workers.DbFacade;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -30,23 +33,18 @@ public class ExportFragment extends Fragment implements IUpdateableView {
     private Button mButStartExportMotions;
     private Button mButStartExportTracks;
 
-    private View.OnClickListener mButExportListener;
-
     private TextView mTextViewAmount;
     private TextView mTextViewAmountExc;
     private TextView mTextViewAmountMotion;
     private TextView mTextViewAmountTracks;
 
     private View mProgressView;
-    private ExportTask mExportTask;
     private LinearLayout mExpWrapper;
-    private ExportStartHelper mExportStartHelper;
     private ExportMetadataLoaderTask mExpDataLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mExportStartHelper = new ExportStartHelper(getActivity(), this);
     }
 
     @Override
@@ -66,16 +64,56 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
         mButStartExportTracks = (Button) view.findViewById(R.id.button_do_track_export);
 
-        mButExportListener = new View.OnClickListener() {
+        final IAsyncTaskCaller<Void, Void> caller = new IAsyncTaskCaller<Void, Void>() {
             @Override
-            public void onClick(View v) {
-                handleButExport(v.getId());
+            public void onPostExecute(Void success) {
+                doDataLoadingAsnc();
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
             }
         };
-        mButStartExport.setOnClickListener(mButExportListener);
-        mButStartExportExc.setOnClickListener(mButExportListener);
-        mButStartExportMotions.setOnClickListener(mButExportListener);
-        mButStartExportTracks.setOnClickListener(mButExportListener);
+
+        mButStartExport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadWaypointsTask(caller, getContext()).execute();
+            }
+        });
+        mButStartExportExc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadLogTask(caller, getContext()).execute();
+            }
+        });
+        mButStartExportMotions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadMotionValuesTask(caller, getContext()).execute();
+            }
+        });
+        mButStartExportTracks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
+                new UploadTracksTask(caller, getContext()).execute();
+            }
+        });
 
         mTextViewAmount = (TextView) view.findViewById(R.id.tbx_amount_of_waypoints);
         mTextViewAmountExc = (TextView) view.findViewById(R.id.tbx_amount_of_exceptions);
@@ -171,12 +209,6 @@ public class ExportFragment extends Fragment implements IUpdateableView {
             }
             ++i;
         }
-    }
-
-    private void handleButExport(int id) {
-
-        mExportStartHelper.startExport(id);
-
     }
 
 }

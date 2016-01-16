@@ -9,19 +9,20 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.helper.TokenHelper;
 
 /**
  * Created by Tobias on 30.10.2015.
  */
 public class Track extends DomainBase implements Serializable, IJSONable, IExportable {
     private int _id;
-    private int _startDateTime;
-    private int _endDateTime;
+    private String _externalId;
+    private long _startDateTime;
+    private long _endDateTime;
     private int _isValid;
     private int _isExported;
 
     public Track() {
-        _startDateTime = (int) (Calendar.getInstance().getTimeInMillis() / 1000);
     }
 
     public int getId() {
@@ -32,19 +33,27 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
         _id = id;
     }
 
-    public int getStartDateTime() {
+    public String getExternalId() {
+        return _externalId;
+    }
+
+    public void setExternalId(String _externalId) {
+        this._externalId = _externalId;
+    }
+
+    public long getStartDateTime() {
         return _startDateTime;
     }
 
-    public void setStartDateTime(int startDateTime) {
+    public void setStartDateTime(long startDateTime) {
         _startDateTime = startDateTime;
     }
 
-    public int getEndDateTime() {
+    public long getEndDateTime() {
         return _endDateTime;
     }
 
-    public void setEndDateTime(int endDateTime) {
+    public void setEndDateTime(long endDateTime) {
         _endDateTime = endDateTime;
     }
 
@@ -57,19 +66,19 @@ public class Track extends DomainBase implements Serializable, IJSONable, IExpor
     }
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
-            json.put("id", getId());
+            json.put("id", getExternalId());
 
-            json.put("startDateTime", getStartDateTime());
-            json.put("endDateTime", getEndDateTime());
+            json.put("startDate", getStartDateTime());
+            json.put("endDate", getEndDateTime());
             json.put("isValid", getIsValid());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
 
     }
 

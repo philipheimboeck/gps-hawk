@@ -10,7 +10,7 @@ import java.util.List;
 
 import gps.fhv.at.gps_hawk.Constants;
 import gps.fhv.at.gps_hawk.R;
-import gps.fhv.at.gps_hawk.communication.ExportClient;
+import gps.fhv.at.gps_hawk.communication.DataClient;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.domain.ExportContext;
 import gps.fhv.at.gps_hawk.domain.MotionValues;
@@ -78,7 +78,7 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     Log.d(Constants.PREFERENCES, "Found " + count + " " + mExpContext.getCollectionName() + " 2 export - Start chunk with limit: " + junkSize);
 
                     // Get all Waypoints from DB to export
-                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
+//                    mExpContext.setExportList(dbFacade.getAllEntities2Export(mExpContext.getT(), junkSize, mExpContext.getCustomWhere()));
 
                     // Insert Tracks and Vehicles as Objects
                     if (mExpContext.getT().equals(Waypoint.class)) {
@@ -86,14 +86,14 @@ public class ExportTask extends AsyncTask<Void, Void, String> {
                     }
 
                     // Send via Web
-                    ExportClient client = new ExportClient(mExpContext.getContext());
+                    DataClient client = new DataClient(mExpContext.getContext());
                     try {
 
-                        boolean result = client.exportCollectedWaypoints(mExpContext);
+//                        boolean result = client.exportWaypoints();
 
-                        // If no successful - be sure to reset flags
-                        if (!result) {
-                            throw new UnExpectedResultException("An unexpected result occured while exporting data");
+//                         If no successful - be sure to reset flags
+                        if (!true) {
+                            throw new UnExpectedResultException("An unexpected result occurred while exporting data");
                         }
 
                     } catch (UnExpectedResultException e) {

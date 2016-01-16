@@ -18,9 +18,9 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     private int _id;
     private int _trackId;
     private int _isExported;
-    private int _nrOfSattelites;
+    private int _nrOfSatellites;
     private int _vehicleId;
-    private int _unixtimestampCaptured;
+    private long _unixtimestampCaptured;
     private float _accuracy;
     private float _speed;
     private String _provider;
@@ -46,12 +46,12 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         _id = id;
     }
 
-    public int getNrOfSattelites() {
-        return _nrOfSattelites;
+    public int getNrOfSatellites() {
+        return _nrOfSatellites;
     }
 
-    public void setNrOfSattelites(int nrOfSattelites) {
-        _nrOfSattelites = nrOfSattelites;
+    public void setNrOfSatellites(int nrOfSatellites) {
+        _nrOfSatellites = nrOfSatellites;
     }
 
     public float getAccuracy() {
@@ -103,11 +103,12 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
     }
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
+            json.put("id", getId());
             json.put("accuracy", getAccuracy());
-            json.put("nrOfSattelites", getNrOfSattelites());
+            json.put("nrOfSatellites", getNrOfSatellites());
             json.put("timestampCaptured", getUnixtimestampCaptured());
             json.put("speed", getSpeed());
             json.put("provider", getProvider());
@@ -119,19 +120,16 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
             if (getVehicle() != null) {
                 json.put("vehicle", getVehicle().toJSON());
             } else {
-                json.put("vehicleid", getVehicleId());
+                json.put("vehicleId", getVehicleId());
             }
 
-            if (getTrack() != null) {
-                json.put("track", getTrack().toJSON());
-            } else {
-                json.put("trackid", getTrackId());
-            }
+            // Ensure the domain object is set! Otherwise we won't get the external ID of it
+            json.put("track", getTrack().toJSON());
 
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
     }
 
     public double getLng() {
@@ -186,11 +184,11 @@ public class Waypoint extends DomainBase implements IJSONable, Serializable, IEx
         _track = track;
     }
 
-    public int getUnixtimestampCaptured() {
+    public long getUnixtimestampCaptured() {
         return _unixtimestampCaptured;
     }
 
-    public void setUnixtimestampCaptured(int unixtimestampCaptured) {
+    public void setUnixtimestampCaptured(long unixtimestampCaptured) {
         _unixtimestampCaptured = unixtimestampCaptured;
     }
 

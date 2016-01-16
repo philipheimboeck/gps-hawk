@@ -57,7 +57,7 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
 
 
     @Override
-    public String toJSON() {
+    public JSONObject toJSON() {
         JSONObject json = new JSONObject();
         try {
             json.put("x", _x);
@@ -69,6 +69,6 @@ public class MotionValues extends DomainBase implements IExportable, IJSONable {
         } catch (JSONException e) {
             Log.e(Constants.PREFERENCES, "Could not create json-object completely", e);
         }
-        return json.toString();
+        return json;
     }
 }

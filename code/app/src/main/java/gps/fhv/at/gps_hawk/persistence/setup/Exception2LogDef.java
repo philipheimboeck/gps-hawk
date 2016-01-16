@@ -31,6 +31,12 @@ public class Exception2LogDef extends BaseTableDef {
 
     @Override
     public String getUpdateScript(int oldVersion) {
-        return null;
+        StringBuilder sb = new StringBuilder();
+
+        if (oldVersion <= 17) {
+            sb.append("DELETE FROM " + TABLE_NAME + ";");
+        }
+
+        return sb.toString();
     }
 }

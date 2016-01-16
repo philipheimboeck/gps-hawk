@@ -29,13 +29,12 @@
     <string name="amount_of_captured_waypoints">Amount of captured waypoints</string>
     <string name="error_permission_location_required">Location permission is required for this application to work</string>
     <string name="txt_export_url">Export-URL:</string>
-    <string name="txt_export_url_default">http://intern.ts-maeder.at/application/debug/gps</string>
     <string name="navigation_settings">Settings</string>
     <string name="notification_tracking_title">GPS Hawk Tracking</string>
     <string name="notification_tracking_text">GPS Hawk is tracking your location</string>
     <string name="number_of_waypoints">Tracked Points: %1$d</string>
     <string name="amount_of_exceptions">Amount of captured log-messages</string>
-    <string name="error_export_failed">An error occured while exporting data - Be sure to have permissions and internet connectivity</string>
+    <string name="error_export_failed">An error occurred while exporting data - Be sure to have permissions and internet connectivity</string>
     <string name="amount_of_motions">Amount of captured motions</string>
     <string name="update_available">There is an update available. Do you want to install it?</string>
     <string name="update_available_title">Update available</string>
@@ -51,4 +50,7 @@
     <string name="txt_valid_track_yes">Yes</string>
     <string name="txt_valid_track_no">no</string>
     <string name="amount_of_tracks">Amount of tracks</string>
+    <string name="pref_allow_tracking">Mobile Mode</string>
+    <string name="error_no_tracks">Sadly you cannot track now as you don\'t have any reserved tracks left. Please start the app when having WLAN or enable tracking without WLAN in the settings.</string>
+    <string name="toast_export">Export started…</string>
 </resources>

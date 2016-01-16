@@ -3,6 +3,8 @@ package gps.fhv.at.gps_hawk;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Environment;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.File;
@@ -13,6 +15,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import gps.fhv.at.gps_hawk.broadcast.TokenInvalidReceiver;
 import gps.fhv.at.gps_hawk.domain.Exception2Log;
 import gps.fhv.at.gps_hawk.helper.ServiceDetectionHelper;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
@@ -49,7 +52,7 @@ public class GpsHawkApplication extends Application {
         dbSetup();
 
         // Be sure to set application context globally (singleton)
-        DbFacade db = DbFacade.getInstance(getApplicationContext());
+        DbFacade.getInstance(getApplicationContext());
 
         // if you need to delete all data in table, use this once
 //        db.emptyTable(Exception2LogDef.TABLE_NAME);
@@ -61,6 +64,10 @@ public class GpsHawkApplication extends Application {
         Intent intent = new Intent(this, AppService.class);
         this.startService(intent);
         ServiceDetectionHelper.isServiceRunning(getApplicationContext(), AppService.class);
+
+        // Register broadcast receiver
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(new TokenInvalidReceiver(), new IntentFilter(Constants.BROADCAST_INVALID_TOKEN));
 
         Log.i(Constants.PREFERENCES, "Started application");
 

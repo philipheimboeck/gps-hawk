@@ -9,7 +9,10 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 import gps.fhv.at.gps_hawk.Constants;
-import gps.fhv.at.gps_hawk.helper.ExportStartHelper;
+import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
+import gps.fhv.at.gps_hawk.tasks.UploadMotionValuesTask;
+import gps.fhv.at.gps_hawk.tasks.UploadTracksTask;
+import gps.fhv.at.gps_hawk.tasks.UploadWaypointsTask;
 import gps.fhv.at.gps_hawk.workers.IExportWorker;
 
 /**
@@ -20,24 +23,22 @@ import gps.fhv.at.gps_hawk.workers.IExportWorker;
 public class ExportNetworkReceiver extends BroadcastReceiver implements IExportWorker {
 
     private Context mContext;
-    private ExportStartHelper mExportStartHelper;
-
-    public ExportNetworkReceiver() {
-
-    }
 
     public ExportNetworkReceiver(Context context) {
         mContext = context;
 
         // Try to export on each startup
         // Only export if WiFi is connected
-        ConnectivityManager connManager = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         if (mWifi != null && mWifi.isConnected()) {
             startExport();
         }
 
+    }
+
+    public ExportNetworkReceiver() {
     }
 
     @Override
@@ -71,10 +72,10 @@ public class ExportNetworkReceiver extends BroadcastReceiver implements IExportW
      * export (ExportStartHelper remembers last export)
      */
     private synchronized void startExport() {
-
-        mExportStartHelper = new ExportStartHelper(mContext, null);
-        mExportStartHelper.startExport(-1);
-
+        new UploadTracksTask(mContext).execute();
+        new UploadWaypointsTask(mContext).execute();
+        new UploadMotionValuesTask(mContext).execute();
+        new UploadLogTask(mContext).execute();
     }
 
 }

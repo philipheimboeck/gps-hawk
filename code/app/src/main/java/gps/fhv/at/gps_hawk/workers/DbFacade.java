@@ -27,6 +27,7 @@ import gps.fhv.at.gps_hawk.persistence.broker.MotionValuesBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.TrackBroker;
 import gps.fhv.at.gps_hawk.persistence.broker.WaypointBroker;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
+import gps.fhv.at.gps_hawk.persistence.setup.TrackDef;
 
 /**
  * Created by Tobias on 25.10.2015.
@@ -153,21 +154,29 @@ public class DbFacade {
     /**
      * ## From here - start type-sepcific SELECT-queries ##
      */
-    public List<IExportable> getAllEntities2Export(Type t, int limit, String where) {
+    public <T extends DomainBase & IExportable> List<T> getAllEntities2Export(Class<T> t, int limit, String where) {
 
-        List<IExportable> listRet = new ArrayList<>();
+        List<T> listRet = new ArrayList<>();
         Cursor c = null;
         try {
 
             BrokerBase broker = mBrokerMap.get(t);
 
             // How you want the results sorted in the resulting Cursor
-            String sortOrder = BaseTableDef._ID + " ASC LIMIT " + limit;
+            String sortOrder = BaseTableDef._ID + " ASC" + (limit > 0 ? " LIMIT " + limit : "");
+
+            String selection = "(" + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2" + (where != null ? " AND " + where : "") + ")";
+
+            // Add type specific where
+            String customWhere = broker.getExportableWhere();
+            if(customWhere != null) {
+                selection += " AND ( " + customWhere + " )";
+            }
 
             c = getDb().query(
                     broker.getTblName(),  // The table to query
                     null,                               // The columns to return - simply all
-                    BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = 2" + (where != null ? " AND " + where : ""),                                // The columns for the WHERE clause
+                    selection,                                // The columns for the WHERE clause
                     null,                              // The values for the WHERE clause
                     null,                                     // don't group the rows
                     null,                                     // don't filter by row groups
@@ -180,8 +189,8 @@ public class DbFacade {
 
             int i = 0;
             while (i < c.getCount()) {
-
-                listRet.add((IExportable) broker.map2domain(c));
+                T entity = broker.map2domain(c);
+                listRet.add(entity);
                 c.moveToNext();
                 ++i;
 
@@ -197,7 +206,7 @@ public class DbFacade {
     }
 
     /**
-     * Masks Waypoints, that hasn't yet been exported, with `isExportet=updValIsExport`
+     * Masks Data, that hasn't yet been exported, with `isExportet=updValIsExport`
      *
      * @return
      */
@@ -211,11 +220,19 @@ public class DbFacade {
         values.put(BaseTableDef.COLUMN_NAME_IS_EXPORTED, updValIsExport);
 
         // Which row to update, based on the ID
-        String selection = BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
+        String selection = "(" + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " = ?";
 
         // If unexported are desired, include those that are NULL
         if (whereIsExport == 0)
             selection += " OR " + BaseTableDef.COLUMN_NAME_IS_EXPORTED + " IS NULL ";
+
+        selection += ")";
+
+        // Add type-specific where
+        String customWhere = broker.getExportableWhere();
+        if(customWhere != null) {
+            selection += " AND ( " + customWhere + " )";
+        }
 
         String[] selectionArgs = {String.valueOf(whereIsExport)};
 
@@ -237,7 +254,7 @@ public class DbFacade {
      * @param t            specific type of IExportable
      * @return -1 in case of error, 0 in case of success
      */
-    public int markExportableList(List<DomainBase> list, int updValExport, Type t) {
+    public <T extends DomainBase> int markExportableList(List<T> list, int updValExport, Type t) {
 
         if (list.size() <= 0) return -1;
 
@@ -304,6 +321,52 @@ public class DbFacade {
         return domain;
     }
 
+    public <T extends DomainBase> List<T> select(ArrayList<Integer> ids, Class<T> cl) {
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        String where = BaseTableDef._ID + " IN (%ids)";
+        StringBuilder builder = new StringBuilder();
+        for(int i = 0; i < ids.size(); i++) {
+            builder.append(String.valueOf(ids.get(i)));
+
+            if (i < ids.size() - 1) {
+                builder.append(",");
+            }
+        }
+        where = where.replace("%ids", builder.toString());
+
+        ArrayList<T> list = new ArrayList<>();
+        Cursor c = null;
+        try {
+            c = getDb().query(
+                    broker.getTblName(), // Table to query
+                    null,
+                    where,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            c.moveToFirst();
+
+
+            for (int i = 0; i < c.getCount(); i++) {
+                T domain = broker.map2domain(c);
+                list.add(domain);
+
+                c.moveToNext();
+            }
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return list;
+    }
+
     public <T extends DomainBase> List<T> selectWhere(String condition, Class<T> cl) {
         BrokerBase broker = mBrokerMap.get(cl);
 
@@ -337,6 +400,40 @@ public class DbFacade {
         }
 
         return list;
+    }
+
+    public <T extends DomainBase> T selectOneWhere(String condition, Class<T> cl) {
+        BrokerBase broker = mBrokerMap.get(cl);
+
+        T domain;
+        Cursor c = null;
+        try {
+            c = getDb().query(
+                    broker.getTblName(), // Table to query
+                    null,
+                    condition,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            c.moveToFirst();
+
+            if(c.getCount() > 0) {
+                domain = broker.map2domain(c);
+            } else {
+                domain = null;
+            }
+
+        } finally {
+            if (c != null) {
+                c.close();
+            }
+        }
+
+        return domain;
     }
 
     public int getCount(String tbl, String where) {
@@ -398,6 +495,18 @@ public class DbFacade {
                 selection,
                 selectionArgs);
 
+        return count;
+    }
+
+    public Track findReservedTrack() {
+        return DbFacade.getInstance().selectOneWhere(TrackDef.COLUMN_NAME_EXTERNAL_ID + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " = 0", Track.class);
+    }
+
+    public int countReservedTracks() {
+        int count = DbFacade.getInstance().getCount(TrackDef.TABLE_NAME, TrackDef.COLUMN_NAME_EXTERNAL_ID + " IS NOT NULL AND " + TrackDef.COLUMN_NAME_DATETIME_START + " = 0");
+        if (count < 0) {
+            return 0;
+        }
         return count;
     }
 
