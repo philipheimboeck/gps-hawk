@@ -130,8 +130,9 @@ public class ExportFragment extends Fragment implements IUpdateableView {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                             REQUEST_WRITE_STORAGE);
+                } else {
+                    exportDatabase();
                 }
-                new ExportDatabaseTask().execute();
             }
         });
 
@@ -237,11 +238,39 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         switch (requestCode) {
             case REQUEST_WRITE_STORAGE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    new ExportDatabaseTask().execute();
+                    exportDatabase();
                 } else {
                     Toast.makeText(getActivity(), "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
                 }
             }
         }
+    }
+
+    private void exportDatabase() {
+        new ExportDatabaseTask(new IAsyncTaskCaller<Void, Boolean>() {
+            @Override
+            public void onPostExecute(Boolean success) {
+                if(success) {
+                    Toast.makeText(getContext(), R.string.database_exported, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), R.string.database_not_exported, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled() {
+
+            }
+
+            @Override
+            public void onProgressUpdate(Void... progress) {
+
+            }
+
+            @Override
+            public void onPreExecute() {
+
+            }
+        }).execute();
     }
 }

@@ -54,4 +54,6 @@
     <string name="error_no_tracks">Sadly you cannot track now as you don\'t have any reserved tracks left. Please start the app when having WLAN or enable tracking without WLAN in the settings.</string>
     <string name="toast_export">Export started…</string>
     <string name="export_database">Export database to Storage</string>
+    <string name="database_not_exported">Database could not be exported</string>
+    <string name="database_exported">Database exported to external storage</string>
 </resources>
