@@ -677,13 +677,20 @@ public class CaptureActivity extends AppCompatActivity {
      * Checks for an update
      */
     private void checkForUpdate() {
+        Log.i(Constants.PREFERENCES, "Checking for update");
 
         // Start update task
         final Context context = this;
-        CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, Uri>() {
+        CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, CheckUpdateTask.UpdateTaskResult>() {
             @Override
-            public void onPostExecute(final Uri updateUrl) {
-                if (updateUrl != null) {
+            public void onPostExecute(final CheckUpdateTask.UpdateTaskResult result) {
+                if(result == null) {
+                    // Error
+                    Toast.makeText(context, R.string.error_update, Toast.LENGTH_LONG);
+                    return;
+                }
+
+                if (result.updateAvailable) {
                     // New update
                     android.support.v7.app.AlertDialog.Builder dialogBuilder = new android.support.v7.app.AlertDialog.Builder(context);
                     dialogBuilder.setMessage(R.string.update_available)
@@ -693,10 +700,10 @@ public class CaptureActivity extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
 
                                     if (checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                                        downloadUpdate(updateUrl);
+                                        downloadUpdate(result.updateLink);
                                     } else if (Build.VERSION.SDK_INT >= 23) {
                                         // Temporary save the download url
-                                        mDownloadUri = updateUrl;
+                                        mDownloadUri = result.updateLink;
                                         requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, Constants.REQUEST_CODE_PERMISSION_STORAGE);
                                     }
                                 }

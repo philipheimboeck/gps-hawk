@@ -56,4 +56,5 @@
     <string name="export_database">Export database to Storage</string>
     <string name="database_not_exported">Database could not be exported</string>
     <string name="database_exported">Database exported to external storage</string>
+    <string name="error_update">Failed to check for updates</string>
 </resources>
