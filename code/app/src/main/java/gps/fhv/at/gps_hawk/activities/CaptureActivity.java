@@ -677,8 +677,6 @@ public class CaptureActivity extends AppCompatActivity {
      * Checks for an update
      */
     private void checkForUpdate() {
-        Log.i(Constants.PREFERENCES, "Checking for update");
-
         // Start update task
         final Context context = this;
         CheckUpdateTask updateTask = new CheckUpdateTask(this, new IAsyncTaskCaller<Void, CheckUpdateTask.UpdateTaskResult>() {

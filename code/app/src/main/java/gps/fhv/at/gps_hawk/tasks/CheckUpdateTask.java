@@ -35,10 +35,15 @@ public class CheckUpdateTask extends AsyncTask<Void, Void, CheckUpdateTask.Updat
             packageInfo = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
             String version = packageInfo.versionName;
 
+            Log.i(Constants.PREFERENCES, "Checking for update; current version is " + version);
+
             String url = appClient.getUpdateLink(version);
             if (url != null) {
+                Log.i(Constants.PREFERENCES, "Update found: " + url);
                 return new UpdateTaskResult(Uri.parse(url));
             }
+
+            Log.i(Constants.PREFERENCES, "No update available");
             return new UpdateTaskResult(false);
 
         } catch (PackageManager.NameNotFoundException e) {
