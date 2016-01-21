@@ -5,11 +5,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.helper.FileUtils;
 import gps.fhv.at.gps_hawk.persistence.setup.BaseTableDef;
 import gps.fhv.at.gps_hawk.persistence.setup.Exception2LogDef;
 import gps.fhv.at.gps_hawk.persistence.setup.MotionValuesDef;
@@ -25,6 +30,7 @@ public class DbSetup extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 18;
     public static final String DATABASE_NAME = "GpwHawk.db";
+    public static final String DB_FILEPATH = "/data/data/gps.fhv.at.gps_hawk/databases/" + DATABASE_NAME;
 
     public DbSetup(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,6 +86,23 @@ public class DbSetup extends SQLiteOpenHelper {
         } catch (Exception e) {
             Log.e(Constants.PREFERENCES, "Error onDowngrade()", e);
         }
+    }
+
+
+    /**
+     * Exports the database to a file
+     *
+     * @param exportPath The path where to save the database to
+     * @return true if exported and false if not
+     * @throws IOException
+     */
+    public static boolean exportDatabase(String exportPath) throws IOException {
+        File database = new File(DB_FILEPATH);
+        if (database.exists()) {
+            FileUtils.copyFile(new FileInputStream(database), new FileOutputStream(exportPath));
+            return true;
+        }
+        return false;
     }
 
 }

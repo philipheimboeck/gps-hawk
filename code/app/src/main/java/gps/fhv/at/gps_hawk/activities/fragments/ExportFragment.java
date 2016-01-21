@@ -1,10 +1,14 @@
 package gps.fhv.at.gps_hawk.activities.fragments;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,7 @@ import android.widget.Toast;
 
 import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.helper.IUpdateableView;
+import gps.fhv.at.gps_hawk.tasks.ExportDatabaseTask;
 import gps.fhv.at.gps_hawk.tasks.ExportMetadataLoaderTask;
 import gps.fhv.at.gps_hawk.tasks.IAsyncTaskCaller;
 import gps.fhv.at.gps_hawk.tasks.UploadLogTask;
@@ -28,6 +33,7 @@ import gps.fhv.at.gps_hawk.workers.DbFacade;
  */
 public class ExportFragment extends Fragment implements IUpdateableView {
 
+    private static final int REQUEST_WRITE_STORAGE = 129;
     private Button mButStartExport;
     private Button mButStartExportExc;
     private Button mButStartExportMotions;
@@ -63,6 +69,7 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         mButStartExportExc = (Button) view.findViewById(R.id.button_do_exception_export);
         mButStartExportMotions = (Button) view.findViewById(R.id.button_do_motion_export);
         mButStartExportTracks = (Button) view.findViewById(R.id.button_do_track_export);
+        Button butExportDB = (Button) view.findViewById(R.id.button_export_db);
 
         final IAsyncTaskCaller<Void, Void> caller = new IAsyncTaskCaller<Void, Void>() {
             @Override
@@ -112,6 +119,19 @@ public class ExportFragment extends Fragment implements IUpdateableView {
             public void onClick(View v) {
                 Toast.makeText(getContext(), R.string.toast_export, Toast.LENGTH_SHORT).show();
                 new UploadTracksTask(caller, getContext()).execute();
+            }
+        });
+        butExportDB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean hasPermission = (ContextCompat.checkSelfPermission(getContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
+                if (!hasPermission) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_WRITE_STORAGE);
+                }
+                new ExportDatabaseTask().execute();
             }
         });
 
@@ -211,4 +231,17 @@ public class ExportFragment extends Fragment implements IUpdateableView {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    new ExportDatabaseTask().execute();
+                } else {
+                    Toast.makeText(getActivity(), "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+    }
 }
