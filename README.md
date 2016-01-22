@@ -14,11 +14,11 @@ All data will be automatically exported to the server.
 #### Modes
 All data can be exported to the server in two modes.
 
-##### Exporting continously
-In this mode all captured data will be automatically send to the server. This is an ongoing process that requires more mobile traffic than the other mode.
+##### Exporting online
+In this mode all captured data will be automatically send to the server after finishing the track.
 You can enable this mode in the settings.
 
-##### Exporting in junks
+##### Exporting with WiFi only
 In this mode all data will just be captured incremently without exporting them directly. As soon as you'll have a WLAN connection it will automatically upload all captured data in junks.
 You can always upload all data manually in the export activity.
 
