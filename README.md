@@ -1,12 +1,15 @@
 # GPS Hawk
 
 GPS Hawk is a GPS Tracking App for Android. It is part of a project of the University of Applied Sciences Vorarlberg. 
-Please check out [FHVGIS](https://github.com/Lucasvo1/FHVGIS) for the server part.
+Please check out [FHVGIS][1] for the server part.
+
+GPS Hawk will track GPS and motion data and saves them in a local database. These data will then be exported to a server from where they will be further processed via a machine learning algorithm. The purpose of this is that the algorithm then can tell what vehicle a user was using when moving.
 
 ## Documentation
+For a more advanced documentation please see the [App Documentation][2] in the Wiki of the [FHVGIS][1] project.
 
-### Server Communication
-Check out the [Webservice of FHVGIS](https://github.com/Lucasvo1/FHVGIS/tree/master/fhvgis/webservice/src/main/java/at/fhv/itm14/fhvgis/webservice/app) for the interfaces.
+### REST Documentation
+Check out the [API Documentation][3] for the interfaces.
 
 ### Exporting the data
 All data will be automatically exported to the server.
@@ -28,3 +31,7 @@ Because you might don't have mobile data enabled, the tracks will be pregenerate
 The app will automatically ask for new tracks when it has an internet connection and the number of reserved tracks falls below a predefined threshold.
 
 When you completely run out of tracks the app will try to reserve new tracks. If this fails the tracking cannot be started and an error message will be displayed.
+
+[1]: https://github.com/Lucasvo1/FHVGIS
+[2]: https://github.com/Lucasvo1/FHVGIS/wiki/App
+[3]: https://github.com/Lucasvo1/FHVGIS/wiki/App---API
