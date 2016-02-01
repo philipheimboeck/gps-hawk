@@ -25,9 +25,18 @@ import gps.fhv.at.gps_hawk.exceptions.RegistrationException;
 public class LoginRestClient extends RestClient implements ILoginClient {
 
     public static final String REST_USER = "app/users/";
-    private static final String REST_USER_EXISTS = REST_SERVER + REST_USER + "exists/$USER";
-    private static final String REST_USER_REGISTER = REST_SERVER + REST_USER + "register";
-    private static final String REST_USER_LOGIN = REST_SERVER + REST_USER + "login/$DEVICE";
+
+    private String getRestUserExists() {
+        return getRestServer() + REST_USER + "exists/$USER";
+    }
+
+    private String getRestUserRegister() {
+        return getRestServer() + REST_USER + "register";
+    }
+
+    private String getRestUserLogin() {
+        return getRestServer() + REST_USER + "login/$DEVICE";
+    }
 
     public LoginRestClient(Context context) {
         super(context);
@@ -36,13 +45,13 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     @Override
     public boolean userExists(String username) {
         try {
-            String urlString = REST_USER_EXISTS.replace("$USER", URLEncoder.encode(username, "UTF-8"));
+            String urlString = getRestUserExists().replace("$USER", URLEncoder.encode(username, "UTF-8"));
             URL url = new URL(urlString);
             HTTPAnswer answer = get(url);
-            if(answer.responseCode == 200) {
+            if (answer.responseCode == 200) {
                 return true;
             }
-            if(answer.responseCode == 404) {
+            if (answer.responseCode == 404) {
                 return false;
             }
 
@@ -60,7 +69,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     @Override
     public String register(String username, String password, String deviceID) throws RegistrationException {
         try {
-            String urlString = REST_USER_REGISTER;
+            String urlString = getRestUserRegister();
             URL url = new URL(urlString);
 
             HashMap<String, String> params = new HashMap<>();
@@ -88,7 +97,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
     @Override
     public String login(String username, String password, String deviceID) throws LoginException {
         try {
-            String urlString = REST_USER_LOGIN.replace("$DEVICE", URLEncoder.encode(deviceID, "UTF-8"));
+            String urlString = getRestUserLogin().replace("$DEVICE", URLEncoder.encode(deviceID, "UTF-8"));
 
             URL url = new URL(urlString);
 
@@ -102,7 +111,7 @@ public class LoginRestClient extends RestClient implements ILoginClient {
             }
 
             JSONObject object = new JSONObject(answer.content);
-            if(!object.has("token") ) {
+            if (!object.has("token")) {
                 throw new LoginException("Login failed due to missing token!");
             }
 

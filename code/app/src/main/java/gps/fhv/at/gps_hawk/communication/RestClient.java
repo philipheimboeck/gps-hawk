@@ -2,10 +2,13 @@ package gps.fhv.at.gps_hawk.communication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import gps.fhv.at.gps_hawk.Constants;
+import gps.fhv.at.gps_hawk.R;
 import gps.fhv.at.gps_hawk.domain.IJSONable;
 import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
 import gps.fhv.at.gps_hawk.helper.TokenHelper;
@@ -35,8 +39,12 @@ import gps.fhv.at.gps_hawk.helper.TokenHelper;
  */
 public class RestClient {
 
-    protected static final String REST_SERVER = "http://46.101.192.214:8080/webservice/fhvgis/";
-//    protected static final String REST_SERVER = "http://192.168.0.3:8080/webservice/fhvgis/";
+    protected String getRestServer() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String url = prefs.getString(Constants.PREF_REST_SERVER, mContext.getResources().getString(R.string.txt_rest_server_default));
+        return url;
+
+    }
 
     protected Context mContext;
 

@@ -57,4 +57,6 @@
     <string name="database_not_exported">Database could not be exported</string>
     <string name="database_exported">Database exported to external storage</string>
     <string name="error_update">Failed to check for updates</string>
+    <string name="txt_rest_server">Server-URL</string>
+    <string name="txt_rest_server_default">http://46.101.192.214:8080/webservice/fhvgis/</string>
 </resources>

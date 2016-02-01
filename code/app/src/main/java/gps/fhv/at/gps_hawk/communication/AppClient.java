@@ -25,7 +25,10 @@ import gps.fhv.at.gps_hawk.helper.TokenHelper;
 public class AppClient extends RestClient implements IAppClient {
 
     public static final String REST_APP = "app/";
-    private static final String REST_VERSION = REST_SERVER + REST_APP + "version";
+
+    private String getRestVersion() {
+        return getRestServer() + REST_APP + "version";
+    }
 
     public AppClient(Context context) {
         super(context);
@@ -34,7 +37,7 @@ public class AppClient extends RestClient implements IAppClient {
     @Override
     public String getUpdateLink(String currentVersion) throws CommunicationException {
         try {
-            String urlString = REST_VERSION;
+            String urlString = getRestVersion();
             URL url = new URL(urlString);
 
             HashMap<String, String> headers = new HashMap<>();
@@ -62,7 +65,7 @@ public class AppClient extends RestClient implements IAppClient {
             for (int i = 0; i < versions.length(); i++) {
                 JSONObject v = versions.getJSONObject(i);
                 if (v.getString("version").equals(newVersion)) {
-                    return REST_SERVER + v.getString("url");
+                    return getRestServer() + v.getString("url");
                 }
             }
 

@@ -22,7 +22,7 @@ In this mode all captured data will be automatically send to the server after fi
 You can enable this mode in the settings.
 
 ##### Exporting with WiFi only
-In this mode all data will just be captured incremently without exporting them directly. As soon as you'll have a WLAN connection it will automatically upload all captured data in junks.
+In this mode all data will just be captured incrementally without exporting them directly. As soon as you'll have a WLAN connection it will automatically upload all captured data in junks.
 You can always upload all data manually in the export activity.
 
 ### Reserved Tracks

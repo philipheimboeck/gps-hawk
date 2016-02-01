@@ -29,16 +29,41 @@ import gps.fhv.at.gps_hawk.exceptions.NoConnectionException;
  */
 public class DataClient extends RestClient implements IDataClient {
 
-    private static final String REST_DATA = REST_SERVER + "app/data/";
-    private static final String REST_RESERVE_TRACKS = REST_DATA + "reservetracks";
-    private static final String REST_START_NEW_TRACK = REST_DATA + "starttrack/$TIME";
-    private static final String REST_START_TRACK = REST_START_NEW_TRACK + "?track=$TRACK";
-    private static final String REST_FINISH_TRACK = REST_DATA + "finishtrack/$TIME/$TRACK";
-    private static final String REST_EXPORT_TRACKS = REST_DATA + "updatetracks";
-    private static final String REST_EXPORT_WAYPOINTS = REST_DATA + "waypoints";
-    private static final String REST_EXPORT_MOTIONVALUES = REST_DATA + "motionValues";
-    private static final String REST_EXPORT_LOGS = REST_SERVER + "app/log";
+    private String getRestData() {
+        return getRestServer() + "app/data/";
+    }
 
+    private String getRestReserveTracks() {
+        return getRestData() + "reservetracks";
+    }
+
+    private String getRestStartNewTrack() {
+        return getRestData() + "starttrack/$TIME";
+    }
+
+    private String getRestStartTrack() {
+        return getRestStartNewTrack() + "?track=$TRACK";
+    }
+
+    private String getRestFinishTrack() {
+        return getRestData() + "finishtrack/$TIME/$TRACK";
+    }
+
+    private String getRestExportTracks() {
+        return getRestData() + "updatetracks";
+    }
+
+    private String getRestExportWaypoints() {
+        return getRestData()+ "waypoints";
+    }
+
+    private String getRestExportMotionvalues() {
+        return  getRestData() + "motionValues";
+    }
+
+    private String getRestExportLogs() {
+        return getRestServer() + "app/log";
+    }
 
     public DataClient(Context context) {
         super(context);
@@ -48,7 +73,7 @@ public class DataClient extends RestClient implements IDataClient {
     public List<Track> reserveTracks() throws CommunicationException {
 
         try {
-            URL url = new URL(REST_RESERVE_TRACKS);
+            URL url = new URL(getRestReserveTracks());
             HashMap<String, String> headers = getAuthorizationHeaders();
 
             // Get the tracks
@@ -85,7 +110,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public Track startTrack(Calendar calendar) throws CommunicationException {
         try {
-            URL url = new URL(REST_START_NEW_TRACK.replace("$TIME", String.valueOf(calendar.getTimeInMillis())));
+            URL url = new URL(getRestStartNewTrack().replace("$TIME", String.valueOf(calendar.getTimeInMillis())));
             HashMap<String, String> headers = getAuthorizationHeaders();
 
             // Get the tracks
@@ -116,7 +141,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public Track startTrack(Calendar calendar, Track track) throws CommunicationException {
         try {
-            URL url = new URL(REST_START_TRACK
+            URL url = new URL(getRestStartTrack()
                     .replace("$TIME", String.valueOf(calendar.getTimeInMillis()))
                     .replace("$TRACK", track.getExternalId()));
             HashMap<String, String> headers = getAuthorizationHeaders();
@@ -147,7 +172,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public Track finishTrack(Calendar calendar, Track track) throws CommunicationException {
         try {
-            URL url = new URL(REST_FINISH_TRACK
+            URL url = new URL(getRestFinishTrack()
                     .replace("$TIME", String.valueOf(calendar.getTimeInMillis()))
                     .replace("$TRACK", track.getExternalId()));
             HashMap<String, String> headers = getAuthorizationHeaders();
@@ -178,7 +203,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public void exportTracks(List<Track> tracks) throws CommunicationException {
         try {
-            URL url = new URL(REST_EXPORT_TRACKS);
+            URL url = new URL(getRestExportTracks());
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
 
@@ -202,7 +227,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public void exportWaypoints(List<Waypoint> waypoints) throws CommunicationException {
         try {
-            URL url = new URL(REST_EXPORT_WAYPOINTS);
+            URL url = new URL(getRestExportWaypoints());
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
 
@@ -226,7 +251,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public void exportMotionValues(List<MotionValues> values) throws CommunicationException {
         try {
-            URL url = new URL(REST_EXPORT_MOTIONVALUES);
+            URL url = new URL(getRestExportMotionvalues());
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
             content.put("motionValues", new JSONObject().put("motionValues", getJsonArray(values)).toString());
@@ -249,7 +274,7 @@ public class DataClient extends RestClient implements IDataClient {
     @Override
     public void exportLogs(List<Exception2Log> logs) throws CommunicationException {
         try {
-            URL url = new URL(REST_EXPORT_LOGS);
+            URL url = new URL(getRestExportLogs());
             HashMap<String, String> headers = getAuthorizationHeaders();
             HashMap<String, String> content = new HashMap<>();
             content.put("logs", new JSONObject().put("logs", getJsonArray(logs)).toString());
